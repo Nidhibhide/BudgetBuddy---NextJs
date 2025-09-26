@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ConnectionObject } from '../../types';
+import { ConnectionObject } from '@/app/types/appTypes';
 
 // Initialize connection object
 const connection: ConnectionObject = {};

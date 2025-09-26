@@ -1,5 +1,5 @@
 // utils/JsonOne.ts
-import { ApiResponse } from "@/app/types";
+import { ApiResponse } from "@/app/types/appTypes";
 
 export function JsonOne(
   statusCode: number,

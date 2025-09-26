@@ -34,6 +34,7 @@ export interface InputBoxProps {
   label: string;
   name: string;
   type?: string;
+  icon?: React.ReactNode;
 }
 
 export interface ButtonProps {
@@ -58,6 +59,13 @@ export interface TooltipProps {
   children: React.ReactNode;
 }
 
+export interface GetStartedLinkProps {
+  href: string;
+  children: React.ReactNode;
+}
+
 export type ConnectionObject = {
   isConnected?: number;
 };
+
+

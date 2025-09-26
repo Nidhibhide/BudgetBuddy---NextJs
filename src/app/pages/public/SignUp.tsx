@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { Formik } from "formik";
@@ -6,13 +6,14 @@ import * as Yup from "yup";
 import { InputBox, showError, showSuccess, Button } from "../../components";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { registerUser } from "../../lib/user";
-import { RegisterUserData } from "@/app/types"
+import { registerUser } from "@/app/lib/auth";
+import { RegisterUserData } from "@/app/types/appTypes";
+import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
+
   // validation schema
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -29,9 +30,12 @@ const SignUp = () => {
       .max(10, "Password must not exceed 10 characters")
       .required("Password is required"),
   });
-  
+
   // handle sign up
-  const handleSignUp = async (values: RegisterUserData , { resetForm }: { resetForm: () => void }) => {
+  const handleSignUp = async (
+    values: RegisterUserData,
+    { resetForm }: { resetForm: () => void }
+  ) => {
     try {
       if (loading) return;
       setLoading(true);
@@ -46,15 +50,16 @@ const SignUp = () => {
       }
       resetForm();
     } catch (err: unknown) {
-      showError(err instanceof Error ? err.message : 'An error occurred');
+      showError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
-    <div className="bg-[#ffffff] dark:bg-[#000000] text-[#0f172a] dark:text-[#f8fafc] h-full w-full flex justify-center">
-      <div className="w-[500px] h-fit md:bg-[#f1f5f9] md:dark:bg-[#1e293b] flex flex-col items-center py-6 px-12 md:mt-20">
+    <div className="bg-primary text-primary min-h-screen w-full flex justify-center items-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
         <Formik
           initialValues={{ name: "", email: "", password: "" }}
           validationSchema={validationSchema}
@@ -63,22 +68,23 @@ const SignUp = () => {
           {({ handleSubmit }) => (
             <>
               <div className="flex flex-col mb-12 gap-3 w-full">
-                <InputBox name="name" label="Enter your Name" type="text"/>
-                <InputBox name="email" label="Enter your Email" type="email" />
+                <InputBox name="name" label="Enter your Name" type="text" icon={<FaUser />} />
+                <InputBox name="email" label="Enter your Email" type="email" icon={<FaEnvelope />} />
                 <InputBox
                   name="password"
                   label="Enter your Password"
                   type="password"
+                  icon={<FaLock />}
                 />
               </div>
 
-              <Button onClick={handleSubmit} disabled={loading}>
+              <Button onClick={handleSubmit} disabled={loading} className="mt-4">
                 {loading ? "Loading..." : "Sign Up"}
               </Button>
-              <p className="md:text-base text-sm ">
-                Back to{" "}
-                <Link href="/" className="font-semibold  hover:underline">
-                  Home
+              <p className="md:text-base text-sm mt-4 text-center">
+                Already have an account?{" "}
+                <Link href="/signin" className="font-semibold text-primary hover:underline">
+                  Sign In
                 </Link>
               </p>
             </>

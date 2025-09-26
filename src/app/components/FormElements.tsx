@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import {
   Box,
   FormControl,
@@ -10,51 +11,51 @@ import {
   TextField,
 } from "@mui/material";
 import { useField } from "formik";
-import { SelectBoxProps, InputBoxProps, ButtonProps, MultiSelectProps, TooltipProps } from '../types';
+import { SelectBoxProps, InputBoxProps, ButtonProps, MultiSelectProps, TooltipProps, GetStartedLinkProps } from '@/app/types/appTypes';
 
 export const SelectBox: React.FC<SelectBoxProps> = ({ label, value, options, onChange }) => {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth size="small">
-        <InputLabel className="text-gray-700 dark:text-gray-300">
+        <InputLabel className="text-muted">
           {label}
         </InputLabel>
 
         <Select
-          value={value}
-          label={label}
-          onChange={onChange}
-          className="bg-white text-black dark:bg-gray-900 dark:text-white"
-          MenuProps={{
-            disablePortal: true,
-            PaperProps: {
-              className: "bg-white dark:bg-gray-800 text-black dark:text-white",
-              style: {
-                maxHeight: 48 * 4.5,
-              },
-            },
-          }}
-        >
-          {options.map((option) => (
-            <MenuItem
-              key={option}
-              value={option}
-              className="text-black dark:text-white dark:hover:bg-gray-700"
-            >
-              {option}
-            </MenuItem>
-          ))}
+           value={value}
+           label={label}
+           onChange={onChange}
+           className="bg-primary text-primary"
+           MenuProps={{
+             disablePortal: true,
+             PaperProps: {
+               className: "bg-primary text-primary",
+               style: {
+                 maxHeight: 48 * 4.5,
+               },
+             },
+           }}
+         >
+           {options.map((option) => (
+             <MenuItem
+               key={option}
+               value={option}
+               className="text-primary hover:bg-secondary"
+             >
+               {option}
+             </MenuItem>
+           ))}
         </Select>
       </FormControl>
     </Box>
   );
 };
 
-export const InputBox: React.FC<InputBoxProps> = ({ label, name, type = "text" }) => {
+export const InputBox: React.FC<InputBoxProps> = ({ label, name, type = "text", icon }) => {
   const [field, meta] = useField(name);
 
   return (
-    <div className="w-full p-2 rounded  text-black dark:bg-gray-900 dark:text-white">
+    <div className="w-full p-2 rounded text-primary">
       <TextField
         {...field}
         type={type}
@@ -64,10 +65,15 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, name, type = "text" }
         helperText={meta.touched && meta.error}
         fullWidth
         InputProps={{
-          className: "text-black dark:text-white",
+          className: "text-primary",
+          startAdornment: icon ? (
+            <div className="mr-2 text-muted">
+              {icon}
+            </div>
+          ) : undefined,
         }}
         InputLabelProps={{
-          className: "text-gray-700 dark:text-gray-300",
+          className: "text-muted",
         }}
       />
     </div>
@@ -87,7 +93,7 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`bg-[#6366f1] dark:bg-[#818cf8] text-white py-2  text-base font-medium rounded-xl hover:bg-indigo-600 hover:shadow-md transition duration-500 ${width} ${className}`}
+      className={`bg-primary text-white py-2 text-base cursor-pointer font-medium rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width} ${className}`}
     >
       {children}
     </button>
@@ -103,7 +109,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 }) => {
   return (
     <FormControl fullWidth size="small" variant="outlined" error={!!error}>
-      <InputLabel className="text-gray-700 dark:text-gray-300">
+      <InputLabel className="text-muted">
         {label}
       </InputLabel>
 
@@ -113,11 +119,11 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         onChange={onChange}
         label={label}
         renderValue={(selected: string[]) => selected.join(", ")}
-        className="bg-white text-black dark:bg-gray-900 dark:text-white"
+        className="bg-primary text-primary"
         MenuProps={{
           disablePortal: true,
           PaperProps: {
-            className: "bg-white dark:bg-gray-800 text-black dark:text-white",
+            className: "bg-primary text-primary",
             style: { maxHeight: 48 * 4.5 },
           },
         }}
@@ -126,7 +132,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           <MenuItem
             key={option}
             value={option}
-            className="text-black dark:text-white"
+            className="text-primary"
           >
             <Checkbox checked={selected.includes(option)} />
             <ListItemText primary={option} />
@@ -145,5 +151,16 @@ export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
         {label}
       </span>
     </div>
+  );
+};
+
+export const GetStartedLink: React.FC<GetStartedLinkProps> = ({ href, children }) => {
+  return (
+    <Link
+      href={href}
+      className="bg-primary py-2 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 w-[150px]"
+    >
+      {children}
+    </Link>
   );
 };

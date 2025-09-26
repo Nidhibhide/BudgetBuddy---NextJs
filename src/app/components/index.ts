@@ -4,7 +4,8 @@ import {
   Button,
   MultiSelect,
   Tooltip,
-} from "./ForElements";
+  GetStartedLink
+} from "@/app/components/FormElements";
 import {
   showSuccess,
   showError,
@@ -22,6 +23,7 @@ export {
   InputBox,
   SelectBox,
   Button,
+  GetStartedLink,
   showError,
   showSuccess,
   Tooltip,

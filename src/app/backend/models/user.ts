@@ -23,6 +23,6 @@ const UserSchema = new mongoose.Schema(
   } // auto adds createdAt and updatedAt
 );
 
-const UserModel = mongoose.model("User", UserSchema);
+const UserModel = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default UserModel;

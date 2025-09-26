@@ -1,20 +1,21 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { InputBox, Button, showError, showSuccess } from "@/app/components";
-import { signInUser } from "@/app/lib/user";
+import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
 import Link from "next/link";
-// import { GoogleLogin } from "@react-oauth/google";
 // import { callToStore } from "../../../components";
 // import { authStore } from "../../../store";
-import { SignInFormValues } from "../../types";
+import { SignInFormValues } from "@/app/types/appTypes";
+import { useRouter } from "next/navigation";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
   // const setUser = authStore((state) => state.setUser);
-  // const router = useRouter();
+  const router = useRouter();
 
   // validation schema
   const validationSchema = Yup.object({
@@ -34,73 +35,73 @@ const SignIn = () => {
     try {
       if (loading) return;
       setLoading(true);
-      const signinRes = await signInUser(values);
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: values.email,
+        password: values.password,
+      });
 
-      const { message: signinMsg, statusCode: signinStatus } = signinRes;
-
-      if (signinStatus === 200) {
-        showSuccess(signinMsg);
-
-        // const userRes = await getMe();
-        // const { statusCode: getMeStatus, data } = userRes;
-        // if (getMeStatus === 200) {
-        //   // callToStore(data);
-        // }
-        // setTimeout(() => router.push("/dashboard/home"), 3000);
-      } else if (signinMsg) {
-        showError(signinMsg);
+      if (res?.error) {
+        showError(
+          res.error === "CredentialsSignin" ? "Login Failed" : res.error
+        );
+      } else {
+        showSuccess("Login Successful");
+        // router.replace(res?.url || "/dashboard"); // redirect manually
       }
       actions.resetForm();
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      showError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
     } finally {
       setLoading(false);
     }
   };
-
-  //handle sign in with google
-  // const handleGoogleLogin = async (values) => {
-  //   try {
-  //     const token = values?.credential;
-
-  //     // const res = await signinwithGoogle(token);
-  //     const { message: signinMsg, statusCode: signinStatus } = res;
-
-  //     if (signinStatus === 200) {
-  //       showSuccess(signinMsg);
-
-  //       const userRes = await getMe();
-  //       const { statusCode: getMeStatus, data } = userRes;
-  //       if (getMeStatus === 200) {
-  //         callToStore(data);
-  //       }
-  //       setTimeout(() => router.push("/dashboard/home"), 3000);
-  //     } else if (signinMsg) {
-  //       showError(signinMsg);
-  //     }
-  //   } catch (err) {
-  //     showError(err.message);
-  //   }
-  // };
-
+const handleGoogleLogin = async () => {
+  try {
+    await signIn("google", { callbackUrl: "/dashboard" });
+  } catch (err) {
+    showError(err instanceof Error ? err.message : "Unexpected error");
+  }
+};
   return (
-    <div className=" bg-[#ffffff] dark:bg-[#000000] text-[#0f172a] dark:text-[#f8fafc] h-full w-full flex justify-center">
-      <div className="w-[500px] h-fit  flex flex-col items-center py-8 px-12 md:mt-20 md:bg-[#f1f5f9] md:dark:bg-[#1e293b] ">
-        <div className="mb-4 flex justify-center ">
-          {/* <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            onError={() => showError("Google Login failed")}
-            theme="filled_blue"
-            size="large"
-            text="continue_with"
-            width="270"
-          /> */}
+    <div className="bg-primary text-primary min-h-screen w-full flex justify-center items-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-6">Sign In</h1>
+
+        <div className="mb-4 flex justify-center">
+          <Button
+            onClick={handleGoogleLogin}
+            className="text-foreground border px-4 w-[270px] flex items-center justify-center gap-2 bg-google"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+
+             Sign in with Google
+          </Button>
         </div>
 
-        <div className="flex items-center">
-          <div className=" flex-1 "></div>
-          <span className="mx-4  font-semibold">OR</span>
-          <div className=" flex-1 "></div>
+        <div className="flex items-center w-full my-6">
+          <div className="flex-1 h-px bg-gray-300"></div>
+          <span className="mx-4 text-muted font-semibold">OR</span>
+          <div className="flex-1 h-px bg-gray-300"></div>
         </div>
         <Formik
           initialValues={{ email: "", password: "" }}
@@ -110,20 +111,21 @@ const SignIn = () => {
           {({ handleSubmit }) => (
             <>
               <div className="flex flex-col mb-12 gap-3 w-full">
-                <InputBox name="email" label="Enter your Email" type="email" />
+                <InputBox name="email" label="Enter your Email" type="email" icon={<FaEnvelope />} />
                 <InputBox
                   name="password"
                   label="Enter your Password"
                   type="password"
+                  icon={<FaLock />}
                 />
               </div>
 
-              <Button onClick={handleSubmit} disabled={loading}>
+              <Button onClick={handleSubmit} disabled={loading} className="mt-4">
                 {loading ? "Loading..." : "Sign In"}
               </Button>
-              <p className="md:text-base text-sm ">
+              <p className="md:text-base text-sm mt-4 text-center">
                 New User?{" "}
-                <Link href="/signup" className="font-semibold  hover:underline">
+                <Link href="/signup" className="font-semibold text-primary hover:underline">
                   Sign Up
                 </Link>
               </p>
