@@ -23,7 +23,7 @@ const Home = () => {
             </GetStartedLink>
             <a
               href="#features"
-              className="bg-primary py-2 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover  hover:shadow-md transition duration-500 w-[150px]"
+              className="bg-primary py-2 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover  hover:shadow-md transition duration-500 w-full sm:w-[150px]"
             >
               Read more
             </a>
@@ -40,8 +40,8 @@ const Home = () => {
             effortlessly.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 w-full justify-items-center">
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mt-12 w-full justify-items-center">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background  rounded-full flex items-center justify-center text-2xl">
                 💡
               </div>
@@ -54,7 +54,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background  rounded-full flex items-center justify-center text-2xl">
                 ⚙️
               </div>
@@ -67,7 +67,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl">
                 📅
               </div>
@@ -80,7 +80,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl">
                 🔔
               </div>
@@ -91,7 +91,7 @@ const Home = () => {
                 Get notified of overspending, due bills, and upcoming payments.
               </p>
             </div>
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl sm:text-3xl">
                 🌍
               </div>
@@ -104,7 +104,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
               <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl sm:text-3xl">
                 🌓
               </div>

@@ -87,13 +87,15 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   width = "w-full",
   className = "",
+  bgColor = "bg-primary",
+  hoverColor = "hover:bg-btn-hover",
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`bg-primary text-white py-2 text-base cursor-pointer font-medium rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width} ${className}`}
+      className={`${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className}`}
     >
       {children}
     </button>
@@ -154,11 +156,11 @@ export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
   );
 };
 
-export const GetStartedLink: React.FC<GetStartedLinkProps> = ({ href, children }) => {
+export const GetStartedLink: React.FC<GetStartedLinkProps> = ({ href, children, width = 'w-full sm:w-[150px]' }) => {
   return (
     <Link
       href={href}
-      className="bg-primary py-2 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 w-[150px]"
+      className={`bg-primary py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width}`}
     >
       {children}
     </Link>

@@ -44,6 +44,8 @@ export interface ButtonProps {
   disabled?: boolean;
   width?: string;
   className?: string;
+  bgColor?: string;
+  hoverColor?: string;
 }
 
 export interface MultiSelectProps {
@@ -62,6 +64,7 @@ export interface TooltipProps {
 export interface GetStartedLinkProps {
   href: string;
   children: React.ReactNode;
+  width?: string;
 }
 
 export type ConnectionObject = {

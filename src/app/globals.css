@@ -6,7 +6,7 @@
 
   /* Main brand colors */
   --color-primary: #6366f1;
-  --color-secondary: #f1f5f9;
+  --color-secondary: #E2E8F0;
   --color-muted: #64748b;
 
   /* Shades */
@@ -21,7 +21,8 @@
   --color-white: #ffffff;
 
   /* Brand-specific */
-  --color-google: #4285F4;
+  --color-google:#3B82F6;
+    --color-google-hover:#2563EB;
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);

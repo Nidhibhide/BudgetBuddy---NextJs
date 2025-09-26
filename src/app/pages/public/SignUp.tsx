@@ -57,8 +57,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="bg-primary text-primary min-h-screen w-full flex justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+    <div className="bg-white text-primary min-h-screen w-full flex justify-center items-center p-4">
+      <div className="w-full max-w-md bg-secondary rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
         <Formik
           initialValues={{ name: "", email: "", password: "" }}
