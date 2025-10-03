@@ -37,6 +37,7 @@ const SignIn = () => {
       setLoading(true);
       const res = await signIn("credentials", {
         redirect: false,
+        callbackUrl: "/dashboard/home",
         email: values.email,
         password: values.password,
       });
@@ -47,7 +48,7 @@ const SignIn = () => {
         );
       } else {
         showSuccess("Login Successful");
-        // router.replace(res?.url || "/dashboard"); // redirect manually
+        router.replace(res?.url || "/dashboard/home"); // redirect manually
       }
       actions.resetForm();
     } catch (err) {
@@ -60,7 +61,7 @@ const SignIn = () => {
   };
   const handleGoogleLogin = async () => {
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn("google", { callbackUrl: "/dashboard/home" });
     } catch (err) {
       showError(err instanceof Error ? err.message : "Unexpected error");
     }

@@ -1,4 +1,5 @@
-import  { DefaultSession } from "next-auth";
+import { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   /**
@@ -15,7 +16,21 @@ declare module "next-auth" {
       id: string;
       name?: string;
       email?: string;
-       authProvider?: "google" | "local";
+      authProvider?: "google" | "local";
     } & DefaultSession["user"];
+    accessToken?: string;
+    refreshToken?: string;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    email?: string;
+    authProvider?: "google" | "local";
+    accessToken?: string;
+    refreshToken?: string;
+    accessTokenExpires?: number;
+    refreshTokenExpires?: number;
   }
 }

@@ -21,7 +21,15 @@ export const authOptions: NextAuthOptions = {
 
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
-        if (!user || !user.password) {
+        if (!user) {
+          throw new Error("No user found with this email");
+        }
+
+        if (user.authProvider !== "local") {
+          throw new Error("This account uses a different login method");
+        }
+
+        if (!user.password) {
           throw new Error("No user found with this email");
         }
 
@@ -45,6 +53,12 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
     }),
   ],
   callbacks: {
@@ -54,25 +68,67 @@ export const authOptions: NextAuthOptions = {
       if (!user.email) return false;
 
       if (account?.provider === "google") {
-        const dbUser = await User.findOne({ email: user.email });
+        let dbUser = await User.findOne({ email: user.email });
         if (!dbUser) {
-          await User.create({
+          dbUser = await User.create({
             name: user.name,
             email: user.email,
             password: null, // no password for Google
             authProvider: "google",
           });
         }
+        user.id = dbUser._id.toString();
+        user.authProvider = "google";
       }
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      if (account?.provider === "google") {
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        if (account.expires_at) {
+          token.accessTokenExpires = account.expires_at * 1000;
+        }
+      }
+
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.authProvider = user.authProvider;
       }
+
+      // Check if access token is expired and refresh if needed (Google only)
+      if (token.authProvider === "google" && token.accessTokenExpires && Date.now() > token.accessTokenExpires && token.refreshToken) {
+        try {
+          const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              client_id: process.env.GOOGLE_CLIENT_ID!,
+              client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+              grant_type: 'refresh_token',
+              refresh_token: token.refreshToken as string,
+            }),
+          });
+          const refreshedTokens = await response.json();
+
+          if (!response.ok) {
+            throw new Error('Failed to refresh token');
+          }
+
+          token.accessToken = refreshedTokens.access_token;
+          token.accessTokenExpires = Date.now() + refreshedTokens.expires_in * 1000;
+          if (refreshedTokens.refresh_token) {
+            token.refreshToken = refreshedTokens.refresh_token;
+          }
+        } catch (error) {
+          throw new Error(`Token refresh failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
       return token;
     },
 
@@ -92,7 +148,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 60 * 60, // 1 hour (in seconds)
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

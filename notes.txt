@@ -1,0 +1,23 @@
+- Client Layout: For browser-only stuff (hooks, context, UI) while main layout stays server-rendered (faster + SEO-friendly).  
+
+- NextAuth automatically manages JWTs.  
+  - No need to manually use jwt.sign() or jwt.verify().  
+
+- JWT: Internal token managed by NextAuth.  
+- Session: Frontend-friendly object to check login status and get user details in React/Next.js.  
+
+- In Express.js:  
+  - Use short-lived access tokens (~15 min).  
+  - Use long-lived refresh tokens (~30 days) to get new access tokens.  
+  - Required because Express doesn’t manage sessions automatically.  
+
+- In NextAuth:  
+  - JWT strategy token acts as both access + refresh token.  
+  - Token valid until maxAge (default 30 days).  
+  - No separate refresh token needed for email/password login.  
+  - Refresh logic only needed for OAuth providers (e.g., Google) since their access tokens expire quickly.  
+
+
+- App JWT lasts 1 hour; re-login needed afterward.
+- Google access token refreshes automatically when expired.
+- Refresh is independent of the 1-hour JWT; users stay logged in via Google.

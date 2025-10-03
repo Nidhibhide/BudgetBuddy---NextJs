@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import Header from "@/app/pages/public/Header";
-import { Toaster } from "react-hot-toast";
+import ClientLayout from "./ClientLayout";
 
 export const metadata: Metadata = {
   title: "BudgetBuddy",
@@ -16,11 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Header />
-        <main>{children}</main>
-        <Toaster />
+      <body className="text-black">
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
 }
+
+

@@ -1,11 +1,11 @@
-"use client";
+
 
 import React from "react";
 import { GetStartedLink } from "@/app/components";
 
 const Home = () => {
   return (
-    <div className="bg-background text-black h-auto w-full py-28">
+    <div className="bg-background h-auto w-full py-28">
       <div className="flex xl:flex-row flex-col gap-12 xl:gap-2 px-4 md:px-20 justify-center">
         <div className="flex flex-col xl:gap-8 gap-6 items-center justify-center">
           <div className="xl:text-6xl md:text-5xl text-4xl font-bold text-center max-w-6xl">
