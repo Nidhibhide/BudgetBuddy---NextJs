@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #ffffff;
-  --color-foreground: #171717;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-btn-background: var(--btn-background);
+  --color-btn-hover: var(--btn-hover);
+}
 
-  /* Main brand colors */
-  --color-primary: #6366f1;
-  --color-secondary: #E2E8F0;
-  --color-muted: #64748b;
+:root {
+  /* header and form section */
+  --foreground: #171717;
+  --background: #f1f5f9;
 
-  /* Shades */
-  --color-icon-background:#E0E7FF;
-    --color-btn-hover:#4F46E5;
-    --color-black: #000000;
-  --color-white: #ffffff;
+  /* button section */
+  --btn-background: #6366f1;
+  --btn-hover: #4f46e5;
+}
+.dark {
+  /* header section */
+  --foreground: #ffffff;
+  --background: #1e293b;
 
-  /* Brand-specific */
-  --color-google:#3B82F6;
-    --color-google-hover:#2563EB;
-
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* button section */
+  --btn-background: #818cf8;
+  --btn-hover: #4f46e5;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

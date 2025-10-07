@@ -1,16 +1,14 @@
-
-
 import React from "react";
 import { GetStartedLink } from "@/app/components";
 
 const Home = () => {
   return (
-    <div className="bg-background h-auto w-full py-28">
+    <div className=" min-h-screen w-full py-28 text-foreground">
       <div className="flex xl:flex-row flex-col gap-12 xl:gap-2 px-4 md:px-20 justify-center">
         <div className="flex flex-col xl:gap-8 gap-6 items-center justify-center">
           <div className="xl:text-6xl md:text-5xl text-4xl font-bold text-center max-w-6xl">
-            Hey there! Ready to take{" "}
-            <span className="text-primary">control</span> of your money?
+            Hey there! Ready to take <span className="text-indigo-500">control</span> of your
+            money?
           </div>
 
           <div className="text-center xl:text-xl text-lg">
@@ -18,12 +16,10 @@ const Home = () => {
             Simple. Smart. Stress-free.
           </div>
           <div className="flex gap-4 items-center">
-            <GetStartedLink href="/signin">
-              Get Started
-            </GetStartedLink>
+            <GetStartedLink href="/signin">Get Started</GetStartedLink>
             <a
               href="#features"
-              className="bg-primary py-2 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover  hover:shadow-md transition duration-500 w-full sm:w-[150px]"
+              className=" bg-btn-background text-white hover:bg-btn-hover py-2 px-4 text-center text-base font-medium  rounded-xl   hover:shadow-md transition duration-500 w-full sm:w-[150px]"
             >
               Read more
             </a>
@@ -41,8 +37,8 @@ const Home = () => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mt-12 w-full justify-items-center">
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background  rounded-full flex items-center justify-center text-2xl">
+            <div className=" rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300 bg-background">
+              <div className="w-16 h-16  bg-indigo-100 rounded-full flex items-center justify-center text-2xl">
                 💡
               </div>
               <h2 className="text-xl font-semibold text-center">
@@ -54,8 +50,8 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background  rounded-full flex items-center justify-center text-2xl">
+            <div className="rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16  bg-indigo-100  rounded-full flex items-center justify-center text-2xl">
                 ⚙️
               </div>
               <h2 className="text-xl font-semibold text-center">
@@ -67,8 +63,8 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl">
+            <div className=" rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-indigo-100  rounded-full flex items-center justify-center text-2xl">
                 📅
               </div>
               <h2 className="text-xl font-semibold text-center">
@@ -80,8 +76,8 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl">
+            <div className=" rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-4 hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-2xl">
                 🔔
               </div>
               <h2 className="text-xl font-semibold text-center">
@@ -91,8 +87,8 @@ const Home = () => {
                 Get notified of overspending, due bills, and upcoming payments.
               </p>
             </div>
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl sm:text-3xl">
+            <div className=" rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-2xl sm:text-3xl">
                 🌍
               </div>
               <h2 className="text-xl font-semibold text-center">
@@ -104,14 +100,14 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="bg-background rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
-              <div className="w-16 h-16 bg-icon-background rounded-full flex items-center justify-center text-2xl sm:text-3xl">
+            <div className=" rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
+              <div className="w-16 h-16 bg-indigo-100  rounded-full flex items-center justify-center text-2xl sm:text-3xl">
                 🌓
               </div>
-              <h2 className="text-xl font-semibold text-center text-gray-800">
+              <h2 className="text-xl font-semibold text-center ">
                 Theme Support
               </h2>
-              <p className="text-center text-gray-600">
+              <p className="text-center ">
                 Enjoy a seamless light and dark mode experience to match your
                 environment.
               </p>
@@ -119,13 +115,13 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <footer className="bg-bg-secondary mt-28 p-3">
+      <footer className=" mt-28 p-3">
         <div className="text-center">
           <h2 className="text-2xl font-bold">BudgetBuddy</h2>
-          <p className="text-sm mt-2 text-muted">
+          <p className="text-sm mt-2 ">
             Simplify your spending. Master your money.
           </p>
-          <p className="text-xs mt-4 text-muted">
+          <p className="text-xs mt-4">
             © {new Date().getFullYear()} BudgetBuddy. Built with care for
             personal finance lovers.
           </p>
