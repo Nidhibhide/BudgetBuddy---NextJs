@@ -52,34 +52,34 @@ export const SelectBox: React.FC<SelectBoxProps> = ({ label, value, options, onC
   );
 };
 
-export const InputBox: React.FC<InputBoxProps> = ({ label, name, type = "text", icon }) => {
-  const [field, meta] = useField(name);
+// export const InputBox: React.FC<InputBoxProps> = ({ label, name, type = "text", icon }) => {
+//   const [field, meta] = useField(name);
 
-  return (
-    <div className="w-full p-2 rounded text-primary">
-      <TextField
-        {...field}
-        type={type}
-        label={label}
-        variant="standard"
-        error={meta.touched && Boolean(meta.error)}
-        helperText={meta.touched && meta.error}
-        fullWidth
-        InputProps={{
-          className: "text-primary",
-          startAdornment: icon ? (
-            <div className="mr-2 text-muted">
-              {icon}
-            </div>
-          ) : undefined,
-        }}
-        InputLabelProps={{
-          className: "text-muted",
-        }}
-      />
-    </div>
-  );
-};
+//   return (
+//     <div className="w-full">
+//       <TextField
+//         {...field}
+//         type={type}
+//         label={label}
+//         variant="outlined"
+//         error={meta.touched && Boolean(meta.error)}
+//         helperText={meta.touched && meta.error}
+//         fullWidth
+//         InputProps={{
+//           className: "text-foreground",
+//           startAdornment: icon ? (
+//             <div className="mr-2 text-muted">
+//               {icon}
+//             </div>
+//           ) : undefined,
+//         }}
+//         InputLabelProps={{
+//           className: "text-muted",
+//         }}
+//       />
+//     </div>
+//   );
+// };
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -88,7 +88,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   width = "w-full",
   className = "",
-  bgColor = "bg-primary",
+  bgColor = "bg-btn-background",
   hoverColor = "hover:bg-btn-hover",
 }) => {
   return (
@@ -161,9 +161,10 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({ href, children, 
   return (
     <Link
       href={href}
-      className={`bg-primary py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width}`}
+      className={`bg-btn-background py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width}`}
     >
       {children}
     </Link>
   );
 };
+

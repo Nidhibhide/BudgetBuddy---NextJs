@@ -21,3 +21,5 @@
 - App JWT lasts 1 hour; re-login needed afterward.
 - Google access token refreshes automatically when expired.
 - Refresh is independent of the 1-hour JWT; users stay logged in via Google.
+
+-Hydration error in next js 

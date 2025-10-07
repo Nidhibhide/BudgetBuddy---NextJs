@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
 import { RegisterUserData } from "@/app/types/appTypes";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
-
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -57,8 +58,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="bg-white text-primary min-h-screen w-full flex justify-center items-center p-4">
-      <div className="w-full max-w-md bg-secondary rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
+    <div className="min-h-screen w-full text-foreground flex justify-center items-center p-4">
+      <div className="w-full max-w-md bg-background  rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
         <Formik
           initialValues={{ name: "", email: "", password: "" }}
@@ -67,23 +68,32 @@ const SignUp = () => {
         >
           {({ handleSubmit }) => (
             <>
-              <div className="flex flex-col mb-12 gap-3 w-full">
-                <InputBox name="name" label="Enter your Name" type="text" icon={<FaUser />} />
-                <InputBox name="email" label="Enter your Email" type="email" icon={<FaEnvelope />} />
-                <InputBox
-                  name="password"
-                  label="Enter your Password"
-                  type="password"
-                  icon={<FaLock />}
-                />
+              <div className="flex flex-col mb-6 gap-6 w-full">
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="email">Email</Label>
+                  <Input type="email" id="email" placeholder="Email" />
+                </div>
+
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="email">Email</Label>
+                  <Input type="email" id="email" placeholder="Email" />
+                </div>
+                <div className="grid w-full max-w-sm items-center gap-3">
+                  <Label htmlFor="email">Email</Label>
+                  <Input type="email" id="email" placeholder="Email" />
+                </div>
               </div>
 
-              <Button onClick={handleSubmit} disabled={loading} className="mt-4">
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="mt-4"
+              >
                 {loading ? "Loading..." : "Sign Up"}
               </Button>
               <p className="md:text-base text-sm mt-4 text-center">
                 Already have an account?{" "}
-                <Link href="/signin" className="font-semibold text-primary hover:underline">
+                <Link href="/signin" className="font-semibold  hover:underline">
                   Sign In
                 </Link>
               </p>
