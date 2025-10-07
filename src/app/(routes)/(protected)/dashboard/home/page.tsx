@@ -1,6 +1,6 @@
 
 
-import MainPage from "@/app/pages/dashboard/components/MainPage";
+import MainPage from "@/app/pages/public/Home";
 
 
 export default function home() {

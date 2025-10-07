@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
-  // const setUser = authStore((state) => state.setUser);
+  // const setUser = authStore((state) > state.setUser);
   const router = useRouter();
 
   // validation schema
@@ -84,7 +84,7 @@ const SignIn = () => {
           </Button>
         </div>
 
-        <div className="flex items-center w-full my-6">
+        <div className="flex items-center w-full my-4">
           <div className="flex-1 h-px bg-gray-300"></div>
           <span className="mx-4 text-muted font-semibold">OR</span>
           <div className="flex-1 h-px bg-gray-300"></div>
@@ -96,16 +96,19 @@ const SignIn = () => {
         >
           {({ handleSubmit }) => (
             <>
-              <div className="flex flex-col mb-6 gap-6 w-full">
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input type="email" id="email" placeholder="Email" />
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input type="email" id="email" placeholder="Email" />
-                </div>
+              <div className="flex flex-col mb-6 gap-4 w-full">
+                <InputBox
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                />
+                <InputBox
+                  label="Password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                />
               </div>
 
               <Button
@@ -115,7 +118,7 @@ const SignIn = () => {
               >
                 {loading ? "Loading..." : "Sign In"}
               </Button>
-              <p className="md:text-base text-sm mt-4 text-center">
+              <p className="md:text-base text-sm mt-2 text-center">
                 New User?{" "}
                 <Link
                   href="/signup"

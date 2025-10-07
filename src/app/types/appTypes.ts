@@ -30,11 +30,12 @@ export interface SelectBoxProps {
   onChange: (event: SelectChangeEvent<string | number>) => void;
 }
 
+
 export interface InputBoxProps {
   label: string;
   name: string;
   type?: string;
-  icon?: React.ReactNode;
+  placeholder?: string;
 }
 
 export interface ButtonProps {

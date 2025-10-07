@@ -68,20 +68,24 @@ const SignUp = () => {
         >
           {({ handleSubmit }) => (
             <>
-              <div className="flex flex-col mb-6 gap-6 w-full">
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input type="email" id="email" placeholder="Email" />
-                </div>
-
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input type="email" id="email" placeholder="Email" />
-                </div>
-                <div className="grid w-full max-w-sm items-center gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input type="email" id="email" placeholder="Email" />
-                </div>
+              <div className="flex flex-col mb-6 gap-4 w-full">
+                <InputBox
+                  label="Name"
+                  name="name"
+                  placeholder="Enter your name"
+                />
+                <InputBox
+                  label="Email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                />
+                <InputBox
+                  label="Password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter your password"
+                />
               </div>
 
               <Button
@@ -91,7 +95,7 @@ const SignUp = () => {
               >
                 {loading ? "Loading..." : "Sign Up"}
               </Button>
-              <p className="md:text-base text-sm mt-4 text-center">
+              <p className="md:text-base text-sm mt-2 text-center">
                 Already have an account?{" "}
                 <Link href="/signin" className="font-semibold  hover:underline">
                   Sign In
