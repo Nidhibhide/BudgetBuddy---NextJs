@@ -10,7 +10,10 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
+    <SessionProvider
+      refetchOnWindowFocus={false}
+      refetchInterval={5 * 60 * 1000} // 5 minutes
+    >
       <Header />
       <main>{children}</main>
       <Toaster />

@@ -8,9 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
 import { RegisterUserData } from "@/app/types/appTypes";
-import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();

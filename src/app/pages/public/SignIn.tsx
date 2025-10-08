@@ -10,9 +10,6 @@ import Link from "next/link";
 // import { authStore } from "../../../store";
 import { SignInFormValues } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
-import { FaEnvelope, FaLock } from "react-icons/fa";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);

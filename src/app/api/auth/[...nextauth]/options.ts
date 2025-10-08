@@ -98,8 +98,8 @@ export const authOptions: NextAuthOptions = {
         token.authProvider = user.authProvider;
       }
 
-      // Check if access token is expired and refresh if needed (Google only)
-      if (token.authProvider === "google" && token.accessTokenExpires && Date.now() > token.accessTokenExpires && token.refreshToken) {
+      // Check if access token is expired and refresh if needed (Google only) - skip in dev
+      if (process.env.NODE_ENV === 'production' && token.authProvider === "google" && token.accessTokenExpires && Date.now() > token.accessTokenExpires && token.refreshToken) {
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',

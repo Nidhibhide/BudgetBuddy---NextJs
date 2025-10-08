@@ -1,21 +1,21 @@
 import mongoose from "mongoose";
-import { ConnectionObject } from '@/app/types/appTypes';
-
-// Initialize connection object
-const connection: ConnectionObject = {};
 
 async function dbConnect() {
-  // If already connected (readyState = 1), skip reconnection
-  if (connection.isConnected) {
+  // If already connected, skip reconnection
+  if (mongoose.connection.readyState >= 1) {
     console.log("Already connected to database");
     return;
   }
 
   try {
-    const db = await mongoose.connect(process.env.MONGO_URL || "", {});
-
-    // Store the connection state
-    connection.isConnected = db.connections[0].readyState;
+    await mongoose.connect(process.env.MONGO_URL || "", {
+      bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000, // Increased timeout
+      socketTimeoutMS: 45000,
+      maxIdleTimeMS: 30000,
+      heartbeatFrequencyMS: 10000,
+    });
 
     console.log("DB connected Successfully");
   } catch (error) {

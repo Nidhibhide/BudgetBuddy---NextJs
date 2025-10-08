@@ -1,5 +1,5 @@
 import SignUp from "@/app/pages/public/SignUp";
 
-export default function signup() {
+export default async function signup() {
   return <SignUp />;
 }
