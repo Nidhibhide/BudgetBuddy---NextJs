@@ -23,3 +23,9 @@
 - Refresh is independent of the 1-hour JWT; users stay logged in via Google.
 
 -Hydration error in next js 
+
+-Server component vs Client component 
+-In Next js by default is Server component in app folder 
+-we cant use async with client component 
+-Server component - Data / api keys are kept secret on the server ( safe for private keys)
+-iF client component imports another component that imported one becomes a client component too if it doesnt have 'use client'
