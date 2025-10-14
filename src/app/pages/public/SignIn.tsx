@@ -6,14 +6,11 @@ import * as Yup from "yup";
 import { InputBox, Button, showError, showSuccess } from "@/app/components";
 import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
 import Link from "next/link";
-// import { callToStore } from "../../../components";
-// import { authStore } from "../../../store";
 import { SignInFormValues } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
-  // const setUser = authStore((state) > state.setUser);
   const router = useRouter();
 
   // validation schema

@@ -4,8 +4,11 @@ import {
   emailValidator,
   passwordValidator,
   selectValidator,
+  stringArrayValidator,
+  numberValidator,
+  arraySelectValidator,
 } from "../utils/GlobalValidation";
-import { CURRENCIES } from "../../../../constants";
+import { CURRENCIES, CATEGORY_LIST } from "../../../lib/constants";
 
 const Register = Joi.object({
   name: stringValidator("Name", 3, 50, true),
@@ -21,13 +24,14 @@ const Login = Joi.object({
 const Update = Joi.object({
   name: stringValidator("Name", 3, 50, false),
   email: emailValidator("Email", false),
-  currency: selectValidator("Currency", CURRENCIES, false),
-});
-const Email = Joi.object({
-  email: emailValidator(),
 });
 const ChangePassword = Joi.object({
   newPassword: passwordValidator(),
   oldPassword: passwordValidator(),
 });
-export { Register, Login, Update, Email, ChangePassword };
+const FinancialSettings = Joi.object({
+  names: arraySelectValidator("Categories", CATEGORY_LIST, true, 4),
+  currency: selectValidator("Currency", CURRENCIES, true),
+  limit: numberValidator("Limit", 0, Number.MAX_SAFE_INTEGER, true),
+});
+export { Register, Login, Update, ChangePassword, FinancialSettings };

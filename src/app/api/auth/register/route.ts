@@ -1,10 +1,25 @@
 import dbConnect from "@/app/backend/config/MongoDB";
 import User from "@/app/backend/models/user";
 import bcrypt from "bcryptjs";
+import { Register } from "@/app/backend/validations/user";
+
 export async function POST(request: Request) {
   await dbConnect();
   try {
-    const { password, name, email } = await request.json();
+    const body = await request.json();
+    const { error } = Register.validate(body);
+    if (error) {
+      return Response.json(
+        {
+          success: false,
+          message: error.details[0].message,
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+    const { password, name, email } = body;
     const existingUserByEmail = await User.findOne({ email });
 
     if (existingUserByEmail) {
