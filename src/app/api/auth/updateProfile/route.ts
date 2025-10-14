@@ -34,7 +34,7 @@ export async function PUT(request: Request) {
         }
       );
     }
-    const { name, email } = body;
+    const { name, email, currency } = body;
 
     // Fetch the current user to check authProvider
     const currentUser = await User.findById(userId);
@@ -82,7 +82,7 @@ export async function PUT(request: Request) {
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, email },
+      { name, email, currency },
       { new: true }
     );
     if (!updatedUser) {
@@ -107,6 +107,7 @@ export async function PUT(request: Request) {
         data: {
           name: updatedUser.name,
           email: updatedUser.email,
+          currency: updatedUser.currency,
         },
       },
       {
