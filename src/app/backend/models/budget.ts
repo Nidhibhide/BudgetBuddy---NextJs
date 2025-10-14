@@ -3,19 +3,24 @@ import mongoose from "mongoose";
 
 const budgetSchema = new mongoose.Schema(
   {
-    budget: {
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
+    amount: {
       type: Number,
       required: true,
-      set: (v: number): number => Number(v.toFixed(2)),
+      min: 0,
+    },
+    spent: {
+      type: Number,
+      default: 0,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    limit: {
-      type: Number,
-      required: false,
     },
   },
   { timestamps: true }

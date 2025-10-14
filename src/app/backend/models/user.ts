@@ -5,8 +5,6 @@ const UserSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: false },
-    resetPasswordToken: { type: String },
-    resetPasswordExpire: { type: Date },
     authProvider: {
       type: String,
       enum: ["google", "local"],
@@ -16,6 +14,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: CURRENCIES,
       default: "INR",
+    },
+    totalBalance: {
+      type: Number,
+      default: 0,
     },
   },
   {

@@ -1,7 +1,7 @@
 import { TYPES } from "../../../lib/constants";
 import mongoose from "mongoose";
 
-const expenseSchema = new mongoose.Schema(
+const transactionSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -11,21 +11,25 @@ const expenseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    description: {
-      type: String,
-      required: false,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
     type: {
       type: String,
       enum: TYPES,
       required: true,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     isDeleted: { type: Boolean, default: false },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -35,4 +39,4 @@ const expenseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Expense", expenseSchema);
+export default mongoose.model("Transaction", transactionSchema);
