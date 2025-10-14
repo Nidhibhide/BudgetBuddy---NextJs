@@ -32,17 +32,32 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth size="small">
-        <InputLabel className="text-muted">{label}</InputLabel>
+        <InputLabel sx={{ color: 'var(--foreground)' }}>{label}</InputLabel>
 
         <Select
           value={value}
           label={label}
           onChange={onChange}
-          className="bg-primary text-primary"
+          sx={{
+            color: 'var(--foreground)',
+            backgroundColor: 'var(--background)',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--foreground)',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--foreground)',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'var(--foreground)',
+            },
+          }}
           MenuProps={{
             disablePortal: true,
             PaperProps: {
-              className: "bg-primary text-primary",
+              sx: {
+                backgroundColor: 'var(--background)',
+                color: 'var(--foreground)',
+              },
               style: {
                 maxHeight: 48 * 4.5,
               },
@@ -53,7 +68,12 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
             <MenuItem
               key={option}
               value={option}
-              className="text-primary hover:bg-secondary"
+              sx={{
+                color: 'var(--foreground)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
             >
               {option}
             </MenuItem>
@@ -137,7 +157,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 }) => {
   return (
     <FormControl fullWidth size="small" variant="outlined" error={!!error}>
-      <InputLabel className="text-muted">{label}</InputLabel>
+      <InputLabel sx={{ color: 'var(--foreground)' }}>{label}</InputLabel>
 
       <Select
         multiple
@@ -145,18 +165,45 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         onChange={onChange}
         label={label}
         renderValue={(selected: string[]) => selected.join(", ")}
-        className="bg-primary text-primary"
+        sx={{
+          color: 'var(--foreground)',
+          backgroundColor: 'var(--background)',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--foreground)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--foreground)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'var(--foreground)',
+          },
+        }}
         MenuProps={{
           disablePortal: true,
           PaperProps: {
-            className: "bg-primary text-primary",
+            sx: {
+              backgroundColor: 'var(--background)',
+              color: 'var(--foreground)',
+            },
             style: { maxHeight: 48 * 4.5 },
           },
         }}
       >
         {options.map((option) => (
-          <MenuItem key={option} value={option} className="text-primary">
-            <Checkbox checked={selected.includes(option)} />
+          <MenuItem
+            key={option}
+            value={option}
+            sx={{
+              color: 'var(--foreground)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
+          >
+            <Checkbox
+              checked={selected.includes(option)}
+              sx={{ color: 'var(--foreground)' }}
+            />
             <ListItemText primary={option} />
           </MenuItem>
         ))}

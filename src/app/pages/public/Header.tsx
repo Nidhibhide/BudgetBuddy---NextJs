@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { FaWallet } from "react-icons/fa";
 import { HeaderProps } from "../../types/appTypes";
 import { usePathname } from "next/navigation";
-import { GetStartedLink } from "@/app/components";
-import { FaArrowLeft } from "react-icons/fa6";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ArrowLeft } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
@@ -29,17 +28,22 @@ const Header: React.FC<HeaderProps> = ({}) => {
           <span className="font-semibold text-2xl">BudgetBuddy</span>
         </div>
         <div className="flex items-center gap-4">
-          <Button size="icon" className="cursor-pointer" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            {theme === "dark" ? <Moon size={20} /> : <Sun size={20} />}
+          <Button
+            size="icon"
+            className="cursor-pointer"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? (
+              <Moon className="size-5" />
+            ) : (
+              <Sun className="size-5" />
+            )}
             <span className="sr-only">Toggle theme</span>
           </Button>
           {showBackButton && (
-            <GetStartedLink href="/" width="w-full sm:w-[180px]">
-              <div className="flex items-center gap-2">
-                <FaArrowLeft className="w-5 h-5" />
-                Back to Home
-              </div>
-            </GetStartedLink>
+            <Link href="/">
+              <ArrowLeft className="size-6" />
+            </Link>
           )}
         </div>
       </div>

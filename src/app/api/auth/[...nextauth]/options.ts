@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/app/backend/config/MongoDB";
 import User from "@/app/backend/models/user";
+import { Login } from "@/app/backend/validations/user";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,6 +18,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing email or password");
+        }
+
+        const { error } = Login.validate({ email: credentials.email, password: credentials.password });
+        if (error) {
+          throw new Error(error.details[0].message);
         }
 
         await dbConnect();
@@ -47,6 +53,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           authProvider: "local",
+          currency: user.currency,
         };
       },
     }),
@@ -79,6 +86,7 @@ export const authOptions: NextAuthOptions = {
         }
         user.id = dbUser._id.toString();
         user.authProvider = "google";
+        user.currency = dbUser.currency;
       }
 
       return true;
@@ -95,7 +103,20 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.name = user.name;
         token.authProvider = user.authProvider;
+        token.currency = user.currency;
+      }
+
+      // Always fetch fresh user data from database to keep session in sync
+      if (token.id) {
+        await dbConnect();
+        const freshUser = await User.findById(token.id);
+        if (freshUser) {
+          token.email = freshUser.email;
+          token.name = freshUser.name;
+          token.currency = freshUser.currency;
+        }
       }
 
       // Check if access token is expired and refresh if needed (Google only) - skip in dev
@@ -137,6 +158,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.authProvider = token.authProvider as "google" | "local";
+        session.user.currency = token.currency as string;
       }
       return session;
     },

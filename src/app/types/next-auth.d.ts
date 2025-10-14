@@ -1,5 +1,4 @@
 import { DefaultSession } from "next-auth";
-import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   /**
@@ -10,6 +9,7 @@ declare module "next-auth" {
     email?: string;
     name?: string;
     authProvider?: "google" | "local";
+    currency?: string;
   }
   interface Session {
     user: {
@@ -17,6 +17,7 @@ declare module "next-auth" {
       name?: string;
       email?: string;
       authProvider?: "google" | "local";
+      currency?: string;
     } & DefaultSession["user"];
     accessToken?: string;
     refreshToken?: string;
@@ -28,6 +29,7 @@ declare module "next-auth/jwt" {
     id?: string;
     email?: string;
     authProvider?: "google" | "local";
+    currency?: string;
     accessToken?: string;
     refreshToken?: string;
     accessTokenExpires?: number;

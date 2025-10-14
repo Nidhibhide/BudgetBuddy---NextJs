@@ -1,4 +1,4 @@
-import { TYPES } from "../../../../constants";
+import { TYPES } from "../../../lib/constants";
 import mongoose from "mongoose";
 
 const expenseSchema = new mongoose.Schema(

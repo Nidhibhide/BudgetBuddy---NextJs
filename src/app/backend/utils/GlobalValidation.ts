@@ -72,7 +72,23 @@ export const passwordValidator = (
   label: string = "Password",
   required: boolean = true
 ) => {
-  let schema = Joi.string().min(6).max(100).label(label);
+  let schema = Joi.string().min(5).max(100).label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
+};
+
+export const arraySelectValidator = (
+  label: string,
+  options: string[],
+  required: boolean,
+  maxLength: number
+) => {
+  let schema = Joi.array()
+    .items(Joi.string().valid(...options))
+    .max(maxLength)
+    .label(label);
   if (required) {
     schema = schema.required();
   }

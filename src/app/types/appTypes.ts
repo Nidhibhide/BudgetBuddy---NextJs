@@ -38,6 +38,12 @@ export interface InputBoxProps {
   placeholder?: string;
 }
 
+export interface CustomTabPanelProps {
+  children?: React.ReactNode;
+  value: number;
+  index: number;
+}
+
 export interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
@@ -73,3 +79,39 @@ export type ConnectionObject = {
 };
 
 
+export interface UserFormValues {
+  name: string;
+  email: string;
+  OldPassword: string;
+  NewPassword: string;
+  ConfirmPassword: string;
+}
+
+export interface AppState {
+  categories: string[];
+  limit: number;
+  setCategories: (categories: string[]) => void;
+  setLimit: (limit: number) => void;
+}
+
+export interface FormValues {
+  names: string[];
+  limit: string;
+}
+
+export interface CategoryDialogState {
+  open: boolean;
+  categoriesToRemove: string[];
+  reassignMap: Record<string, string>;
+}
+
+export interface CategoryRemovalDialogProps {
+  open: boolean;
+  categoriesToRemove: string[];
+  reassignMap: Record<string, string>;
+  availableCategories: string[];
+  onClose: () => void;
+  onArchive: () => void;
+  onReassign: () => void;
+  onReassignMapChange: (category: string, newCategory: string) => void;
+}
