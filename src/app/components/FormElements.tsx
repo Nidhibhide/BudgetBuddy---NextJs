@@ -25,19 +25,20 @@ import { Input } from "@/components/ui/input";
 
 export const SelectBox: React.FC<SelectBoxProps> = ({
   label,
-  value,
+  name,
   options,
-  onChange,
 }) => {
-  return (
-    <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel sx={{ color: 'var(--foreground)' }}>{label}</InputLabel>
+  const [field, meta] = useField(name);
 
+  return (
+    <div className="w-full flex flex-col gap-1">
+      <Label htmlFor={name} className="text-base">
+        {label}
+      </Label>
+      <FormControl fullWidth size="small" error={!!meta.error}>
         <Select
-          value={value}
-          label={label}
-          onChange={onChange}
+          {...field}
+          id={name}
           sx={{
             color: 'var(--foreground)',
             backgroundColor: 'var(--background)',
@@ -64,7 +65,7 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
             },
           }}
         >
-          {options.map((option) => (
+          {options.map((option: string) => (
             <MenuItem
               key={option}
               value={option}
@@ -80,7 +81,10 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
           ))}
         </Select>
       </FormControl>
-    </Box>
+      {meta.touched && meta.error && (
+        <p className="text-red-500 text-sm">{meta.error}</p>
+      )}
+    </div>
   );
 };
 
@@ -204,7 +208,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               checked={selected.includes(option)}
               sx={{ color: 'var(--foreground)' }}
             />
-            <ListItemText primary={option} />
+            <ListItemText primary={option as string} />
           </MenuItem>
         ))}
       </Select>

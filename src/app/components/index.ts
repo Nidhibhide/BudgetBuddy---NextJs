@@ -8,12 +8,11 @@ import {
 } from "@/app/components/FormElements";
 import { showSuccess, showError, useHandleResponse } from "./Utils";
 import UserSetting from "./UserSetting";
-import FinancialSetting from "./FinancialSetting";
-import CategoryRemovalDialog from "./CategoryRemovalDialog";
+import ChangePassword from "./ChangePassword";
 export {
-  FinancialSetting,
   InputBox,
   UserSetting,
+  ChangePassword,
   SelectBox,
   Button,
   GetStartedLink,
@@ -22,5 +21,4 @@ export {
   Tooltip,
   MultiSelect,
   useHandleResponse,
-  CategoryRemovalDialog,
 };

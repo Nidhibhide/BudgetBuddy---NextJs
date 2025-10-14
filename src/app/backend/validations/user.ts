@@ -24,6 +24,7 @@ const Login = Joi.object({
 const Update = Joi.object({
   name: stringValidator("Name", 3, 50, false),
   email: emailValidator("Email", false),
+  currency: selectValidator("Currency", CURRENCIES, false),
 });
 const ChangePassword = Joi.object({
   newPassword: passwordValidator(),

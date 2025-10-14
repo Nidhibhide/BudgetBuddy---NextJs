@@ -25,9 +25,8 @@ export interface ApiResponse {
 
 export interface SelectBoxProps {
   label: string;
-  value: string | number;
+  name: string;
   options: string[];
-  onChange: (event: SelectChangeEvent<string | number>) => void;
 }
 
 
@@ -82,6 +81,7 @@ export type ConnectionObject = {
 export interface UserFormValues {
   name: string;
   email: string;
+  currency: string;
   OldPassword: string;
   NewPassword: string;
   ConfirmPassword: string;

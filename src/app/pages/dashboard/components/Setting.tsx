@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import {
-  UserSetting,
-  FinancialSetting,
-} from "@/app/components/index";
+import { UserSetting, ChangePassword } from "@/app/components/index";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
 
@@ -58,12 +55,12 @@ const Setting: React.FC = () => {
             className="bg-background"
           >
             <Tab
-              label="User Settings"
+              label="Edit Profile"
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label="Financial Settings"
+              label="Change Password"
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />
@@ -75,7 +72,7 @@ const Setting: React.FC = () => {
         </CustomTabPanel>
 
         <CustomTabPanel value={value} index={1}>
-          <FinancialSetting />
+          <ChangePassword />
         </CustomTabPanel>
       </Box>
     </div>
