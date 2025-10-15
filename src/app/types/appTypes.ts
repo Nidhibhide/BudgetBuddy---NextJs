@@ -1,5 +1,4 @@
-import React from 'react';
-import { SelectChangeEvent } from '@mui/material';
+
 
 export interface HeaderProps {
   children?: React.ReactNode;
@@ -54,13 +53,6 @@ export interface ButtonProps {
   hoverColor?: string;
 }
 
-export interface MultiSelectProps {
-  label: string;
-  options: string[];
-  selected?: string[];
-  onChange: (event: SelectChangeEvent<string[]>) => void;
-  error?: string;
-}
 
 export interface TooltipProps {
   label: string;
@@ -99,19 +91,28 @@ export interface FormValues {
   limit: string;
 }
 
-export interface CategoryDialogState {
-  open: boolean;
-  categoriesToRemove: string[];
-  reassignMap: Record<string, string>;
+
+
+
+
+export interface AddCategoryFormValues {
+  name: string;
+  type: string;
 }
 
-export interface CategoryRemovalDialogProps {
+export interface AddCategoryProps {
   open: boolean;
-  categoriesToRemove: string[];
-  reassignMap: Record<string, string>;
-  availableCategories: string[];
-  onClose: () => void;
-  onArchive: () => void;
-  onReassign: () => void;
-  onReassignMapChange: (category: string, newCategory: string) => void;
+  onOpenChange: (open: boolean) => void;
+}
+export interface TableColumn {
+  key: string;
+  label: string;
+  sortable?: boolean;
+}
+
+export interface GenericTableProps {
+  data: Record<string, string | number>[];
+  columns: TableColumn[];
+  title?: string;
+  keyField?: string;
 }

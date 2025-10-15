@@ -2,21 +2,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Checkbox,
-  ListItemText,
-} from "@mui/material";
 import { useField } from "formik";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   SelectBoxProps,
   ButtonProps,
   InputBoxProps,
-  MultiSelectProps,
   TooltipProps,
   GetStartedLinkProps,
 } from "@/app/types/appTypes";
@@ -31,56 +28,31 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   const [field, meta] = useField(name);
 
   return (
-    <div className="w-full flex flex-col gap-1">
-      <Label htmlFor={name} className="text-base">
+    <div className="w-full flex flex-col gap-1 relative">
+      <Label htmlFor={name} className="text-base text-foreground">
         {label}
       </Label>
-      <FormControl fullWidth size="small" error={!!meta.error}>
-        <Select
-          {...field}
-          id={name}
-          sx={{
-            color: 'var(--foreground)',
-            backgroundColor: 'var(--background)',
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'var(--foreground)',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'var(--foreground)',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'var(--foreground)',
-            },
-          }}
-          MenuProps={{
-            disablePortal: true,
-            PaperProps: {
-              sx: {
-                backgroundColor: 'var(--background)',
-                color: 'var(--foreground)',
-              },
-              style: {
-                maxHeight: 48 * 4.5,
-              },
-            },
-          }}
-        >
+      <Select
+        value={field.value}
+        onValueChange={(value) => {
+          field.onChange({ target: { name, value } });
+        }}
+      >
+        <SelectTrigger className="h-11 bg-background text-foreground border-foreground cursor-pointer">
+          <SelectValue placeholder={label} />
+        </SelectTrigger>
+        <SelectContent className="bg-background text-foreground border-foreground">
           {options.map((option: string) => (
-            <MenuItem
+            <SelectItem
               key={option}
               value={option}
-              sx={{
-                color: 'var(--foreground)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-              }}
+              className="hover:bg-foreground/10"
             >
               {option}
-            </MenuItem>
+            </SelectItem>
           ))}
-        </Select>
-      </FormControl>
+        </SelectContent>
+      </Select>
       {meta.touched && meta.error && (
         <p className="text-red-500 text-sm">{meta.error}</p>
       )}
@@ -100,8 +72,8 @@ export const InputBox: React.FC<InputBoxProps> = ({
   const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
-    <div className="w-full flex flex-col gap-1">
-      <Label htmlFor={name} className="text-base">
+    <div className="w-full flex flex-col gap-1 relative">
+      <Label htmlFor={name} className="text-base text-foreground">
         {label}
       </Label>
       <div className="relative">
@@ -110,7 +82,7 @@ export const InputBox: React.FC<InputBoxProps> = ({
           id={name}
           type={inputType}
           placeholder={placeholder || label}
-          className={`h-11 placeholder:text-base text-lg ${
+          className={`h-11 placeholder:text-base text-lg text-foreground ${
             type === "password" ? "pr-10" : ""
           }`}
         />
@@ -152,70 +124,6 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-export const MultiSelect: React.FC<MultiSelectProps> = ({
-  label,
-  options,
-  selected = [],
-  onChange,
-  error,
-}) => {
-  return (
-    <FormControl fullWidth size="small" variant="outlined" error={!!error}>
-      <InputLabel sx={{ color: 'var(--foreground)' }}>{label}</InputLabel>
-
-      <Select
-        multiple
-        value={selected}
-        onChange={onChange}
-        label={label}
-        renderValue={(selected: string[]) => selected.join(", ")}
-        sx={{
-          color: 'var(--foreground)',
-          backgroundColor: 'var(--background)',
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--foreground)',
-          },
-          '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--foreground)',
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'var(--foreground)',
-          },
-        }}
-        MenuProps={{
-          disablePortal: true,
-          PaperProps: {
-            sx: {
-              backgroundColor: 'var(--background)',
-              color: 'var(--foreground)',
-            },
-            style: { maxHeight: 48 * 4.5 },
-          },
-        }}
-      >
-        {options.map((option) => (
-          <MenuItem
-            key={option}
-            value={option}
-            sx={{
-              color: 'var(--foreground)',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              },
-            }}
-          >
-            <Checkbox
-              checked={selected.includes(option)}
-              sx={{ color: 'var(--foreground)' }}
-            />
-            <ListItemText primary={option as string} />
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-};
-
 export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
   return (
     <div className="relative group inline-block cursor-pointer">
@@ -241,3 +149,4 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     </Link>
   );
 };
+
