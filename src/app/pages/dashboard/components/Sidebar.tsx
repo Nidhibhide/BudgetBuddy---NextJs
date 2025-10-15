@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import {
+  MdCategory,
   MdLogout,
   MdDashboard,
   MdOutlineRestore,
@@ -30,6 +31,16 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       label: "Reports",
       icon: (
         <MdOutlineRestore
+          size={28}
+          className="text-foreground group-hover:text-background"
+        />
+      ),
+    },
+    {
+      href: "/dashboard/category",
+      label: "Category",
+      icon: (
+        <MdCategory
           size={28}
           className="text-foreground group-hover:text-background"
         />
