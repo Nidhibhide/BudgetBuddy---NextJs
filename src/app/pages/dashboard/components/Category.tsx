@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, ArrowUp } from "lucide-react";
+import { Plus, ArrowUp, Hand, SearchX, MousePointer, AlertTriangle } from "lucide-react";
 import { TYPES, CATEGORY_LIST } from "@/lib/constants";
-import { AddCategory, CustomPagination } from "@/app/components/index";
+import { AddCategory, CustomPagination, NotFound } from "@/app/components/index";
 import { Table } from "@/app/components/index";
 
 interface CategoryData {
@@ -146,13 +146,7 @@ const dummyFreelanceRecords: CategoryRecord[] = [
 ];
 
 const dummyInvestmentRecords: CategoryRecord[] = [
-  {
-    id: 1,
-    date: "2023-10-20",
-    description: "Stock dividends",
-    amount: 2500,
-    type: "Income",
-  },
+
 ];
 
 const getRecordsForCategory = (categoryName: string): CategoryRecord[] => {
@@ -269,38 +263,43 @@ const Category: React.FC = () => {
 
       {/* Table Section */}
       {selectedCategory ? (
-        <>
-          <Table
-            data={getRecordsForCategory(selectedCategory).slice(
-              (currentPage - 1) * itemsPerPage,
-              currentPage * itemsPerPage
-            )}
-            columns={[
-              { key: "date", label: "Date", sortable: true },
-              { key: "description", label: "Description" },
-              { key: "amount", label: "Amount", sortable: true },
-              { key: "type", label: "Type" },
-            ]}
-            title={`Records for ${selectedCategory}`}
-          />
-          <div className="flex justify-end mt-4">
-            <CustomPagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(getRecordsForCategory(selectedCategory).length / itemsPerPage)}
-              onPageChange={setCurrentPage}
-              className="justify-end"
+        getRecordsForCategory(selectedCategory).length > 0 ? (
+          <>
+            <Table
+              data={getRecordsForCategory(selectedCategory).slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+              )}
+              columns={[
+                { key: "date", label: "Date", sortable: true },
+                { key: "description", label: "Description" },
+                { key: "amount", label: "Amount", sortable: true },
+                { key: "type", label: "Type" },
+              ]}
+              title={`Records for ${selectedCategory}`}
             />
-          </div>
-        </>
+            <div className="flex justify-end mt-4">
+              <CustomPagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(getRecordsForCategory(selectedCategory).length / itemsPerPage)}
+                onPageChange={setCurrentPage}
+                className="justify-end"
+              />
+            </div>
+          </>
+        ) : (
+          <NotFound
+            title="No Records Found"
+            message={`There are no transaction records available for ${selectedCategory}. Try selecting a different category or add some transactions.`}
+            icon={AlertTriangle}
+          />
+        )
       ) : (
-        <Card className="w-full mt-8 bg-background/50 border-dashed border-2 border-foreground/20">
-          <CardContent className="flex flex-col items-center justify-center py-8 space-y-2">
-            <ArrowUp className="w-8 h-8 text-foreground/70 animate-bounce" />
-            <span className="text-lg font-medium text-foreground/80 text-center">
-              Select a category above to display its records
-            </span>
-          </CardContent>
-        </Card>
+        <NotFound
+          title="Select a Category"
+          message="Click on any category card above to view its detailed transaction records and insights."
+          icon={MousePointer}
+        />
       )}
 
       <AddCategory

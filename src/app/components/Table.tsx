@@ -54,7 +54,9 @@ export const Table: React.FC<GenericTableProps> = ({
             <TableRow key={row[keyField] || index} className="hover:bg-foreground hover:text-background cursor-pointer transition-colors">
               {columns.map((column) => (
                 <TableCell key={column.key}>
-                  {column.key === "amount"
+                  {column.render
+                    ? column.render(row[column.key], row)
+                    : column.key === "amount"
                     ? `₹${row[column.key].toLocaleString()}`
                     : row[column.key]}
                 </TableCell>
