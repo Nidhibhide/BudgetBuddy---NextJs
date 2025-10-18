@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   MdCategory,
   MdLogout,
   MdDashboard,
   MdOutlineRestore,
   MdAccountBalance,
+  MdPayment,
 } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { Moon, Sun, X } from "lucide-react";
@@ -14,57 +16,38 @@ import { Button } from "@/components/ui/button";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const { setTheme, theme } = useTheme();
+  const pathname = usePathname();
 
   const sidebarLinks = [
     {
       href: "/dashboard/home",
       label: "Dashboard",
-      icon: (
-        <MdDashboard
-          size={28}
-          className="text-foreground group-hover:text-background"
-        />
-      ),
+      icon: MdDashboard,
     },
     {
       href: "/dashboard/report",
       label: "Reports",
-      icon: (
-        <MdOutlineRestore
-          size={28}
-          className="text-foreground group-hover:text-background"
-        />
-      ),
+      icon: MdOutlineRestore,
     },
     {
       href: "/dashboard/category",
       label: "Category",
-      icon: (
-        <MdCategory
-          size={28}
-          className="text-foreground group-hover:text-background"
-        />
-      ),
+      icon: MdCategory,
+    },
+    {
+      href: "/dashboard/transaction",
+      label: "Transaction",
+      icon: MdPayment,
     },
     {
       href: "/dashboard/setting",
       label: "Setting",
-      icon: (
-        <IoMdSettings
-          size={28}
-          className="text-foreground group-hover:text-background"
-        />
-      ),
+      icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
       label: "Logout",
-      icon: (
-        <MdLogout
-          size={28}
-          className="text-foreground group-hover:text-background"
-        />
-      ),
+      icon: MdLogout,
     },
   ];
 
@@ -106,16 +89,21 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       <div className="flex-1">
         <ul className="flex flex-col text-xl font-medium">
           {sidebarLinks.map((link) => {
+            const isActive = pathname === link.href;
             return (
               <li
                 key={link.href}
-                className="group flex items-center hover:bg-foreground hover:text-background gap-2 cursor-pointer md:py-3 py-2 justify-center text-foreground"
+                className={`group flex items-center gap-2 cursor-pointer md:py-3 py-2 justify-center ${
+                  isActive
+                    ? "bg-foreground text-background"
+                    : "hover:bg-sidebar-hover text-foreground"
+                }`}
               >
                 <Link
                   href={link.href}
                   className="flex items-center gap-2 text-base md:text-lg"
                 >
-                  {link.icon}
+                  <link.icon size={28} className={isActive ? "text-background" : "text-foreground"} />
                   {link.label}
                 </Link>
               </li>

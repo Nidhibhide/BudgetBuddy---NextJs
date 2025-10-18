@@ -23,7 +23,7 @@ export interface ApiResponse {
 }
 
 export interface SelectBoxProps {
-  label: string;
+  label?: string;
   name: string;
   options: string[];
 }
@@ -104,10 +104,24 @@ export interface AddCategoryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+export interface AddTransactionFormValues {
+  date: string;
+  description: string;
+  category: string;
+  amount: number;
+  type: string;
+}
+
+export interface AddTransactionProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 export interface TableColumn {
   key: string;
   label: string;
   sortable?: boolean;
+  render?: (value: string | number, row: Record<string, string | number>) => React.ReactNode;
 }
 
 export interface GenericTableProps {
@@ -115,4 +129,10 @@ export interface GenericTableProps {
   columns: TableColumn[];
   title?: string;
   keyField?: string;
+}
+
+export interface NotFoundProps {
+  title?: string;
+  message?: string;
+  icon?: React.ComponentType<{ className?: string }>;
 }

@@ -10,13 +10,16 @@ import { showSuccess, showError, useHandleResponse } from "./Utils";
 import UserSetting from "./UserSetting";
 import ChangePassword from "./ChangePassword";
 import AddCategory from "./AddCategory";
+import AddTransaction from "./AddTransaction";
 import CustomPagination from "./Pagination";
+import NotFound from "./NotFound";
 export {
   Table,
   InputBox,
   UserSetting,
   ChangePassword,
   AddCategory,
+  AddTransaction,
   SelectBox,
   Button,
   GetStartedLink,
@@ -25,4 +28,5 @@ export {
   Tooltip,
   useHandleResponse,
   CustomPagination,
+  NotFound,
 };

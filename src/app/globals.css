@@ -7,6 +7,7 @@
   --color-foreground: var(--foreground);
   --color-btn-background: var(--btn-background);
   --color-btn-hover: var(--btn-hover);
+  --color-sidebar-hover: var(--sidebar-hover);
 }
 
 :root {
@@ -17,6 +18,9 @@
   /* button section */
   --btn-background: #6366f1;
   --btn-hover: #4f46e5;
+
+  /* sidebar hover */
+  --sidebar-hover: #e2e8f0;
 }
 .dark {
   /* header section */
@@ -26,6 +30,9 @@
   /* button section */
   --btn-background: #818cf8;
   --btn-hover: #4f46e5;
+
+  /* sidebar hover */
+  --sidebar-hover: #334155;
 }
 
 body {
