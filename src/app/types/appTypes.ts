@@ -1,5 +1,3 @@
-
-
 export interface HeaderProps {
   children?: React.ReactNode;
 }
@@ -15,19 +13,18 @@ export interface RegisterUserData {
   password: string;
 }
 
-export interface ApiResponse {
-  message: string;
-  success: boolean;
-  statusCode: number;
-  data?: object;  // optional, can hold user or anything else
-}
+// export interface ApiResponse {
+//   message: string;
+//   success: boolean;
+//   statusCode: number;
+//   data?: object; // optional, can hold user or anything else
+// }
 
 export interface SelectBoxProps {
   label?: string;
   name: string;
   options: string[];
 }
-
 
 export interface InputBoxProps {
   label: string;
@@ -53,7 +50,6 @@ export interface ButtonProps {
   hoverColor?: string;
 }
 
-
 export interface TooltipProps {
   label: string;
   children: React.ReactNode;
@@ -68,7 +64,6 @@ export interface GetStartedLinkProps {
 export type ConnectionObject = {
   isConnected?: number;
 };
-
 
 export interface UserFormValues {
   name: string;
@@ -91,13 +86,14 @@ export interface FormValues {
   limit: string;
 }
 
-
-
-
-
-export interface AddCategoryFormValues {
+export interface Category {
   name: string;
   type: string;
+  _id?: string;
+  user?: string;
+  isArchived?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AddCategoryProps {
@@ -121,7 +117,10 @@ export interface TableColumn {
   key: string;
   label: string;
   sortable?: boolean;
-  render?: (value: string | number, row: Record<string, string | number>) => React.ReactNode;
+  render?: (
+    value: string | number,
+    row: Record<string, string | number>
+  ) => React.ReactNode;
 }
 
 export interface GenericTableProps {

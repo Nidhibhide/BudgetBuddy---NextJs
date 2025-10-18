@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -9,11 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, SelectBox, Button, showSuccess } from "./index";
+import { InputBox, SelectBox, Button, showSuccess, showError } from "./index";
 import { TYPES } from "@/lib/constants";
-import { AddCategoryFormValues, AddCategoryProps } from "@/app/types/appTypes";
+import { Category, AddCategoryProps } from "@/app/types/appTypes";
+import { createCategory } from "@/app/lib/category";
 
 const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Name must be at least 2 characters")
@@ -24,10 +27,22 @@ const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
       .required("Type is required"),
   });
 
-  const handleSubmit = (values: AddCategoryFormValues) => {
-    // For now, just show success and close dialog
-    showSuccess("Category added successfully");
-    onOpenChange(false);
+  const handleSubmit = async (values:Category) => {
+    setIsLoading(true);
+    try {
+      const response = await createCategory(values);
+      console.log(response)
+      if (response.success) {
+        showSuccess(response.message);
+        onOpenChange(false);
+      } else {
+        showError(response.message);
+      }
+    } catch (error) {
+      showError("Something went wrong while creating category");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,7 +70,9 @@ const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Add Category</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Adding..." : "Add Category"}
+                </Button>
               </div>
             </form>
           )}

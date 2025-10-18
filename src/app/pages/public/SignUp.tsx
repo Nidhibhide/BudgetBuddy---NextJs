@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { InputBox, showError, showSuccess, Button } from "../../components";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/app/lib/user";
+import { registerUser } from "@/app/lib/auth";
 import { RegisterUserData } from "@/app/types/appTypes";
 
 const SignUp = () => {
@@ -39,6 +39,7 @@ const SignUp = () => {
       if (loading) return;
       setLoading(true);
       const response = await registerUser(values);
+
       const { message, statusCode } = response;
 
       if (statusCode === 201) {
