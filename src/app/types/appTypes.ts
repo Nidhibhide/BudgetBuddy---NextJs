@@ -13,12 +13,12 @@ export interface RegisterUserData {
   password: string;
 }
 
-// export interface ApiResponse {
-//   message: string;
-//   success: boolean;
-//   statusCode: number;
-//   data?: object; // optional, can hold user or anything else
-// }
+export interface ApiResponse {
+  message: string;
+  success: boolean;
+  statusCode: number;
+  data?: object; // optional, can hold user or anything else
+}
 
 export interface SelectBoxProps {
   label?: string;
