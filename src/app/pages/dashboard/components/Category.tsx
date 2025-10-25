@@ -4,53 +4,77 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, MousePointer, AlertTriangle, Loader2 } from "lucide-react";
-import { TYPES, CATEGORY_LIST } from "@/lib/constants";
+import { Plus, MousePointer, Loader2 } from "lucide-react";
 import {
   AddCategory,
   CustomPagination,
   NotFound,
 } from "@/app/components/index";
 import { Table } from "@/app/components/index";
-// import { CategoryData, CategoryRecord } from "@/app/types/appTypes";
 import { getCategoryDetails } from "@/app/lib/category";
-import type { Category } from "@/app/types/appTypes";
+import { getTransactions } from "@/app/lib/transaction";
+import type { Category, Transaction as TransactionType } from "@/app/types/appTypes";
 
 const Category: React.FC = () => {
   const [isExpense, setIsExpense] = useState(true);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState<Category[]>([]);
-  // const [records, setRecords] = useState<CategoryRecord[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [loading, setLoading] = useState(true);
   const [recordsLoading, setRecordsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5;
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalTransactions: 0,
+    limit: 10,
+  });
 
   // Fetch category details
   const fetchCategoryDetails = async (type: string) => {
     try {
       setLoading(true);
-      setError(null);
       const result = await getCategoryDetails(type);
-      console.log(result);
       if (result.success && result.data) {
         setData(result.data);
-      } else {
-        setError(result.message || "Failed to fetch category details");
       }
     } catch (err) {
-      setError("Failed to fetch category details");
+      console.error("Error fetching category details:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch transactions for selected category
+  const fetchTransactions = async (type: string, category: string, page: number = 1) => {
+    setRecordsLoading(true);
+    try {
+      const response = await getTransactions(type, category, page, 10);
+      if (response.success) {
+        setTransactions(response.data || []);
+        setPagination(prev => response.pagination || prev);
+      } else {
+        console.error("Failed to fetch transactions:", response.message);
+        setTransactions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setTransactions([]);
+    } finally {
+      setRecordsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCategoryDetails(isExpense ? "Expense" : "Income");
+    setSelectedCategory(null); // Reset selected category when type changes
   }, [isExpense]);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchTransactions(isExpense ? "Expense" : "Income", selectedCategory, pagination.currentPage);
+    }
+  }, [selectedCategory, pagination.currentPage, isExpense]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -81,23 +105,15 @@ const Category: React.FC = () => {
           <div className="col-span-full flex justify-center items-center py-8">
             <Loader2 className="w-8 h-8 animate-spin text-foreground" />
           </div>
-        ) : error ? (
-          <div className="col-span-full flex justify-center items-center py-8">
-            <div className="text-center">
-              <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <div className="text-lg font-semibold text-foreground">Error</div>
-              <div className="text-sm text-foreground/70">{error}</div>
-            </div>
-          </div>
         ) : (
           <>
             {data?.map((category, index) => (
               <Card
                 key={index}
-                className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 bg-background cursor-pointer"
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${selectedCategory === category.name ? 'bg-selected-background' : 'bg-background'} cursor-pointer`}
                 onClick={() => {
                   setSelectedCategory(category.name);
-                  setCurrentPage(1);
+                  setPagination(prev => ({ ...prev, currentPage: 1 }));
                 }}
               >
                 <CardHeader className="pb-2">
@@ -151,15 +167,15 @@ const Category: React.FC = () => {
       </div>
 
       {/* Table Section */}
-      {/* {selectedCategory ? (
+      {selectedCategory ? (
         recordsLoading ? (
           <div className="flex justify-center items-center py-8">
             <Loader2 className="w-8 h-8 animate-spin text-foreground" />
           </div>
-        ) : .length > 0 ? (
+        ) : transactions.length > 0 ? (
           <>
             <Table
-              data={records}
+              data={transactions}
               columns={[
                 { key: "date", label: "Date", sortable: true },
                 { key: "description", label: "Description" },
@@ -170,9 +186,9 @@ const Category: React.FC = () => {
             />
             <div className="flex justify-end mt-4">
               <CustomPagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={(page) => setPagination(prev => ({ ...prev, currentPage: page }))}
                 className="justify-end"
               />
             </div>
@@ -181,7 +197,6 @@ const Category: React.FC = () => {
           <NotFound
             title="No Records Found"
             message={`There are no transaction records available for ${selectedCategory}. Try selecting a different category or add some transactions.`}
-            icon={AlertTriangle}
           />
         )
       ) : (
@@ -190,7 +205,7 @@ const Category: React.FC = () => {
           message="Click on any category card above to view its detailed transaction records and insights."
           icon={MousePointer}
         />
-      )}  */}
+      )}
 
       <AddCategory
         open={isAddCategoryOpen}

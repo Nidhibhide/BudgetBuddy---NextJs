@@ -9,13 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  className?: string;
-}
+import { PaginationProps } from "@/app/types/appTypes";
 
 const CustomPagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -32,6 +26,7 @@ const CustomPagination: React.FC<PaginationProps> = ({
           <PaginationPrevious
             href="#"
             size="default"
+            className="text-foreground"
             onClick={(e) => {
               e.preventDefault();
               if (currentPage > 1) onPageChange(currentPage - 1);
@@ -43,6 +38,7 @@ const CustomPagination: React.FC<PaginationProps> = ({
             <PaginationLink
               href="#"
               size="default"
+              className="text-foreground"
               isActive={page === currentPage}
               onClick={(e) => {
                 e.preventDefault();
@@ -57,6 +53,7 @@ const CustomPagination: React.FC<PaginationProps> = ({
           <PaginationNext
             href="#"
             size="default"
+            className="text-foreground"
             onClick={(e) => {
               e.preventDefault();
               if (currentPage < totalPages) onPageChange(currentPage + 1);

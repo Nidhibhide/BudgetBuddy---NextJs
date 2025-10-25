@@ -8,6 +8,7 @@
   --color-btn-background: var(--btn-background);
   --color-btn-hover: var(--btn-hover);
   --color-sidebar-hover: var(--sidebar-hover);
+  --color-selected-background: var(--selected-background);
 }
 
 :root {
@@ -21,6 +22,9 @@
 
   /* sidebar hover */
   --sidebar-hover: #e2e8f0;
+
+  /* selected category background */
+  --selected-background: #dbeafe;
 }
 .dark {
   /* header section */
@@ -33,6 +37,9 @@
 
   /* sidebar hover */
   --sidebar-hover: #334155;
+
+  /* selected category background */
+  --selected-background: #334155;
 }
 
 body {
