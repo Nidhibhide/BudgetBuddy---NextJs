@@ -24,12 +24,20 @@ export interface SelectBoxProps {
   label?: string;
   name: string;
   options: string[];
+  onChange?: (value: string) => void;
+  value?: string;
 }
 
 export interface InputBoxProps {
   label: string;
   name: string;
   type?: string;
+  placeholder?: string;
+}
+
+export interface TextareaBoxProps {
+  label: string;
+  name: string;
   placeholder?: string;
 }
 
@@ -59,6 +67,8 @@ export interface GetStartedLinkProps {
   href: string;
   children: React.ReactNode;
   width?: string;
+  onClick?: () => void;
+  loading?: boolean;
 }
 
 export type ConnectionObject = {
@@ -101,12 +111,14 @@ export interface AddCategoryProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export interface AddTransactionFormValues {
+export interface Transaction {
+  id: number;
   date: string;
   description: string;
   category: string;
   amount: number;
   type: string;
+  [key: string]: string | number;
 }
 
 export interface AddTransactionProps {
@@ -134,4 +146,11 @@ export interface NotFoundProps {
   title?: string;
   message?: string;
   icon?: React.ComponentType<{ className?: string }>;
+}
+
+export interface MatchStage {
+  user: string | object;
+  isDeleted: boolean;
+  type?: string;
+  "category.name"?: string;
 }

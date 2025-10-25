@@ -2,6 +2,7 @@ import { Table } from "@/app/components/Table";
 import {
   SelectBox,
   InputBox,
+  TextareaBox,
   Button,
   Tooltip,
   GetStartedLink,
@@ -16,6 +17,7 @@ import NotFound from "./NotFound";
 export {
   Table,
   InputBox,
+  TextareaBox,
   UserSetting,
   ChangePassword,
   AddCategory,

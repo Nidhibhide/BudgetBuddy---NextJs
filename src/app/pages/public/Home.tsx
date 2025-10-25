@@ -1,7 +1,17 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { GetStartedLink } from "@/app/components";
 
 const Home = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleGetStartedClick = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000); // Adjust delay as needed
+  };
+
   return (
     <div className=" min-h-screen w-full py-28 text-foreground">
       <div className="flex xl:flex-row flex-col gap-12 xl:gap-2 px-4 md:px-20 justify-center">
@@ -16,7 +26,7 @@ const Home = () => {
             Simple. Smart. Stress-free.
           </div>
           <div className="flex gap-4 items-center">
-            <GetStartedLink href="/signin" width="w-[150px]">Get Started</GetStartedLink>
+            <GetStartedLink href="/signin" width="w-[150px]" onClick={handleGetStartedClick} loading={loading}>Get Started</GetStartedLink>
             <a
               href="#features"
               className=" bg-btn-background text-white hover:bg-btn-hover py-2.5 px-4 text-center text-base font-medium  rounded-xl   hover:shadow-md transition duration-500 w-[150px]"

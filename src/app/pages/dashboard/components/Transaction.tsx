@@ -1,187 +1,105 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button, SelectBox } from "@/app/components/FormElements";
-import { Plus, Edit, Trash2, SearchX } from "lucide-react";
-import { TYPES, CATEGORY_LIST } from "@/lib/constants";
-import { Table, CustomPagination, NotFound, AddTransaction } from "@/app/components/index";
-
-interface TransactionRecord extends Record<string, string | number> {
-  id: number;
-  date: string;
-  description: string;
-  category: string;
-  amount: number;
-  type: string;
-}
-
-const dummyTransactions: TransactionRecord[] = [
-  {
-    id: 1,
-    date: "2023-10-01",
-    description: "Grocery shopping",
-    category: "Groceries",
-    amount: 500,
-    type: "Expense",
-  },
-  {
-    id: 2,
-    date: "2023-10-02",
-    description: "Bus fare",
-    category: "Transport",
-    amount: 200,
-    type: "Expense",
-  },
-  {
-    id: 3,
-    date: "2023-10-03",
-    description: "Weekly groceries",
-    category: "Groceries",
-    amount: 800,
-    type: "Expense",
-  },
-  {
-    id: 4,
-    date: "2023-10-04",
-    description: "Movie tickets",
-    category: "Entertainment",
-    amount: 300,
-    type: "Expense",
-  },
-  {
-    id: 5,
-    date: "2023-10-05",
-    description: "Clothing",
-    category: "Shopping",
-    amount: 1200,
-    type: "Expense",
-  },
-  {
-    id: 6,
-    date: "2023-10-06",
-    description: "Monthly salary",
-    category: "Salary",
-    amount: 50000,
-    type: "Income",
-  },
-  {
-    id: 7,
-    date: "2023-10-07",
-    description: "Taxi",
-    category: "Transport",
-    amount: 800,
-    type: "Expense",
-  },
-  {
-    id: 8,
-    date: "2023-10-08",
-    description: "Fruits and vegetables",
-    category: "Groceries",
-    amount: 600,
-    type: "Expense",
-  },
-  {
-    id: 9,
-    date: "2023-10-09",
-    description: "Concert",
-    category: "Entertainment",
-    amount: 200,
-    type: "Expense",
-  },
-  {
-    id: 10,
-    date: "2023-10-10",
-    description: "Electronics",
-    category: "Shopping",
-    amount: 1500,
-    type: "Expense",
-  },
-  {
-    id: 11,
-    date: "2023-10-11",
-    description: "Fuel",
-    category: "Transport",
-    amount: 400,
-    type: "Expense",
-  },
-  {
-    id: 12,
-    date: "2023-10-12",
-    description: "Web development project",
-    category: "Freelance",
-    amount: 10000,
-    type: "Income",
-  },
-  {
-    id: 13,
-    date: "2023-10-13",
-    description: "Dairy products",
-    category: "Groceries",
-    amount: 400,
-    type: "Expense",
-  },
-  {
-    id: 14,
-    date: "2023-10-14",
-    description: "Investment returns",
-    category: "Investment",
-    amount: 2500,
-    type: "Income",
-  },
-  {
-    id: 15,
-    date: "2023-10-15",
-    description: "Restaurant dinner",
-    category: "Entertainment",
-    amount: 1500,
-    type: "Expense",
-  },
-];
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import {
+  Table,
+  CustomPagination,
+  NotFound,
+  AddTransaction,
+} from "@/app/components/index";
+import { getCategoryDetails } from "@/app/lib/category";
+import { getTransactions } from "@/app/lib/transaction";
+import { Category, Transaction as TransactionType } from "@/app/types/appTypes";
 
 const Transaction: React.FC = () => {
   const [isExpense, setIsExpense] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
-  const itemsPerPage = 5;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalTransactions: 0,
+    limit: 10,
+  });
+
+  const fetchCategories = async (type: string) => {
+    try {
+      const response = await getCategoryDetails(type);
+      if (response.success) {
+        setCategories(response.data || []);
+      } else {
+        console.error("Failed to fetch categories:", response.message);
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setCategories([]);
+    }
+  };
+
+  const fetchTransactions = useCallback(async (
+    type: string,
+    category: string,
+    page: number = 1
+  ) => {
+    setLoading(true);
+    try {
+      const response = await getTransactions(
+        type,
+        category,
+        page,
+        10
+      );
+      if (response.success) {
+        setTransactions(response.data || []);
+        setPagination(prev => response.pagination || prev);
+      } else {
+        console.error("Failed to fetch transactions:", response.message);
+        setTransactions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
+    fetchTransactions(isExpense ? "Expense" : "Income", value, 1);
   };
 
-  const filteredTransactions = dummyTransactions.filter((transaction) => {
-    const matchesType = isExpense
-      ? transaction.type === "Expense"
-      : transaction.type === "Income";
-    const matchesCategory =
-      selectedCategory === "All" || transaction.category === selectedCategory;
-    return matchesType && matchesCategory;
-  });
+  useEffect(() => {
+    setSelectedCategory("All");
+    setCurrentPage(1);
+  }, [isExpense]);
 
-  const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    const type = isExpense ? "Expense" : "Income";
+    fetchCategories(type);
+  }, [isExpense]);
 
-  const handleEdit = (id: number) => {
-    console.log("Edit transaction:", id);
-    // TODO: Implement edit functionality
-  };
-
-  const handleDelete = (id: number) => {
-    console.log("Delete transaction:", id);
-    // TODO: Implement delete functionality
-  };
+  useEffect(() => {
+    const type = isExpense ? "Expense" : "Income";
+    fetchTransactions(type, selectedCategory, currentPage);
+  }, [isExpense, selectedCategory, currentPage, fetchTransactions]);
 
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-foreground">Transactions</h2>
+        <h2 className="text-2xl font-bold text-foreground">Transactions Overview</h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
@@ -209,7 +127,9 @@ const Transaction: React.FC = () => {
               <div className="w-full sm:w-[180px]">
                 <SelectBox
                   name="category"
-                  options={["All", ...CATEGORY_LIST]}
+                  options={["All", ...categories.map((cat) => cat.name)]}
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
                 />
               </div>
             )}
@@ -227,10 +147,14 @@ const Transaction: React.FC = () => {
       </div>
 
       {/* Table Section */}
-      {filteredTransactions.length > 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+      ) : transactions.length > 0 ? (
         <>
           <Table
-            data={paginatedTransactions}
+            data={transactions as TransactionType[]}
             columns={[
               { key: "date", label: "Date", sortable: true },
               { key: "description", label: "Description" },
@@ -240,17 +164,17 @@ const Transaction: React.FC = () => {
               {
                 key: "actions",
                 label: "Actions",
-                render: (value, row) => (
+                render: () => (
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEdit(row.id as number)}
+                      // onClick={() => handleEdit(row.id as number)}
                       className="p-1 hover:bg-background/10 hover:text-foreground rounded transition-colors"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDelete(row.id as number)}
+                      // onClick={() => handleDelete(row.id as number)}
                       className="p-1 hover:bg-red-500/10 rounded transition-colors"
                       title="Delete"
                     >
@@ -266,8 +190,8 @@ const Transaction: React.FC = () => {
           {/* Pagination */}
           <div className="flex justify-end mt-4">
             <CustomPagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(filteredTransactions.length / itemsPerPage)}
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
               onPageChange={setCurrentPage}
               className="justify-end"
             />

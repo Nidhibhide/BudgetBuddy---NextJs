@@ -43,11 +43,7 @@ export async function POST(request: Request) {
     await newCategory.save();
 
     return JsonOne(201, "Category created successfully", true, {
-      category: {
-        id: newCategory._id,
-        name: newCategory.name,
-        type: newCategory.type,
-      },
+      category: newCategory
     });
   } catch (error) {
     console.log("Error creating category", error);

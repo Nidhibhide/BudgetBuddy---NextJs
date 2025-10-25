@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useField } from "formik";
 import {
   Select,
@@ -14,16 +14,20 @@ import {
   SelectBoxProps,
   ButtonProps,
   InputBoxProps,
+  TextareaBoxProps,
   TooltipProps,
   GetStartedLinkProps,
 } from "@/app/types/appTypes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export const SelectBox: React.FC<SelectBoxProps> = ({
   label,
   name,
   options,
+  onChange,
+  value,
 }) => {
   const [field, meta] = useField(name);
 
@@ -33,9 +37,10 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
         {label}
       </Label>
       <Select
-        value={field.value}
+        value={value ?? field.value}
         onValueChange={(value) => {
           field.onChange({ target: { name, value } });
+          if (onChange) onChange(value);
         }}
       >
         <SelectTrigger className="h-11 bg-background text-foreground border-foreground cursor-pointer">
@@ -102,6 +107,31 @@ export const InputBox: React.FC<InputBoxProps> = ({
     </div>
   );
 };
+
+export const TextareaBox: React.FC<TextareaBoxProps> = ({
+  label,
+  name,
+  placeholder,
+}) => {
+  const [field, meta] = useField(name);
+
+  return (
+    <div className="w-full flex flex-col gap-1 relative">
+      <Label htmlFor={name} className="text-base text-foreground">
+        {label}
+      </Label>
+      <Textarea
+        {...field}
+        id={name}
+        placeholder={placeholder || label}
+        className="placeholder:text-base text-lg text-foreground resize-none min-h-[80px]"
+      />
+      {meta.touched && meta.error && (
+        <p className="text-red-500 text-sm">{meta.error}</p>
+      )}
+    </div>
+  );
+};
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
@@ -139,13 +169,23 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
   href,
   children,
   width = "w-full sm:w-[150px]",
+  onClick,
+  loading = false,
 }) => {
   return (
     <Link
       href={href}
-      className={`bg-btn-background py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width}`}
+      onClick={onClick}
+      className={`bg-btn-background py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width} ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
     >
-      {children}
+      {loading ? (
+        <div className="flex items-center justify-center gap-2">
+          <Loader2 className="animate-spin" size={16} />
+          Loading...
+        </div>
+      ) : (
+        children
+      )}
     </Link>
   );
 };
