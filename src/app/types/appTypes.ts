@@ -154,3 +154,10 @@ export interface MatchStage {
   type?: string;
   "category.name"?: string;
 }
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}
