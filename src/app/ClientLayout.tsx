@@ -10,7 +10,7 @@ export default function ClientLayout({
 }) {
   return (
     <SessionProvider
-      refetchOnWindowFocus={false}
+      refetchOnWindowFocus={true}
       refetchInterval={5 * 60 * 1000} // 5 minutes
     >
       <main>{children}</main>

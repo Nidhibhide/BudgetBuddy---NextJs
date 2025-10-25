@@ -1,38 +1,39 @@
 import axios, { AxiosError } from "axios";
-import { Category } from "@/app/types/appTypes";
+import { Transaction } from "@/app/types/appTypes";
 
-export async function createCategory(data: Category) {
+export async function addTransaction(data: Transaction) {
   try {
-    const response = await axios.post("/api/category/create", data);
+    const response = await axios.post("/api/transaction/create", data);
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error creating category:", error);
+    console.error("Error adding transaction:", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while creating category",
+        "Something went wrong while adding transaction",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getCategoryDetails(type: string) {
+export async function getTransactions(type: string, category?: string, page?: number, limit?: number) {
   try {
-    const response = await axios.get(`/api/category/details?type=${type}`);
+    const response = await axios.get(
+      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}`
+    );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching category details:", error);
+    console.error("Error fetching transactions:", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching category details",
+        "Something went wrong while fetching transactions",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
-
