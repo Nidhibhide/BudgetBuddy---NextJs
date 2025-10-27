@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ import { getTransactions } from "@/app/lib/transaction";
 import { Category, Transaction as TransactionType } from "@/app/types/appTypes";
 
 const Transaction: React.FC = () => {
+  const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +32,8 @@ const Transaction: React.FC = () => {
     totalTransactions: 0,
     limit: 10,
   });
+  const [sortBy, setSortBy] = useState<string>("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const fetchCategories = async (type: string) => {
     try {
@@ -49,7 +53,9 @@ const Transaction: React.FC = () => {
   const fetchTransactions = useCallback(async (
     type: string,
     category: string,
-    page: number = 1
+    page: number = 1,
+    sortByParam?: string,
+    sortOrderParam?: "asc" | "desc"
   ) => {
     setLoading(true);
     try {
@@ -57,7 +63,9 @@ const Transaction: React.FC = () => {
         type,
         category,
         page,
-        10
+        10,
+        sortByParam || sortBy,
+        sortOrderParam || sortOrder
       );
       if (response.success) {
         setTransactions(response.data || []);
@@ -72,12 +80,21 @@ const Transaction: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [sortBy, sortOrder]);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
-    fetchTransactions(isExpense ? "Expense" : "Income", value, 1);
+  };
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -93,7 +110,7 @@ const Transaction: React.FC = () => {
   useEffect(() => {
     const type = isExpense ? "Expense" : "Income";
     fetchTransactions(type, selectedCategory, currentPage);
-  }, [isExpense, selectedCategory, currentPage, fetchTransactions]);
+  }, [isExpense, selectedCategory, currentPage, sortBy, sortOrder, fetchTransactions, session?.user?.currency]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -156,10 +173,23 @@ const Transaction: React.FC = () => {
           <Table
             data={transactions as TransactionType[]}
             columns={[
-              { key: "date", label: "Date", sortable: true },
+              {
+                key: "date",
+                label: "Date",
+                sortable: true,
+                render: (value) => value ? new Date(value).toLocaleDateString('en-GB') : ''
+              },
               { key: "description", label: "Description" },
               { key: "category", label: "Category" },
-              { key: "amount", label: "Amount", sortable: true },
+              {
+                key: "amount",
+                label: "Amount",
+                sortable: true,
+                render: (value) => {
+                  const currency = session?.user?.currency || 'INR';
+                  return `${value} ${currency}`;
+                }
+              },
               { key: "type", label: "Type" },
               {
                 key: "actions",
@@ -185,6 +215,9 @@ const Transaction: React.FC = () => {
               },
             ]}
             title="Transaction Records"
+            onSort={handleSort}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
           />
 
           {/* Pagination */}
@@ -207,6 +240,7 @@ const Transaction: React.FC = () => {
       <AddTransaction
         open={isAddTransactionOpen}
         onOpenChange={setIsAddTransactionOpen}
+        onTransactionAdded={() => fetchTransactions(isExpense ? "Expense" : "Income", selectedCategory, currentPage)}
       />
     </div>
   );

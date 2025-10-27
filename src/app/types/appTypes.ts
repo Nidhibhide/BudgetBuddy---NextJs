@@ -56,6 +56,7 @@ export interface ButtonProps {
   className?: string;
   bgColor?: string;
   hoverColor?: string;
+  loading?: boolean;
 }
 
 export interface TooltipProps {
@@ -112,34 +113,42 @@ export interface AddCategoryProps {
 }
 
 export interface Transaction {
-  id: number;
+  id?: number;
+  title: string;
   date: string;
   description: string;
   category: string;
   amount: number;
   type: string;
-  [key: string]: string | number;
+  _id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: string | number | undefined;
 }
 
 export interface AddTransactionProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onTransactionAdded?: () => void;
 }
 export interface TableColumn {
   key: string;
   label: string;
   sortable?: boolean;
   render?: (
-    value: string | number,
-    row: Record<string, string | number>
+    value: string | number | undefined,
+    row: Record<string, string | number | undefined>
   ) => React.ReactNode;
 }
 
 export interface GenericTableProps {
-  data: Record<string, string | number>[];
+  data: Record<string, string | number | undefined>[];
   columns: TableColumn[];
   title?: string;
   keyField?: string;
+  onSort?: (column: string) => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export interface NotFoundProps {

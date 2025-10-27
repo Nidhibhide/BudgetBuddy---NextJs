@@ -9,6 +9,7 @@ import Link from "next/link";
 import { SignInFormValues } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
 
+
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -109,8 +110,9 @@ const SignIn = () => {
                 onClick={handleSubmit}
                 disabled={loading}
                 className="mt-4"
+                loading={loading}
               >
-                {loading ? "Loading..." : "Sign In"}
+                Sign In
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
                 New User?{" "}

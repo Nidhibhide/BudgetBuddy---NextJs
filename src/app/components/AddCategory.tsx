@@ -70,8 +70,8 @@ const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Adding..." : "Add Category"}
+                <Button type="submit" loading={isLoading}>
+                  Add Category
                 </Button>
               </div>
             </form>
