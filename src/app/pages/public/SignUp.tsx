@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
 import { RegisterUserData } from "@/app/types/appTypes";
 
+
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -91,8 +92,9 @@ const SignUp = () => {
                 onClick={handleSubmit}
                 disabled={loading}
                 className="mt-4"
+                loading={loading}
               >
-                {loading ? "Loading..." : "Sign Up"}
+                Sign Up
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
                 Already have an account?{" "}

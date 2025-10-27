@@ -101,8 +101,8 @@ const ChangePassword: React.FC = () => {
             />
           </div>
           <div className="mt-4">
-            <Button onClick={handleSubmit} width="w-full">
-              {passwordLoading ? "Loading..." : "Change Password"}
+            <Button onClick={handleSubmit} width="w-full" loading={passwordLoading}>
+              Change Password
             </Button>
           </div>
         </div>

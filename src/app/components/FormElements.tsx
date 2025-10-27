@@ -141,15 +141,23 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   bgColor = "bg-btn-background",
   hoverColor = "hover:bg-btn-hover",
+  loading = false,
 }) => {
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
-      className={`${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className}`}
+      disabled={disabled || loading}
+      className={`${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className} ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
     >
-      {children}
+      {loading ? (
+        <div className="flex items-center justify-center gap-2">
+          <Loader2 className="animate-spin" size={16} />
+          Loading...
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 };

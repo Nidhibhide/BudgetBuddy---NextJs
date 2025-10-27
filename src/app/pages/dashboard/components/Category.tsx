@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,7 @@ import { getTransactions } from "@/app/lib/transaction";
 import type { Category, Transaction as TransactionType } from "@/app/types/appTypes";
 
 const Category: React.FC = () => {
+  const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -29,9 +31,11 @@ const Category: React.FC = () => {
     totalTransactions: 0,
     limit: 10,
   });
+  const [sortBy, setSortBy] = useState<string>("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Fetch category details
-  const fetchCategoryDetails = async (type: string) => {
+  const fetchCategoryDetails = useCallback(async (type: string) => {
     try {
       setLoading(true);
       const result = await getCategoryDetails(type);
@@ -43,13 +47,26 @@ const Category: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Fetch transactions for selected category
-  const fetchTransactions = async (type: string, category: string, page: number = 1) => {
+  const fetchTransactions = useCallback(async (
+    type: string,
+    category: string,
+    page: number = 1,
+    sortByParam?: string,
+    sortOrderParam?: "asc" | "desc"
+  ) => {
     setRecordsLoading(true);
     try {
-      const response = await getTransactions(type, category, page, 10);
+      const response = await getTransactions(
+        type,
+        category,
+        page,
+        10,
+        sortByParam || sortBy,
+        sortOrderParam || sortOrder
+      );
       if (response.success) {
         setTransactions(response.data || []);
         setPagination(prev => response.pagination || prev);
@@ -63,18 +80,28 @@ const Category: React.FC = () => {
     } finally {
       setRecordsLoading(false);
     }
-  };
+  }, [sortBy, sortOrder]);
 
   useEffect(() => {
     fetchCategoryDetails(isExpense ? "Expense" : "Income");
     setSelectedCategory(null); // Reset selected category when type changes
-  }, [isExpense]);
+  }, [isExpense,fetchCategoryDetails]);
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
+  };
 
   useEffect(() => {
     if (selectedCategory) {
       fetchTransactions(isExpense ? "Expense" : "Income", selectedCategory, pagination.currentPage);
     }
-  }, [selectedCategory, pagination.currentPage, isExpense]);
+  }, [selectedCategory, pagination.currentPage, isExpense, sortBy, sortOrder,fetchTransactions]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -177,12 +204,28 @@ const Category: React.FC = () => {
             <Table
               data={transactions}
               columns={[
-                { key: "date", label: "Date", sortable: true },
+                {
+                  key: "date",
+                  label: "Date",
+                  sortable: true,
+                  render: (value) => value ? new Date(value).toLocaleDateString('en-GB') : ''
+                },
                 { key: "description", label: "Description" },
-                { key: "amount", label: "Amount", sortable: true },
+                {
+                  key: "amount",
+                  label: "Amount",
+                  sortable: true,
+                  render: (value) => {
+                    const currency = session?.user?.currency || 'INR';
+                    return `${value} ${currency}`;
+                  }
+                },
                 { key: "type", label: "Type" },
               ]}
               title={`Records for ${selectedCategory}`}
+              onSort={handleSort}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
             />
             <div className="flex justify-end mt-4">
               <CustomPagination

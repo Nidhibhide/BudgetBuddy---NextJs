@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useSession } from "next-auth/react";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +15,7 @@ import { TYPES} from "@/lib/constants";
 import { getCategoryDetails } from "@/app/lib/category";
 import { addTransaction } from "@/app/lib/transaction";
 import {
-  AddTransactionFormValues,
+Transaction,
   AddTransactionProps,
   Category,
 } from "@/app/types/appTypes";
@@ -22,9 +23,11 @@ import {
 const AddTransaction: React.FC<AddTransactionProps> = ({
   open,
   onOpenChange,
+  onTransactionAdded,
 }) => {
+  const { data: session } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
+  
   const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
@@ -52,7 +55,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
     type: string,
     setFieldValue?: (field: string, value: string) => void
   ) => {
-    setLoadingCategories(true);
+    
     try {
       const response = await getCategoryDetails(type);
       if (response.success) {
@@ -70,7 +73,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
       setCategories([]);
       // TODO: Show user-friendly error message
     } finally {
-      setLoadingCategories(false);
+      
     }
   };
 
@@ -87,13 +90,14 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
     }
   }, [open]);
 
-  const handleSubmit = async (values: AddTransactionFormValues) => {
+  const handleSubmit = async (values:Transaction) => {
     setLoading(true);
     try {
       const response = await addTransaction(values);
       if (response.success) {
         showSuccess("Transaction added successfully");
         onOpenChange(false);
+        onTransactionAdded?.();
       } else {
         showError(response.message || "Failed to add transaction");
       }
@@ -138,16 +142,12 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
               <SelectBox
                 name="category"
                 label="Category"
-                options={
-                  loadingCategories
-                    ? ["Loading..."]
-                    : categories.map((cat) => cat.name)
-                }
+                options={categories.map((cat) => cat.name)}
               />
               <InputBox name="title" label="Title" />
 
               <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label="Amount" type="number" />
+              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
 
               <div className="flex justify-end space-x-2">
                 <Button
@@ -157,8 +157,8 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Adding..." : "Add Transaction"}
+                <Button type="submit" loading={loading}>
+                  Add Transaction
                 </Button>
               </div>
             </form>

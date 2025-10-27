@@ -86,8 +86,8 @@ const UserSetting: React.FC = () => {
               />
             </div>
             <div className="mt-4">
-              <Button onClick={handleSubmit} width="w-full">
-                {profileLoading ? "Loading..." : "Update Profile"}
+              <Button onClick={handleSubmit} width="w-full" loading={profileLoading}>
+                Update Profile
               </Button>
             </div>
           </div>

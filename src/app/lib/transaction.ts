@@ -19,10 +19,10 @@ export async function addTransaction(data: Transaction) {
   }
 }
 
-export async function getTransactions(type: string, category?: string, page?: number, limit?: number) {
+export async function getTransactions(type: string, category?: string, page?: number, limit?: number, sortBy?: string, sortOrder?: string) {
   try {
     const response = await axios.get(
-      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}`
+      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import {
   Table as ShadcnTable,
@@ -16,12 +16,10 @@ export const Table: React.FC<GenericTableProps> = ({
   columns,
   title,
   keyField = "id",
+  onSort,
+  sortBy,
+  sortOrder,
 }) => {
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const toggleSort = () => {
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-  };
 
   return (
     <div className="w-full mt-10 text-foreground overflow-x-auto">
@@ -36,8 +34,8 @@ export const Table: React.FC<GenericTableProps> = ({
                 <div className="flex items-center gap-2">
                   {column.label}
                   {column.sortable && (
-                    <button onClick={toggleSort} className="cursor-pointer">
-                      {sortDirection === "asc" ? (
+                    <button onClick={() => onSort && onSort(column.key)} className="cursor-pointer">
+                      {sortBy === column.key && sortOrder === "asc" ? (
                         <ArrowUp className="w-4 h-4" />
                       ) : (
                         <ArrowDown className="w-4 h-4" />
@@ -57,7 +55,7 @@ export const Table: React.FC<GenericTableProps> = ({
                   {column.render
                     ? column.render(row[column.key], row)
                     : column.key === "amount"
-                    ? `₹${row[column.key].toLocaleString()}`
+                    ? row[column.key]?.toLocaleString()
                     : row[column.key]}
                 </TableCell>
               ))}
