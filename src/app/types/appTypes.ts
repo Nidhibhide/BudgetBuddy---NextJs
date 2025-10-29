@@ -74,9 +74,6 @@ export interface GetStartedLinkProps {
   loading?: boolean;
 }
 
-export type ConnectionObject = {
-  isConnected?: number;
-};
 
 export interface UserFormValues {
   name: string;
@@ -94,10 +91,6 @@ export interface AppState {
   setLimit: (limit: number) => void;
 }
 
-export interface FormValues {
-  names: string[];
-  limit: string;
-}
 
 export interface Category {
   name: string;
@@ -113,7 +106,10 @@ export interface AddCategoryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCategoryAdded?: () => void;
+  category?: Category | null;
+  onCategoryEdited?: () => void;
 }
+
 
 export interface Transaction {
   id?: number;
