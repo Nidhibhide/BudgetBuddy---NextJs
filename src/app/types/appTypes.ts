@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export interface HeaderProps {
   children?: React.ReactNode;
 }
@@ -110,39 +112,41 @@ export interface Category {
 export interface AddCategoryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCategoryAdded?: () => void;
 }
 
 export interface Transaction {
   id?: number;
-  title: string;
-  date: string;
-  description: string;
-  category: string;
-  amount: number;
-  type: string;
+  title?: string;
+  date?: Date |string ;
+  description?: string;
+  category?: string | number | mongoose.Types.ObjectId | undefined;
+  amount?: number;
+  type?: string;
   _id?: string;
   createdAt?: string;
   updatedAt?: string;
-  [key: string]: string | number | undefined;
+  [key: string]: string | number | Date | mongoose.Types.ObjectId | undefined;
 }
 
 export interface AddTransactionProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTransactionAdded?: () => void;
+  transaction?: Transaction | null;
 }
 export interface TableColumn {
   key: string;
   label: string;
   sortable?: boolean;
   render?: (
-    value: string | number | undefined,
-    row: Record<string, string | number | undefined>
+    value: string | number | Date | mongoose.Types.ObjectId | undefined,
+    row: Record<string, string | number | Date | mongoose.Types.ObjectId | undefined>
   ) => React.ReactNode;
 }
 
 export interface GenericTableProps {
-  data: Record<string, string | number | undefined>[];
+  data: Record<string, string | number | Date | mongoose.Types.ObjectId | undefined>[];
   columns: TableColumn[];
   title?: string;
   keyField?: string;
@@ -170,3 +174,21 @@ export interface PaginationProps {
   onPageChange: (page: number) => void;
   className?: string;
 }
+
+export interface TypeTotal {
+  type: string;
+  total: number;
+  categories: {
+    category: string;
+    total: number;
+    percentage: number;
+  }[];
+}
+export interface ConfirmationProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  title?: string;
+  description?: string;
+}
+

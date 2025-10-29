@@ -13,8 +13,8 @@ import {
 } from "@/app/components/index";
 import { Table } from "@/app/components/index";
 import { getCategoryDetails } from "@/app/lib/category";
-import { getTransactions } from "@/app/lib/transaction";
-import type { Category, Transaction as TransactionType } from "@/app/types/appTypes";
+import { getTransactions, getTransactionTotals } from "@/app/lib/transaction";
+import type { Category, Transaction as TransactionType, TypeTotal } from "@/app/types/appTypes";
 
 const Category: React.FC = () => {
   const { data: session } = useSession();
@@ -33,6 +33,9 @@ const Category: React.FC = () => {
   });
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [totals, setTotals] = useState<TypeTotal[]>([]);
+
+  const currentType = isExpense ? "Expense" : "Income";
 
   // Fetch category details
   const fetchCategoryDetails = useCallback(async (type: string) => {
@@ -41,6 +44,11 @@ const Category: React.FC = () => {
       const result = await getCategoryDetails(type);
       if (result.success && result.data) {
         setData(result.data);
+      }
+      // Fetch totals
+      const totalsResult = await getTransactionTotals(type);
+      if (totalsResult.success && totalsResult.data) {
+        setTotals(totalsResult.data);
       }
     } catch (err) {
       console.error("Error fetching category details:", err);
@@ -83,9 +91,9 @@ const Category: React.FC = () => {
   }, [sortBy, sortOrder]);
 
   useEffect(() => {
-    fetchCategoryDetails(isExpense ? "Expense" : "Income");
+    fetchCategoryDetails(currentType);
     setSelectedCategory(null); // Reset selected category when type changes
-  }, [isExpense,fetchCategoryDetails]);
+  }, [currentType, fetchCategoryDetails]);
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -99,9 +107,9 @@ const Category: React.FC = () => {
 
   useEffect(() => {
     if (selectedCategory) {
-      fetchTransactions(isExpense ? "Expense" : "Income", selectedCategory, pagination.currentPage);
+      fetchTransactions(currentType, selectedCategory, pagination.currentPage);
     }
-  }, [selectedCategory, pagination.currentPage, isExpense, sortBy, sortOrder,fetchTransactions]);
+  }, [selectedCategory, pagination.currentPage, currentType, sortBy, sortOrder, fetchTransactions]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -115,7 +123,7 @@ const Category: React.FC = () => {
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {isExpense ? "Expense" : "Income"}
+            {currentType}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -154,17 +162,17 @@ const Category: React.FC = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="text-2xl font-bold text-foreground">
-                      {/* ₹{category.amount.toLocaleString()} */} 400
+                      {(totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.total || 0).toLocaleString()} {session?.user?.currency || 'INR'}
                     </div>
                     <div className="text-sm text-foreground">
-                      {/* {category.percentage}% of total */}40%
+                      {totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.percentage || 0}%
                     </div>
                     <div className="w-full bg-foreground rounded-full h-2">
                       <div
                         className={`h-2 rounded-full ${
                           isExpense ? "bg-red-500" : "bg-green-500"
                         } transition-all duration-500`}
-                        // style={{ width: `${category.percentage}%` }}
+                        style={{ width: `${totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.percentage || 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -208,7 +216,7 @@ const Category: React.FC = () => {
                   key: "date",
                   label: "Date",
                   sortable: true,
-                  render: (value) => value ? new Date(value).toLocaleDateString('en-GB') : ''
+                  render: (value) => value ? new Date(value as string | number | Date).toLocaleDateString('en-GB') : ''
                 },
                 { key: "description", label: "Description" },
                 {
@@ -253,6 +261,7 @@ const Category: React.FC = () => {
       <AddCategory
         open={isAddCategoryOpen}
         onOpenChange={setIsAddCategoryOpen}
+        onCategoryAdded={() => fetchCategoryDetails(currentType)}
       />
     </div>
   );

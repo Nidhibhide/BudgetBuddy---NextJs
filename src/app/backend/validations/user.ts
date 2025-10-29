@@ -4,7 +4,6 @@ import {
   emailValidator,
   passwordValidator,
   selectValidator,
-  stringArrayValidator,
   numberValidator,
   arraySelectValidator,
 } from "../utils/GlobalValidation";

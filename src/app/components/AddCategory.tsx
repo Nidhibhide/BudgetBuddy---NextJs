@@ -14,7 +14,7 @@ import { TYPES } from "@/lib/constants";
 import { Category, AddCategoryProps } from "@/app/types/appTypes";
 import { createCategory } from "@/app/lib/category";
 
-const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
+const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange, onCategoryAdded }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
@@ -27,18 +27,20 @@ const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
       .required("Type is required"),
   });
 
-  const handleSubmit = async (values:Category) => {
+  const handleSubmit = async (values: Category, { resetForm }: { resetForm: () => void }) => {
     setIsLoading(true);
     try {
       const response = await createCategory(values);
-      console.log(response)
       if (response.success) {
         showSuccess(response.message);
+        resetForm();
         onOpenChange(false);
+        onCategoryAdded?.();
       } else {
         showError(response.message);
       }
     } catch (error) {
+      console.error("Error creating category:", error);
       showError("Something went wrong while creating category");
     } finally {
       setIsLoading(false);
@@ -58,7 +60,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({ open, onOpenChange }) => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit}) => (
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputBox name="name" label="Category Name" />
               <SelectBox name="type" label="Type" options={TYPES} />

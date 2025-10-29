@@ -79,7 +79,7 @@ export async function GET(request: Request) {
     const transactions = await Promise.all(
       rawTransactions.map(async (transaction: TransactionType) => ({
         ...transaction,
-        amount: await convertFromINR(transaction.amount, user.currency),
+        amount: transaction.amount ? await convertFromINR(transaction.amount, user.currency) : 0,
       }))
     );
 

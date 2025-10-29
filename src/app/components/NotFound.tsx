@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { SearchX, Plus } from "lucide-react";
-import { Button } from "./index";
+import { SearchX } from "lucide-react";
 import { NotFoundProps } from "@/app/types/appTypes";
 
 const NotFound: React.FC<NotFoundProps> = ({

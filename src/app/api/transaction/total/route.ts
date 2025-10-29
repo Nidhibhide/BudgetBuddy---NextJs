@@ -2,9 +2,11 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/app/backend/config/MongoDB";
 import Transaction from "@/app/backend/models/transaction";
+import User from "@/app/backend/models/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 import { MatchStage } from "@/app/types/appTypes";
+import { convertFromINR } from "@/app/backend/utils/currencyConverter";
 
 export async function GET(request: Request) {
   await dbConnect();
@@ -16,16 +18,19 @@ export async function GET(request: Request) {
     const userId = new Types.ObjectId(session.user.id);
     const url = new URL(request.url);
     const type = url.searchParams.get("type");
-    const category = url.searchParams.get("category");
+
+    // Get user's currency
+    const user = await User.findById(userId);
+    if (!user) return JsonOne(404, "User not found", false);
 
     const matchStage: MatchStage = {
       user: userId,
       isDeleted: false,
       type: type || undefined,
-      "category.name": category || undefined,
     };
 
     const pipeline: PipelineStage[] = [
+      { $match: matchStage },
       {
         $lookup: {
           from: "categories",
@@ -35,7 +40,6 @@ export async function GET(request: Request) {
         },
       },
       { $unwind: "$category" },
-      { $match: matchStage },
       {
         $group: {
           _id: { type: "$type", category: "$category.name" },
@@ -43,17 +47,53 @@ export async function GET(request: Request) {
         },
       },
       {
-        $project: {
-          _id: 0,
-          type: "$_id.type",
-          category: "$_id.category",
-          total: 1,
+        $group: {
+          _id: "$_id.type",
+          total: { $sum: "$total" },
+          categories: {
+            $push: {
+              category: "$_id.category",
+              total: "$total",
+            },
+          },
         },
       },
-      { $sort: { type: 1, category: 1 } },
+      {
+        $project: {
+          _id: 0,
+          type: "$_id",
+          total: 1,
+          categories: {
+            $map: {
+              input: "$categories",
+              as: "cat",
+              in: {
+                category: "$$cat.category",
+                total: "$$cat.total",
+                percentage: {
+                  $round: [
+                    {
+                      $multiply: [{ $divide: ["$$cat.total", "$total"] }, 100],
+                    },
+                    2,
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
     ];
 
     const totals = await Transaction.aggregate(pipeline);
+
+    // Convert totals from INR to user's currency
+    for (const total of totals) {
+      total.total = await convertFromINR(total.total, user.currency);
+      for (const cat of total.categories) {
+        cat.total = await convertFromINR(cat.total, user.currency);
+      }
+    }
 
     return JsonOne(200, "Totals fetched successfully", true, totals);
   } catch (err) {

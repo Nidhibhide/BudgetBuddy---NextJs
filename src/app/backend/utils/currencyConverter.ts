@@ -6,7 +6,7 @@ export const convertToINR = async (amount: number, fromCurrency: string): Promis
   }
 
   try {
-    const response = await axios.get(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+    const response = await axios.get(`${process.env.EXCHANGE_RATE_API_BASE_URL}${fromCurrency}`);
     const rate = response.data.rates.INR;
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
@@ -22,7 +22,7 @@ export const convertFromINR = async (amount: number, toCurrency: string): Promis
   }
 
   try {
-    const response = await axios.get(`https://api.exchangerate-api.com/v4/latest/INR`);
+    const response = await axios.get(`${process.env.EXCHANGE_RATE_API_BASE_URL}INR`);
     const rate = response.data.rates[toCurrency];
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
