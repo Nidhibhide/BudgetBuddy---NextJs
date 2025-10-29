@@ -36,3 +36,20 @@ export async function getCategoryDetails(type: string) {
   }
 }
 
+export async function editCategory(id: string, data: { name: string }) {
+  try {
+    const response = await axios.put(`/api/category/edit?id=${id}`, data);
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error editing category:", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Something went wrong while editing category",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}
+

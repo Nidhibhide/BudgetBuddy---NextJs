@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, MousePointer, Loader2 } from "lucide-react";
+import { Plus, MousePointer, Loader2, Pen } from "lucide-react";
 import {
   AddCategory,
   CustomPagination,
@@ -21,6 +21,7 @@ const Category: React.FC = () => {
   const [isExpense, setIsExpense] = useState(true);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [data, setData] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,13 @@ const Category: React.FC = () => {
   const [totals, setTotals] = useState<TypeTotal[]>([]);
 
   const currentType = isExpense ? "Expense" : "Income";
+  const currency = session?.user?.currency || 'INR';
+
+  // Helper function to get category totals
+  const getCategoryTotal = (categoryName: string) => {
+    const typeTotals = totals.find(t => t.type === currentType);
+    return typeTotals?.categories.find(c => c.category === categoryName) || { total: 0, percentage: 0 };
+  };
 
   // Fetch category details
   const fetchCategoryDetails = useCallback(async (type: string) => {
@@ -92,16 +100,14 @@ const Category: React.FC = () => {
 
   useEffect(() => {
     fetchCategoryDetails(currentType);
-    setSelectedCategory(null); // Reset selected category when type changes
+    setSelectedCategory(null);
+    setEditingCategory(null);
   }, [currentType, fetchCategoryDetails]);
 
   const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(column);
-      setSortOrder("asc");
-    }
+    const newSortOrder = sortBy === column && sortOrder === "asc" ? "desc" : "asc";
+    setSortBy(column);
+    setSortOrder(newSortOrder);
     setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
@@ -114,7 +120,7 @@ const Category: React.FC = () => {
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
           Category Overview
         </h2>
@@ -135,50 +141,60 @@ const Category: React.FC = () => {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
           <div className="col-span-full flex justify-center items-center py-8">
             <Loader2 className="w-8 h-8 animate-spin text-foreground" />
           </div>
         ) : (
           <>
-            {data?.map((category, index) => (
-              <Card
-                key={index}
-                className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${selectedCategory === category.name ? 'bg-selected-background' : 'bg-background'} cursor-pointer`}
-                onClick={() => {
-                  setSelectedCategory(category.name);
-                  setPagination(prev => ({ ...prev, currentPage: 1 }));
-                }}
-              >
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold text-foreground">
-                      {category.name}
-                    </CardTitle>
-                    <div className="w-4 h-4 rounded-full bg-foreground"></div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-foreground">
-                      {(totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.total || 0).toLocaleString()} {session?.user?.currency || 'INR'}
+            {data?.map((category, index) => {
+              const { total, percentage } = getCategoryTotal(category.name);
+              return (
+                <Card
+                  key={index}
+                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${selectedCategory === category.name ? 'bg-selected-background' : 'bg-background'} cursor-pointer`}
+                  onClick={() => {
+                    setSelectedCategory(category.name);
+                    setPagination(prev => ({ ...prev, currentPage: 1 }));
+                  }}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg font-semibold text-foreground">
+                        {category.name}
+                      </CardTitle>
+                      <Pen
+                        className="w-4 h-4 text-foreground cursor-pointer hover:text-blue-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingCategory(category);
+                          setIsAddCategoryOpen(true)
+                        }}
+                      />
                     </div>
-                    <div className="text-sm text-foreground">
-                      {totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.percentage || 0}%
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="text-2xl font-bold text-foreground">
+                        {total.toLocaleString()} {currency}
+                      </div>
+                      <div className="text-sm text-foreground">
+                        {percentage}%
+                      </div>
+                      <div className="w-full bg-foreground rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            isExpense ? "bg-red-500" : "bg-green-500"
+                          } transition-all duration-500`}
+                          style={{ width: `${percentage}%` }}
+                        ></div>
+                      </div>
                     </div>
-                    <div className="w-full bg-foreground rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          isExpense ? "bg-red-500" : "bg-green-500"
-                        } transition-all duration-500`}
-                        style={{ width: `${totals.find(t => t.type === currentType)?.categories.find(c => c.category === category.name)?.percentage || 0}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
             {data.length < 4 && (
               <Card
                 className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 bg-background border-dashed border-2 border-foreground/50 cursor-pointer"
@@ -223,10 +239,7 @@ const Category: React.FC = () => {
                   key: "amount",
                   label: "Amount",
                   sortable: true,
-                  render: (value) => {
-                    const currency = session?.user?.currency || 'INR';
-                    return `${value} ${currency}`;
-                  }
+                  render: (value) => `${value} ${currency}`
                 },
                 { key: "type", label: "Type" },
               ]}
@@ -262,6 +275,11 @@ const Category: React.FC = () => {
         open={isAddCategoryOpen}
         onOpenChange={setIsAddCategoryOpen}
         onCategoryAdded={() => fetchCategoryDetails(currentType)}
+        category={editingCategory}
+        onCategoryEdited={() => {
+          fetchCategoryDetails(currentType);
+          setEditingCategory(null);
+        }}
       />
     </div>
   );
