@@ -21,7 +21,7 @@ const ChangePassword: React.FC = () => {
 
     NewPassword: Yup.string().when("OldPassword", {
       is: (val: string | undefined) => val && val.length > 0,
-      then: (schema) => passwordBaseSchema.required("New Password is required"),
+      then: () => passwordBaseSchema.required("New Password is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
 
@@ -29,7 +29,7 @@ const ChangePassword: React.FC = () => {
       .oneOf([Yup.ref("NewPassword"), undefined], "Passwords must match")
       .when("OldPassword", {
         is: (val: string | undefined) => val && val.length > 0,
-        then: (schema) => passwordBaseSchema.required("Confirm Password is required"),
+        then: () => passwordBaseSchema.required("Confirm Password is required"),
         otherwise: (schema) => schema.notRequired(),
       }),
   }) as Yup.ObjectSchema<

@@ -14,6 +14,7 @@ import AddCategory from "./AddCategory";
 import AddTransaction from "./AddTransaction";
 import CustomPagination from "./Pagination";
 import NotFound from "./NotFound";
+import Confirmation from "./Confirmation";
 export {
   Table,
   InputBox,
@@ -30,5 +31,6 @@ export {
   Tooltip,
   useHandleResponse,
   CustomPagination,
-  NotFound,
+  Confirmation,
+  NotFound
 };

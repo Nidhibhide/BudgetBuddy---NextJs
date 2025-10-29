@@ -12,10 +12,12 @@ import {
   CustomPagination,
   NotFound,
   AddTransaction,
+  Confirmation,
 } from "@/app/components/index";
 import { getCategoryDetails } from "@/app/lib/category";
-import { getTransactions } from "@/app/lib/transaction";
+import { getTransactions, deleteTransaction } from "@/app/lib/transaction";
 import { Category, Transaction as TransactionType } from "@/app/types/appTypes";
+import { showSuccess, showError } from "@/app/components/Utils";
 
 const Transaction: React.FC = () => {
   const { data: session } = useSession();
@@ -23,6 +25,11 @@ const Transaction: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [editTransactionData, setEditTransactionData] =
+    useState<TransactionType | null>(null);
+  const [deleteTransactionId, setDeleteTransactionId] = useState<string | null>(
+    null
+  );
   const [categories, setCategories] = useState<Category[]>([]);
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,37 +57,40 @@ const Transaction: React.FC = () => {
     }
   };
 
-  const fetchTransactions = useCallback(async (
-    type: string,
-    category: string,
-    page: number = 1,
-    sortByParam?: string,
-    sortOrderParam?: "asc" | "desc"
-  ) => {
-    setLoading(true);
-    try {
-      const response = await getTransactions(
-        type,
-        category,
-        page,
-        10,
-        sortByParam || sortBy,
-        sortOrderParam || sortOrder
-      );
-      if (response.success) {
-        setTransactions(response.data || []);
-        setPagination(prev => response.pagination || prev);
-      } else {
-        console.error("Failed to fetch transactions:", response.message);
+  const fetchTransactions = useCallback(
+    async (
+      type: string,
+      category: string,
+      page: number = 1,
+      sortByParam?: string,
+      sortOrderParam?: "asc" | "desc"
+    ) => {
+      setLoading(true);
+      try {
+        const response = await getTransactions(
+          type,
+          category,
+          page,
+          10,
+          sortByParam || sortBy,
+          sortOrderParam || sortOrder
+        );
+        if (response.success) {
+          setTransactions(response.data || []);
+          setPagination((prev) => response.pagination || prev);
+        } else {
+          console.error("Failed to fetch transactions:", response.message);
+          setTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
         setTransactions([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      setTransactions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [sortBy, sortOrder]);
+    },
+    [sortBy, sortOrder]
+  );
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
@@ -97,6 +107,38 @@ const Transaction: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleEditClick = (transaction: TransactionType) => {
+    setEditTransactionData(transaction);
+    setIsAddTransactionOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteTransactionId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTransactionId) return;
+
+    try {
+      const response = await deleteTransaction(deleteTransactionId);
+      if (response.success) {
+        showSuccess(response.message);
+        // Refresh transactions
+        fetchTransactions(
+          isExpense ? "Expense" : "Income",
+          selectedCategory,
+          currentPage
+        );
+        setDeleteTransactionId(null);
+      } else {
+        showError(response.message || "Failed to delete transaction");
+      }
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      showError("An unexpected error occurred while deleting the transaction");
+    }
+  };
+
   useEffect(() => {
     setSelectedCategory("All");
     setCurrentPage(1);
@@ -110,13 +152,23 @@ const Transaction: React.FC = () => {
   useEffect(() => {
     const type = isExpense ? "Expense" : "Income";
     fetchTransactions(type, selectedCategory, currentPage);
-  }, [isExpense, selectedCategory, currentPage, sortBy, sortOrder, fetchTransactions, session?.user?.currency]);
+  }, [
+    isExpense,
+    selectedCategory,
+    currentPage,
+    sortBy,
+    sortOrder,
+    fetchTransactions,
+    session?.user?.currency,
+  ]);
 
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-foreground">Transactions Overview</h2>
+        <h2 className="text-2xl font-bold text-foreground">
+          Transactions Overview
+        </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
@@ -177,7 +229,12 @@ const Transaction: React.FC = () => {
                 key: "date",
                 label: "Date",
                 sortable: true,
-                render: (value) => value ? new Date(value).toLocaleDateString('en-GB') : ''
+                render: (value) =>
+                  value
+                    ? new Date(
+                        value as string | number | Date
+                      ).toLocaleDateString("en-GB")
+                    : "",
               },
               { key: "description", label: "Description" },
               { key: "category", label: "Category" },
@@ -186,26 +243,26 @@ const Transaction: React.FC = () => {
                 label: "Amount",
                 sortable: true,
                 render: (value) => {
-                  const currency = session?.user?.currency || 'INR';
+                  const currency = session?.user?.currency || "INR";
                   return `${value} ${currency}`;
-                }
+                },
               },
               { key: "type", label: "Type" },
               {
                 key: "actions",
                 label: "Actions",
-                render: () => (
+                render: (value, row) => (
                   <div className="flex gap-2">
                     <button
-                      // onClick={() => handleEdit(row.id as number)}
-                      className="p-1 hover:bg-background/10 hover:text-foreground rounded transition-colors"
+                      onClick={() => handleEditClick(row as TransactionType)}
+                      className="p-1 hover:bg-background/10  rounded transition-colors cursor-pointer"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      // onClick={() => handleDelete(row.id as number)}
-                      className="p-1 hover:bg-red-500/10 rounded transition-colors"
+                      onClick={() => handleDeleteClick(row._id as string)}
+                      className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
@@ -239,8 +296,25 @@ const Transaction: React.FC = () => {
 
       <AddTransaction
         open={isAddTransactionOpen}
-        onOpenChange={setIsAddTransactionOpen}
-        onTransactionAdded={() => fetchTransactions(isExpense ? "Expense" : "Income", selectedCategory, currentPage)}
+        onOpenChange={(open) => {
+          setIsAddTransactionOpen(open);
+          if (!open) setEditTransactionData(null);
+        }}
+        transaction={editTransactionData}
+        onTransactionAdded={() => {
+          setCurrentPage(1);
+          fetchTransactions(
+            isExpense ? "Expense" : "Income",
+            selectedCategory,
+            1
+          );
+        }}
+      />
+
+      <Confirmation
+        open={!!deleteTransactionId}
+        onOpenChange={(open) => !open && setDeleteTransactionId(null)}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

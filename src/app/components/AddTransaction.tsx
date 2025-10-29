@@ -13,7 +13,7 @@ import {
 import { InputBox, SelectBox, TextareaBox, Button, showSuccess, showError } from "./index";
 import { TYPES} from "@/lib/constants";
 import { getCategoryDetails } from "@/app/lib/category";
-import { addTransaction } from "@/app/lib/transaction";
+import { addTransaction, editTransaction } from "@/app/lib/transaction";
 import {
 Transaction,
   AddTransactionProps,
@@ -24,6 +24,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
   open,
   onOpenChange,
   onTransactionAdded,
+  transaction,
 }) => {
   const { data: session } = useSession();
   const [categories, setCategories] = useState<Category[]>([]);
@@ -86,24 +87,27 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
 
   useEffect(() => {
     if (open) {
-      fetchCategories(TYPES[0]); // Fetch categories for default type (Expense)
+      const typeToFetch = transaction?.type || TYPES[0];
+      fetchCategories(typeToFetch);
     }
-  }, [open]);
+  }, [open, transaction]);
 
-  const handleSubmit = async (values:Transaction) => {
+  const handleSubmit = async (values: Transaction) => {
     setLoading(true);
     try {
-      const response = await addTransaction(values);
+      const response = transaction?._id
+        ? await editTransaction(transaction._id, { ...values, type: undefined })
+        : await addTransaction(values);
       if (response.success) {
-        showSuccess("Transaction added successfully");
+        showSuccess(response.message);
         onOpenChange(false);
         onTransactionAdded?.();
       } else {
-        showError(response.message || "Failed to add transaction");
+        showError(response.message);
       }
     } catch (error) {
-      console.error("Error adding transaction:", error);
-      showError("An unexpected error occurred while adding the transaction");
+      console.error(`Error ${transaction?._id ? 'updating' : 'adding'} transaction:`, error);
+      showError("An unexpected error occurred while processing the transaction");
     } finally {
       setLoading(false);
     }
@@ -114,17 +118,17 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            Add New Transaction
+            {transaction?._id ? "Edit Transaction" : "Add New Transaction"}
           </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={{
-            date: new Date().toISOString().split("T")[0],
-            title: "",
-            description: "",
-            category: categories[0]?.name || "",
-            amount: 1,
-            type: TYPES[0],
+            date: new Date(transaction?.date || Date.now()).toISOString().split("T")[0],
+            title: transaction?.title || "",
+            description: transaction?.description || "",
+            category: transaction?.category || categories[0]?.name || "",
+            amount: transaction?.amount || 1,
+            type: transaction?.type || TYPES[0],
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -158,7 +162,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
                   Cancel
                 </Button>
                 <Button type="submit" loading={loading}>
-                  Add Transaction
+                  {transaction?._id ? "Update Transaction" : "Add Transaction"}
                 </Button>
               </div>
             </form>

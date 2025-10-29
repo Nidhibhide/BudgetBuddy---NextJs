@@ -49,14 +49,14 @@ export const Table: React.FC<GenericTableProps> = ({
         </TableHeader>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow key={row[keyField] || index} className="hover:bg-foreground hover:text-background cursor-pointer transition-colors">
+            <TableRow key={String(row[keyField] || index)} className="hover:bg-foreground hover:text-background cursor-pointer transition-colors">
               {columns.map((column) => (
                 <TableCell key={column.key}>
                   {column.render
                     ? column.render(row[column.key], row)
                     : column.key === "amount"
                     ? row[column.key]?.toLocaleString()
-                    : row[column.key]}
+                    : row[column.key] ? String(row[column.key]) : ''}
                 </TableCell>
               ))}
             </TableRow>
