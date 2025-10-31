@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button, SelectBox } from "@/app/components/FormElements";
+import { Button, SelectBox } from "@/app/components/Elements";
 import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import {
   Table,

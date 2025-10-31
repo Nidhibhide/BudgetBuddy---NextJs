@@ -97,7 +97,6 @@ const AddCategory: React.FC<AddCategoryProps> = ({
     setIsFetchingIcons(true);
     try {
       const response = await getIconSuggestions(name);
-      console.log(response)
       if (response.success) {
         setIconSuggestions(response.data.suggestions);
       } else {

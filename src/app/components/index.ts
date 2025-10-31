@@ -7,7 +7,7 @@ import {
   Tooltip,
   GetStartedLink,
   IconComponent,
-} from "@/app/components/FormElements";
+} from "@/app/components/Elements";
 import { showSuccess, showError, useHandleResponse } from "./Utils";
 import UserSetting from "./UserSetting";
 import ChangePassword from "./ChangePassword";
