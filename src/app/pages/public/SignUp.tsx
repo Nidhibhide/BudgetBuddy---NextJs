@@ -7,7 +7,7 @@ import { InputBox, showError, showSuccess, Button } from "../../components";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
-import { RegisterUserData } from "@/app/types/appTypes";
+import { User } from "@/app/types/appTypes";
 
 
 const SignUp = () => {
@@ -33,7 +33,7 @@ const SignUp = () => {
 
   // handle sign up
   const handleSignUp = async (
-    values: RegisterUserData,
+    values: User,
     { resetForm }: { resetForm: () => void }
   ) => {
     try {
@@ -61,8 +61,8 @@ const SignUp = () => {
     <div className="min-h-screen w-full text-foreground flex justify-center items-center p-4">
       <div className="w-full max-w-md bg-background  rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
-        <Formik
-          initialValues={{ name: "", email: "", password: "" }}
+        <Formik<User>
+          initialValues={{ name: "", email: "", password: "", currency: "INR" }}
           validationSchema={validationSchema}
           onSubmit={handleSignUp}
         >

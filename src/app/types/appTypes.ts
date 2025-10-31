@@ -4,22 +4,21 @@ export interface HeaderProps {
   children?: React.ReactNode;
 }
 
-export interface SignInFormValues {
-  email: string;
-  password: string;
-}
-
-export interface RegisterUserData {
-  name: string;
-  email: string;
-  password: string;
-}
-
 export interface ApiResponse {
   message: string;
   success: boolean;
   statusCode: number;
   data?: object; // optional, can hold user or anything else
+}
+
+export interface User {
+  name: string;
+  email: string;
+  password?: string;
+  currency: string;
+  OldPassword?: string;
+  NewPassword?: string;
+  ConfirmPassword?: string;
 }
 
 export interface SelectBoxProps {
@@ -35,6 +34,7 @@ export interface InputBoxProps {
   name: string;
   type?: string;
   placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export interface TextareaBoxProps {
@@ -74,16 +74,6 @@ export interface GetStartedLinkProps {
   loading?: boolean;
 }
 
-
-export interface UserFormValues {
-  name: string;
-  email: string;
-  currency: string;
-  OldPassword: string;
-  NewPassword: string;
-  ConfirmPassword: string;
-}
-
 export interface AppState {
   categories: string[];
   limit: number;
@@ -91,10 +81,10 @@ export interface AppState {
   setLimit: (limit: number) => void;
 }
 
-
 export interface Category {
   name: string;
   type: string;
+  icon: string;
   _id?: string;
   user?: string;
   isArchived?: boolean;
@@ -110,11 +100,10 @@ export interface AddCategoryProps {
   onCategoryEdited?: () => void;
 }
 
-
 export interface Transaction {
   id?: number;
   title?: string;
-  date?: Date |string ;
+  date?: Date | string;
   description?: string;
   category?: string | number | mongoose.Types.ObjectId | undefined;
   amount?: number;
@@ -137,12 +126,18 @@ export interface TableColumn {
   sortable?: boolean;
   render?: (
     value: string | number | Date | mongoose.Types.ObjectId | undefined,
-    row: Record<string, string | number | Date | mongoose.Types.ObjectId | undefined>
+    row: Record<
+      string,
+      string | number | Date | mongoose.Types.ObjectId | undefined
+    >
   ) => React.ReactNode;
 }
 
 export interface GenericTableProps {
-  data: Record<string, string | number | Date | mongoose.Types.ObjectId | undefined>[];
+  data: Record<
+    string,
+    string | number | Date | mongoose.Types.ObjectId | undefined
+  >[];
   columns: TableColumn[];
   title?: string;
   keyField?: string;
@@ -188,3 +183,8 @@ export interface ConfirmationProps {
   description?: string;
 }
 
+export interface IconComponentProps {
+  iconName: string;
+  size?: number;
+  className?: string;
+}

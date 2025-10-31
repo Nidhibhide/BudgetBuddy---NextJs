@@ -5,8 +5,10 @@ import { stringValidator, selectValidator } from "@/app/backend/utils/GlobalVali
 export const CreateCategory = Joi.object({
   name: stringValidator("Name", 1, 50, true),
   type: selectValidator("Type", TYPES, true),
+  icon: stringValidator("Icon", 1, 100, true),
 });
 
 export const EditCategory = Joi.object({
   name: stringValidator("Name", 1, 50, true),
+  icon: stringValidator("Icon", 1, 100, true),
 });

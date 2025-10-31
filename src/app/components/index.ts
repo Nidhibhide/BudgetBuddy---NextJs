@@ -6,6 +6,7 @@ import {
   Button,
   Tooltip,
   GetStartedLink,
+  IconComponent,
 } from "@/app/components/FormElements";
 import { showSuccess, showError, useHandleResponse } from "./Utils";
 import UserSetting from "./UserSetting";
@@ -32,5 +33,6 @@ export {
   useHandleResponse,
   CustomPagination,
   Confirmation,
-  NotFound
+  NotFound,
+  IconComponent,
 };

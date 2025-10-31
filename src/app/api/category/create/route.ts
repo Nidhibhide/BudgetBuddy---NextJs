@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       return JsonOne(400, error.details[0].message, false);
     }
 
-    const { name, type } = body;
+    const { name, type, icon } = body;
 
     // Check if category already exists for this user
     const existingCategory = await Category.findOne({
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     const newCategory = new Category({
       name,
       type,
+      icon,
       user: userId,
     });
 
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
       category: newCategory
     });
   } catch (error) {
-    console.log("Error creating category", error);
+    console.error("Error creating category", error);
     return JsonOne(500, "Error creating category", false);
   }
 }

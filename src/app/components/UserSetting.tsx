@@ -4,8 +4,8 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { InputBox, Button, showError, useHandleResponse, SelectBox } from "./index";
 import { updateProfile } from "../lib/auth";
-import { UserFormValues } from "@/app/types/appTypes";
-import { User } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
+import { User } from "@/app/types/appTypes";
 import { useSession } from "next-auth/react";
 import { CURRENCIES } from "@/lib/constants";
 
@@ -26,10 +26,10 @@ const UserSetting: React.FC = () => {
     currency: Yup.string()
       .oneOf(CURRENCIES, "Invalid currency")
       .required("Currency is required"),
-  }) as Yup.ObjectSchema<Pick<UserFormValues, "name" | "email" | "currency">>;
+  });
 
   const handleProfileSubmit = async (
-    values: Pick<UserFormValues, "name" | "email" | "currency">
+    values: User
   ) => {
     if (profileLoading) return;
     setProfileLoading(true);
@@ -46,7 +46,11 @@ const UserSetting: React.FC = () => {
         return;
       }
 
-      const response = await updateProfile(values);
+      const response = await updateProfile({
+        name: values.name!,
+        email: values.email,
+        currency: values.currency!,
+      });
       Response({ response, successMessage: "Profile updated successfully" });
       await update({ name: values.name, email: values.email, currency: values.currency });
     } catch (error: unknown) {
@@ -73,7 +77,7 @@ const UserSetting: React.FC = () => {
         {({ handleSubmit }) => (
           <div className="w-full max-w-[600px] bg-background p-6 rounded-lg shadow-sm border">
             <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
-              <User className="w-6 h-6 text-foreground" />
+              <UserIcon className="w-6 h-6 text-foreground" />
               Edit Profile
             </h2>
             <div className="flex flex-col gap-6">

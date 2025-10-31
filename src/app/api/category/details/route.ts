@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       {
         $facet: {
           data: [
-            { $project: { _id: 1, name: 1, type: 1 } },
+            { $project: { _id: 1, name: 1, type: 1, icon: 1 } },
             { $sort: { name: 1 } },
             { $skip: skip },
             { $limit: limit },
