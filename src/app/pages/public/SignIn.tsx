@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import { InputBox, Button, showError, showSuccess } from "@/app/components";
 import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
 import Link from "next/link";
-import { SignInFormValues } from "@/app/types/appTypes";
+import { User } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
 
 
@@ -26,8 +26,8 @@ const SignIn = () => {
 
   // handle sign in
   const handleSignIn = async (
-    values: SignInFormValues,
-    actions: FormikHelpers<SignInFormValues>
+    values: User,
+    actions: FormikHelpers<User>
   ): Promise<void> => {
     try {
       if (loading) return;
@@ -84,8 +84,8 @@ const SignIn = () => {
           <span className="mx-4 text-muted font-semibold">OR</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
-        <Formik
-          initialValues={{ email: "", password: "" }}
+        <Formik<User>
+          initialValues={{ name: "", email: "", currency: "", password: "" }}
           validationSchema={validationSchema}
           onSubmit={handleSignIn}
         >

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Plus, MousePointer, Loader2, Pen } from "lucide-react";
+import * as Icons from "lucide-react";
 import {
   AddCategory,
   CustomPagination,
@@ -161,9 +162,16 @@ const Category: React.FC = () => {
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg font-semibold text-foreground">
-                        {category.name}
-                      </CardTitle>
+                      <div className="flex items-center justify-center  space-x-2">
+                        {category.icon && (() => {
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          const IconComponent = (Icons as any)[category.icon];
+                          return IconComponent ? <IconComponent className="w-6 h-6 text-foreground" /> : null;
+                        })()}
+                        <CardTitle className="text-xl font-semibold text-foreground">
+                          {category.name}
+                        </CardTitle>
+                      </div>
                       <Pen
                         className="w-4 h-4 text-foreground cursor-pointer hover:text-blue-500"
                         onClick={(e) => {

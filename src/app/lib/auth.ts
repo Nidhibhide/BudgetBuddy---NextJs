@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { RegisterUserData } from "@/app/types/appTypes";
+import {User } from "@/app/types/appTypes";
 
-export async function registerUser(data: RegisterUserData) {
+export async function registerUser(data: User) {
   try {
     const response = await axios.post("/api/auth/register", data);
 
@@ -40,11 +40,7 @@ export async function changePassword(data: {
   }
 }
 
-export async function updateProfile(data: {
-  name: string;
-  email: string;
-  currency: string;
-}) {
+export async function updateProfile(data: User) {
   try {
     const response = await axios.put("/api/auth/updateProfile", data);
 

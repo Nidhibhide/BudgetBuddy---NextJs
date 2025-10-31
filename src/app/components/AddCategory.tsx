@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, SelectBox, Button, showSuccess, showError } from "./index";
+import { InputBox, SelectBox, Button, showSuccess, showError, IconComponent } from "./index";
 import { TYPES } from "@/lib/constants";
 import { Category, AddCategoryProps} from "@/app/types/appTypes";
-import { createCategory, editCategory } from "@/app/lib/category";
+import { createCategory, editCategory, getIconSuggestions } from "@/app/lib/category";
 
 const AddCategory: React.FC<AddCategoryProps> = ({
   open,
@@ -22,34 +23,57 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   onCategoryEdited,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [iconSuggestions, setIconSuggestions] = useState<string[]>([]);
+  const [selectedIcon, setSelectedIcon] = useState<string>("");
+  const [isFetchingIcons, setIsFetchingIcons] = useState(false);
   const isEdit = !!category;
+
+  useEffect(() => {
+    if (isEdit && category.icon) {
+      setSelectedIcon(category.icon);
+    } else {
+      setSelectedIcon("");
+    }
+  }, [isEdit, category]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
       .min(2, "Name must be at least 2 characters")
       .max(50, "Name must not exceed 50 characters")
       .required("Name is required"),
-    ...(isEdit
-      ? {}
-      : {
-          type: Yup.string()
-            .oneOf(TYPES, "Invalid type")
-            .required("Type is required"),
-        }),
+    icon: Yup.string().required("Icon is required"),
+    ...(isEdit ? {} : {
+        type: Yup.string()
+          .oneOf(TYPES, "Invalid type")
+          .required("Type is required"),
+      }),
   });
+
+  useEffect(() => {
+    if (isEdit && category.name) {
+      fetchIconSuggestions(category.name);
+    }
+  }, [isEdit, category]);
 
   const handleSubmit = async (
     values: Category | { name: string },
-    { resetForm }: { resetForm: () => void }
+    { resetForm, setFieldValue }: { resetForm: () => void; setFieldValue: (field: string, value: string) => void }
   ) => {
+    if (!selectedIcon) {
+      showError("Icon is required");
+      setFieldValue("icon", "");
+      return;
+    }
     setIsLoading(true);
     try {
       const response = isEdit
-        ? await editCategory(category._id!, values as { name: string })
+        ? await editCategory(category._id!, values as Category)
         : await createCategory(values as Category);
       if (response.success) {
         showSuccess(response.message);
         resetForm();
+        setIconSuggestions([]);
+        setSelectedIcon("");
         onOpenChange(false);
         if (isEdit) {
           onCategoryEdited?.();
@@ -59,17 +83,36 @@ const AddCategory: React.FC<AddCategoryProps> = ({
       } else {
         showError(response.message);
       }
-    } catch (error) {
-      console.error(
-        `Error ${isEdit ? "editing" : "creating"} category:`,
-        error
-      );
+    } catch {
       showError(
         `Something went wrong while ${isEdit ? "editing" : "creating"} category`
       );
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchIconSuggestions = async (name: string) => {
+    if (name.length < 2) return;
+    setIsFetchingIcons(true);
+    try {
+      const response = await getIconSuggestions(name);
+      console.log(response)
+      if (response.success) {
+        setIconSuggestions(response.data.suggestions);
+      } else {
+        showError("Failed to fetch icon suggestions");
+      }
+    } catch {
+      showError("Something went wrong while fetching icon suggestions");
+    } finally {
+      setIsFetchingIcons(false);
+    }
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    fetchIconSuggestions(name);
   };
 
   return (
@@ -82,17 +125,48 @@ const AddCategory: React.FC<AddCategoryProps> = ({
         </DialogHeader>
         <Formik
           initialValues={
-            isEdit ? { name: category.name } : { name: "", type: TYPES[0] }
+            isEdit ? { name: category.name, icon: category.icon } : { name: "", type: TYPES[0], icon: "" }
           }
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, setFieldValue }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="name" label="Category Name" />
+              <InputBox name="name" label="Category Name" onChange={handleNameChange} />
               {!isEdit && (
-                <SelectBox name="type" label="Type" options={TYPES} />
+                <>
+                  <p className="text-sm text-foreground/70">Enter a category name to generate icon suggestions.</p>
+                  <SelectBox name="type" label="Type" options={TYPES} />
+                </>
+              )}
+              {isFetchingIcons && (
+                <div className="flex items-center space-x-2 text-sm text-foreground">
+                  <Loader2 className="animate-spin" size={16} />
+                  <span>Generating suggestions...</span>
+                </div>
+              )}
+              {iconSuggestions.length > 0 && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Select Icon</label>
+                  <div className="flex space-x-2">
+                    {iconSuggestions.map((iconName) => (
+                      <button
+                        key={iconName}
+                        type="button"
+                        onClick={() => {
+                          setSelectedIcon(iconName);
+                          setFieldValue("icon", iconName);
+                        }}
+                        className={`p-2 border rounded ${
+                          selectedIcon === iconName ? "border-btn-background bg-selected-background" : "border-foreground bg-background"
+                        }`}
+                      >
+                        <IconComponent iconName={iconName} size={24} className="text-foreground cursor-pointer" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               <div className="flex justify-end space-x-2">
                 <Button
@@ -102,7 +176,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" loading={isLoading}>
+                <Button type="submit" loading={isLoading} disabled={!selectedIcon}>
                   {isEdit ? "Update Category" : "Add Category"}
                 </Button>
               </div>

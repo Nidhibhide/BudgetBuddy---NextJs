@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, HelpCircle } from "lucide-react";
+import * as Icons from "lucide-react";
 import { useField } from "formik";
 import {
   Select,
@@ -17,6 +18,7 @@ import {
   TextareaBoxProps,
   TooltipProps,
   GetStartedLinkProps,
+  IconComponentProps,
 } from "@/app/types/appTypes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -70,6 +72,7 @@ export const InputBox: React.FC<InputBoxProps> = ({
   name,
   type = "text",
   placeholder,
+  onChange,
 }) => {
   const [field, meta] = useField(name);
   const [showPassword, setShowPassword] = useState(false);
@@ -87,6 +90,10 @@ export const InputBox: React.FC<InputBoxProps> = ({
           id={name}
           type={inputType}
           placeholder={placeholder || label}
+          onChange={(e) => {
+            field.onChange(e);
+            if (onChange) onChange(e);
+          }}
           className={`h-11 placeholder:text-base text-lg text-foreground ${
             type === "password" ? "pr-10" : ""
           }`}
@@ -172,7 +179,6 @@ export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
     </div>
   );
 };
-
 export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
   href,
   children,
@@ -197,4 +203,21 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     </Link>
   );
 };
+
+export const IconComponent: React.FC<IconComponentProps> = ({
+  iconName,
+  size = 24,
+  className = "",
+}) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Icon = (Icons as any)[iconName];
+
+  if (!Icon) {
+    return <HelpCircle size={size} className={className} />;
+  }
+
+  return <Icon size={size} className={className} />;
+};
+
+
 

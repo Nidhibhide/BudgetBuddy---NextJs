@@ -4,7 +4,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { InputBox, Button, showError, useHandleResponse } from "./index";
 import { changePassword } from "../lib/auth";
-import { UserFormValues } from "@/app/types/appTypes";
+import { User } from "@/app/types/appTypes";
 import { Lock } from "lucide-react";
 
 const ChangePassword: React.FC = () => {
@@ -33,12 +33,12 @@ const ChangePassword: React.FC = () => {
         otherwise: (schema) => schema.notRequired(),
       }),
   }) as Yup.ObjectSchema<
-    Pick<UserFormValues, "OldPassword" | "NewPassword" | "ConfirmPassword">
+    Pick<User, "OldPassword" | "NewPassword" | "ConfirmPassword">
   >;
 
   const handlePasswordSubmit = async (
     values: Pick<
-      UserFormValues,
+      User,
       "OldPassword" | "NewPassword" | "ConfirmPassword"
     >
   ) => {
