@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Transaction from "@/app/backend/models/transaction";
 import User from "@/app/backend/models/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
@@ -9,22 +7,17 @@ import { MatchStage } from "@/app/types/appTypes";
 import { convertFromINR } from "@/app/backend/utils/currencyConverter";
 
 export async function GET(request: Request) {
-  await dbConnect();
-
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) return JsonOne(401, "Unauthorized", false);
-
-    const userId = new Types.ObjectId(session.user.id);
+  return await withAuthAndDB(async (session, userId) => {
+    const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
     const type = url.searchParams.get("type");
 
     // Get user's currency
-    const user = await User.findById(userId);
+    const user = await User.findById(userIdObj);
     if (!user) return JsonOne(404, "User not found", false);
 
     const matchStage: MatchStage = {
-      user: userId,
+      user: userIdObj,
       isDeleted: false,
       type: type || undefined,
     };
@@ -96,8 +89,5 @@ export async function GET(request: Request) {
     }
 
     return JsonOne(200, "Totals fetched successfully", true, totals);
-  } catch (err) {
-    console.error("❌ Error fetching totals:", err);
-    return JsonOne(500, "Internal Server Error", false);
-  }
+  });
 }

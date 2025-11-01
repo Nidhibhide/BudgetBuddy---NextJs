@@ -1,17 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { withAuth } from "next-auth/middleware";
 
 export const runtime = 'nodejs';
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const sessionToken = req.cookies.get("next-auth.session-token");
- 
-  if (pathname.startsWith("/dashboard") && !sessionToken) {
-    return NextResponse.redirect(new URL("/signin", req.url));
+export default withAuth(
+  function middleware() {
+    // Additional middleware logic can be added here if needed
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
   }
-
-  return NextResponse.next();
-}
+);
 
 export const config = {
   matcher: ["/dashboard/:path*"], // Protect all /dashboard/* routes

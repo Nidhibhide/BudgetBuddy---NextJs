@@ -1,19 +1,11 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import User from "@/app/backend/models/user";
 import bcrypt from "bcryptjs";
 import { ChangePassword } from "@/app/backend/validations/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function POST(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return JsonOne(401, "Unauthorized", false);
-    }
-
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
     const { error } = ChangePassword.validate(body);
     if (error) {
@@ -43,8 +35,5 @@ export async function POST(request: Request) {
     await user.save();
 
     return JsonOne(201, "Password changed successfully", true);
-  } catch (error) {
-    console.error("Error occurred while change password:", error);
-    return JsonOne(500, "Server error", false);
-  }
+  });
 }

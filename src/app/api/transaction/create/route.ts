@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Transaction from "@/app/backend/models/transaction";
 import Category from "@/app/backend/models/category";
 import User from "@/app/backend/models/user";
@@ -10,14 +8,7 @@ import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR } from "@/app/backend/utils/currencyConverter";
 
 export async function POST(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return JsonOne(401, "Unauthorized", false);
-    }
-
-    const userId = session.user.id;
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
     const { error } = CreateTransaction.validate(body);
     if (error) {
@@ -68,8 +59,5 @@ export async function POST(request: Request) {
     return JsonOne(201, "Transaction created successfully", true, {
       transaction: newTransaction,
     });
-  } catch (error) {
-    console.log("Error creating transaction", error);
-    return JsonOne(500, error instanceof Error ? error.message : "Error creating transaction", false);
-  }
+  });
 }

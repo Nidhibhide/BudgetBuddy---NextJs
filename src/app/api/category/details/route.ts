@@ -1,25 +1,18 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
 import { JsonOne, JsonAll } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 
 export async function GET(request: Request) {
-  await dbConnect();
-
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) return JsonOne(401, "Unauthorized", false);
-
-    const userId = new Types.ObjectId(session.user.id);
+  return await withAuthAndDB(async (session, userId) => {
+    const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
     const type = url.searchParams.get("type");
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "10");
 
     const skip = (page - 1) * limit;
-    const matchStage = { user: userId, type, isArchived: false };
+    const matchStage = { user: userIdObj, type, isArchived: false };
 
     const pipeline = [
       { $match: matchStage },
@@ -48,8 +41,5 @@ export async function GET(request: Request) {
       totalCategories,
       limit,
     });
-  } catch (err) {
-    console.error("❌ Error fetching categories:", err);
-    return JsonOne(500, "Internal Server Error", false);
-  }
+  });
 }

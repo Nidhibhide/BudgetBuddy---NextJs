@@ -1,22 +1,8 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip as ChartTip,
-  Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
 import { IoAddSharp } from "react-icons/io5";
 import { Button, Tooltip } from "@/app/components"; // adjust path based on your folder structure
-
-// Register chart.js components
-ChartJS.register(ArcElement, ChartTip, Legend);
-ChartJS.register(BarElement, CategoryScale, LinearScale, ChartTip, Legend);
 
 const MainPage: React.FC = () => {
   const router = useRouter();

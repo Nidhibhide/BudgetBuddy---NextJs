@@ -1,16 +1,24 @@
 import mongoose from "mongoose";
+import * as React from "react";
 
 export interface HeaderProps {
   children?: React.ReactNode;
 }
 
-export interface ApiResponse {
+export interface ApiResponse<T = unknown> {
   message: string;
   success: boolean;
   statusCode: number;
-  data?: object; // optional, can hold user or anything else
+  data?: T;
 }
-
+export interface DeleteCategoryProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  category: Category | null;
+  onCategoryDeleted: () => void;
+  categories: Category[];
+  transactionCount: number;
+}
 export interface User {
   name: string;
   email: string;
@@ -180,11 +188,21 @@ export interface ConfirmationProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title?: string;
-  description?: string;
+  description?: string | React.ReactNode;
+  loading?: boolean;
 }
 
 export interface IconComponentProps {
   iconName: string;
   size?: number;
   className?: string;
+}
+
+export interface UseTransactionsProps {
+  type: string;
+  category?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
