@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Transaction from "@/app/backend/models/transaction";
 import Category from "@/app/backend/models/category";
 import User from "@/app/backend/models/user";
@@ -11,12 +9,7 @@ import { convertToINR, convertFromINR } from "@/app/backend/utils/currencyConver
 import { Transaction as TransactionType } from "@/app/types/appTypes";
 
 export async function PUT(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) return JsonOne(401, "Unauthorized", false);
-
-    const userId = session.user.id;
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const transactionId = url.searchParams.get("id");
 
@@ -98,8 +91,5 @@ export async function PUT(request: Request) {
         amount: responseAmount,
       },
     });
-  } catch (error) {
-    console.error("Error updating transaction:", error);
-    return JsonOne(500, error instanceof Error ? error.message : "Error updating transaction", false);
-  }
+  });
 }

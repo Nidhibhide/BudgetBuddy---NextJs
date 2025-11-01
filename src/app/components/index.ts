@@ -15,6 +15,7 @@ import AddCategory from "./AddCategory";
 import AddTransaction from "./AddTransaction";
 import CustomPagination from "./Pagination";
 import NotFound from "./NotFound";
+import DeleteCategory from "./DeleteCategory";
 import Confirmation from "./Confirmation";
 export {
   Table,
@@ -34,5 +35,6 @@ export {
   CustomPagination,
   Confirmation,
   NotFound,
+  DeleteCategory,
   IconComponent,
 };

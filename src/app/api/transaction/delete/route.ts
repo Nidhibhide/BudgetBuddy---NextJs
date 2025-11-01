@@ -1,6 +1,4 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Transaction from "@/app/backend/models/transaction";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { updateUserBalance } from "@/app/backend/utils/updateBalance";
@@ -8,14 +6,7 @@ import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import User from "@/app/backend/models/user";
 
 export async function DELETE(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return JsonOne(401, "Unauthorized", false);
-    }
-
-    const userId = session.user.id;
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const transactionId = url.searchParams.get("id");
 
@@ -55,8 +46,5 @@ export async function DELETE(request: Request) {
     await transaction.save();
 
     return JsonOne(200, "Transaction deleted successfully", true);
-  } catch (error) {
-    console.log("Error deleting transaction", error);
-    return JsonOne(500, error instanceof Error ? error.message : "Error deleting transaction", false);
-  }
+  });
 }

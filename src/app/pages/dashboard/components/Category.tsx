@@ -5,118 +5,96 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, MousePointer, Loader2, Pen } from "lucide-react";
-import * as Icons from "lucide-react";
+import { Plus, MousePointer, Loader2, Pen, Trash2 } from "lucide-react";
 import {
   AddCategory,
   CustomPagination,
   NotFound,
+  DeleteCategory,
+  IconComponent,
 } from "@/app/components/index";
 import { Table } from "@/app/components/index";
-import { getCategoryDetails } from "@/app/lib/category";
-import { getTransactions, getTransactionTotals } from "@/app/lib/transaction";
-import type { Category, Transaction as TransactionType, TypeTotal } from "@/app/types/appTypes";
+import { getTransactions } from "@/app/lib/transaction";
+import { useCategories, useTransactions } from "@/app/hooks/index";
+import type { Category } from "@/app/types/appTypes";
 
-const Category: React.FC = () => {
+const Category: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [data, setData] = useState<Category[]>([]);
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(
+    null
+  );
+  const [categoryTransactionCount, setCategoryTransactionCount] =
+    useState<number>(0);
   const [recordsLoading, setRecordsLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalTransactions: 0,
-    limit: 10,
-  });
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [totals, setTotals] = useState<TypeTotal[]>([]);
 
   const currentType = isExpense ? "Expense" : "Income";
-  const currency = session?.user?.currency || 'INR';
+  const currency = session?.user?.currency || "INR";
+
+  const {
+    categories: data,
+    loading,
+    refetch: refetchCategories,
+  } = useCategories(currentType);
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    transactions,
+    totals,
+    pagination,
+    refetch: refetchTransactions,
+    refetchTotals,
+  } = useTransactions({
+    type: currentType,
+    category: selectedCategory || undefined,
+    page: currentPage,
+    sortBy,
+    sortOrder,
+  });
 
   // Helper function to get category totals
-  const getCategoryTotal = (categoryName: string) => {
-    const typeTotals = totals.find(t => t.type === currentType);
-    return typeTotals?.categories.find(c => c.category === categoryName) || { total: 0, percentage: 0 };
-  };
-
-  // Fetch category details
-  const fetchCategoryDetails = useCallback(async (type: string) => {
-    try {
-      setLoading(true);
-      const result = await getCategoryDetails(type);
-      if (result.success && result.data) {
-        setData(result.data);
-      }
-      // Fetch totals
-      const totalsResult = await getTransactionTotals(type);
-      if (totalsResult.success && totalsResult.data) {
-        setTotals(totalsResult.data);
-      }
-    } catch (err) {
-      console.error("Error fetching category details:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch transactions for selected category
-  const fetchTransactions = useCallback(async (
-    type: string,
-    category: string,
-    page: number = 1,
-    sortByParam?: string,
-    sortOrderParam?: "asc" | "desc"
-  ) => {
-    setRecordsLoading(true);
-    try {
-      const response = await getTransactions(
-        type,
-        category,
-        page,
-        10,
-        sortByParam || sortBy,
-        sortOrderParam || sortOrder
+  const getCategoryTotal = useCallback(
+    (categoryName: string) => {
+      const typeTotals = totals.find((t) => t.type === currentType);
+      return (
+        typeTotals?.categories.find((c) => c.category === categoryName) || {
+          total: 0,
+          percentage: 0,
+        }
       );
-      if (response.success) {
-        setTransactions(response.data || []);
-        setPagination(prev => response.pagination || prev);
-      } else {
-        console.error("Failed to fetch transactions:", response.message);
-        setTransactions([]);
-      }
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      setTransactions([]);
-    } finally {
-      setRecordsLoading(false);
-    }
-  }, [sortBy, sortOrder]);
+    },
+    [totals, currentType]
+  );
 
   useEffect(() => {
-    fetchCategoryDetails(currentType);
     setSelectedCategory(null);
     setEditingCategory(null);
-  }, [currentType, fetchCategoryDetails]);
+    setDeletingCategory(null);
+    setCurrentPage(1);
+  }, [currentType]);
 
-  const handleSort = (column: string) => {
-    const newSortOrder = sortBy === column && sortOrder === "asc" ? "desc" : "asc";
-    setSortBy(column);
-    setSortOrder(newSortOrder);
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-  };
+  const handleSort = useCallback(
+    (column: string) => {
+      const newSortOrder =
+        sortBy === column && sortOrder === "asc" ? "desc" : "asc";
+      setSortBy(column);
+      setSortOrder(newSortOrder);
+      setCurrentPage(1);
+    },
+    [sortBy, sortOrder]
+  );
 
   useEffect(() => {
     if (selectedCategory) {
-      fetchTransactions(currentType, selectedCategory, pagination.currentPage);
+      setRecordsLoading(true);
+      refetchTransactions().finally(() => setRecordsLoading(false));
     }
-  }, [selectedCategory, pagination.currentPage, currentType, sortBy, sortOrder, fetchTransactions]);
+  }, [selectedCategory, currentPage, sortBy, sortOrder, refetchTransactions]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -149,37 +127,73 @@ const Category: React.FC = () => {
           </div>
         ) : (
           <>
-            {data?.map((category, index) => {
+            {data?.map((category: Category, index: number) => {
               const { total, percentage } = getCategoryTotal(category.name);
               return (
                 <Card
                   key={index}
-                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${selectedCategory === category.name ? 'bg-selected-background' : 'bg-background'} cursor-pointer`}
+                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${
+                    selectedCategory === category.name
+                      ? "bg-selected-background"
+                      : "bg-background"
+                  } cursor-pointer`}
                   onClick={() => {
                     setSelectedCategory(category.name);
-                    setPagination(prev => ({ ...prev, currentPage: 1 }));
+                    setCurrentPage(1);
                   }}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center justify-center  space-x-2">
-                        {category.icon && (() => {
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          const IconComponent = (Icons as any)[category.icon];
-                          return IconComponent ? <IconComponent className="w-6 h-6 text-foreground" /> : null;
-                        })()}
+                        {category.icon && (
+                          <IconComponent
+                            iconName={category.icon}
+                            size={24}
+                            className="text-foreground"
+                          />
+                        )}
                         <CardTitle className="text-xl font-semibold text-foreground">
                           {category.name}
                         </CardTitle>
                       </div>
-                      <Pen
-                        className="w-4 h-4 text-foreground cursor-pointer hover:text-blue-500"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingCategory(category);
-                          setIsAddCategoryOpen(true)
-                        }}
-                      />
+                      <div className="flex gap-2">
+                        <Pen
+                          className="w-4 h-4 text-foreground cursor-pointer hover:text-blue-500"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingCategory(category);
+                            setIsAddCategoryOpen(true);
+                          }}
+                        />
+                        <Trash2
+                          className={`w-4 h-4 text-foreground cursor-pointer hover:text-red-500 ${
+                            deleteLoading ? "animate-spin" : ""
+                          }`}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setDeleteLoading(true);
+                            try {
+                              // Get transaction count for this category
+                              let count = 0;
+                              if (selectedCategory === category.name) {
+                                count = pagination.totalTransactions;
+                              } else {
+                                const result = await getTransactions(
+                                  currentType,
+                                  category.name,
+                                  1,
+                                  1
+                                );
+                                count = result.pagination?.totalTransactions || 0;
+                              }
+                              setCategoryTransactionCount(count);
+                              setDeletingCategory(category);
+                            } finally {
+                              setDeleteLoading(false);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -240,14 +254,19 @@ const Category: React.FC = () => {
                   key: "date",
                   label: "Date",
                   sortable: true,
-                  render: (value) => value ? new Date(value as string | number | Date).toLocaleDateString('en-GB') : ''
+                  render: (value) =>
+                    value
+                      ? new Date(
+                          value as string | number | Date
+                        ).toLocaleDateString("en-GB")
+                      : "",
                 },
                 { key: "description", label: "Description" },
                 {
                   key: "amount",
                   label: "Amount",
                   sortable: true,
-                  render: (value) => `${value} ${currency}`
+                  render: (value) => `${value} ${currency}`,
                 },
                 { key: "type", label: "Type" },
               ]}
@@ -260,7 +279,7 @@ const Category: React.FC = () => {
               <CustomPagination
                 currentPage={pagination.currentPage}
                 totalPages={pagination.totalPages}
-                onPageChange={(page) => setPagination(prev => ({ ...prev, currentPage: page }))}
+                onPageChange={setCurrentPage}
                 className="justify-end"
               />
             </div>
@@ -282,15 +301,43 @@ const Category: React.FC = () => {
       <AddCategory
         open={isAddCategoryOpen}
         onOpenChange={setIsAddCategoryOpen}
-        onCategoryAdded={() => fetchCategoryDetails(currentType)}
+        onCategoryAdded={() => refetchCategories()}
         category={editingCategory}
         onCategoryEdited={() => {
-          fetchCategoryDetails(currentType);
+          refetchCategories();
           setEditingCategory(null);
         }}
       />
+
+      <DeleteCategory
+        open={!!deletingCategory}
+        onOpenChange={(open: boolean) => {
+          if (!open) {
+            setDeletingCategory(null);
+          }
+        }}
+        category={deletingCategory}
+        onCategoryDeleted={() => {
+          refetchCategories();
+          refetchTransactions();
+          refetchTotals();
+          setSelectedCategory(null);
+          setCurrentPage(1);
+        }}
+        categories={data}
+        transactionCount={categoryTransactionCount}
+      />
     </div>
   );
-};
+});
+
+Category.displayName = "Category";
 
 export default Category;
+
+//useCallback makes your React app faster by remembering functions, so they don’t get recreated on every render.
+// This stops child components from re-rendering again and again without need.
+
+//React.memo stops a component from re-rendering if its props haven’t changed, so it only updates when needed.
+
+//React.memo prevents a component from re-rendering if props don’t change, while useCallback keeps a function from being recreated on every render.

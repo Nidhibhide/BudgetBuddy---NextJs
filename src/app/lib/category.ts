@@ -70,3 +70,23 @@ export async function getIconSuggestions(categoryName: string) {
   }
 }
 
+export async function deleteCategory(id: string, reassignCategoryId?: string) {
+  try {
+    const url = reassignCategoryId
+      ? `/api/category/delete?id=${id}&reassignCategoryId=${reassignCategoryId}`
+      : `/api/category/delete?id=${id}`;
+    const response = await axios.delete(url);
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error deleting category:", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Something went wrong while deleting category",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}
+

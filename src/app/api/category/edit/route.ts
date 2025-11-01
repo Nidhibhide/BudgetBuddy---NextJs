@@ -1,19 +1,10 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
 import { EditCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function PUT(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return JsonOne(401, "Unauthorized", false);
-    }
-
-    const userId = session.user.id;
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
 
@@ -60,8 +51,5 @@ export async function PUT(request: Request) {
     return JsonOne(200, "Category updated successfully", true, {
       category: existingCategory
     });
-  } catch (error) {
-    console.log("Error updating category", error);
-    return JsonOne(500, "Error updating category", false);
-  }
+  });
 }

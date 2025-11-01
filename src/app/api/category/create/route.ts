@@ -1,26 +1,18 @@
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import dbConnect from "@/app/backend/config/MongoDB";
+import { withAuthAndDB, validateBody } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
 import { CreateCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function POST(request: Request) {
-  await dbConnect();
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return JsonOne(401, "Unauthorized", false);
-    }
-
-    const userId = session.user.id;
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
-    const { error } = CreateCategory.validate(body);
+    const { error, value } = validateBody<{ name: string; type: string; icon: string }>(body, CreateCategory);
+
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
 
-    const { name, type, icon } = body;
+    const { name, type, icon } = value!;
 
     // Check if category already exists for this user
     const existingCategory = await Category.findOne({
@@ -46,8 +38,5 @@ export async function POST(request: Request) {
     return JsonOne(201, "Category created successfully", true, {
       category: newCategory
     });
-  } catch (error) {
-    console.error("Error creating category", error);
-    return JsonOne(500, "Error creating category", false);
-  }
+  });
 }

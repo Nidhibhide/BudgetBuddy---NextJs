@@ -141,7 +141,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               )}
               {isFetchingIcons && (
                 <div className="flex items-center space-x-2 text-sm text-foreground">
-                  <Loader2 className="animate-spin" size={16} />
+                  <Loader2 className="animate-spin text-foreground" size={16} />
                   <span>Generating suggestions...</span>
                 </div>
               )}

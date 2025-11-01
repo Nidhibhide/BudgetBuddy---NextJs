@@ -14,12 +14,12 @@ import {
   AddTransaction,
   Confirmation,
 } from "@/app/components/index";
-import { getCategoryDetails } from "@/app/lib/category";
-import { getTransactions, deleteTransaction } from "@/app/lib/transaction";
-import { Category, Transaction as TransactionType } from "@/app/types/appTypes";
+import { deleteTransaction } from "@/app/lib/transaction";
+import { Transaction as TransactionType } from "@/app/types/appTypes";
 import { showSuccess, showError } from "@/app/components/Utils";
+import { useCategories, useTransactions } from "@/app/hooks";
 
-const Transaction: React.FC = () => {
+const Transaction: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -30,74 +30,27 @@ const Transaction: React.FC = () => {
   const [deleteTransactionId, setDeleteTransactionId] = useState<string | null>(
     null
   );
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-    totalTransactions: 0,
-    limit: 10,
-  });
+  const [deleting, setDeleting] = useState(false);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const fetchCategories = async (type: string) => {
-    try {
-      const response = await getCategoryDetails(type);
-      if (response.success) {
-        setCategories(response.data || []);
-      } else {
-        console.error("Failed to fetch categories:", response.message);
-        setCategories([]);
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      setCategories([]);
-    }
-  };
-
-  const fetchTransactions = useCallback(
-    async (
-      type: string,
-      category: string,
-      page: number = 1,
-      sortByParam?: string,
-      sortOrderParam?: "asc" | "desc"
-    ) => {
-      setLoading(true);
-      try {
-        const response = await getTransactions(
-          type,
-          category,
-          page,
-          10,
-          sortByParam || sortBy,
-          sortOrderParam || sortOrder
-        );
-        if (response.success) {
-          setTransactions(response.data || []);
-          setPagination((prev) => response.pagination || prev);
-        } else {
-          console.error("Failed to fetch transactions:", response.message);
-          setTransactions([]);
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-        setTransactions([]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [sortBy, sortOrder]
-  );
+  const currentType = isExpense ? "Expense" : "Income";
+  const { categories } = useCategories(currentType);
+  const { transactions, loading, pagination, refetch: refetchTransactions } = useTransactions({
+    type: currentType,
+    category: selectedCategory === "All" ? undefined : selectedCategory,
+    page: currentPage,
+    limit: 10,
+    sortBy,
+    sortOrder,
+  });
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
   };
 
-  const handleSort = (column: string) => {
+  const handleSort = useCallback((column: string) => {
     if (sortBy === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -105,7 +58,7 @@ const Transaction: React.FC = () => {
       setSortOrder("asc");
     }
     setCurrentPage(1);
-  };
+  }, [sortBy, sortOrder]);
 
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
@@ -119,16 +72,13 @@ const Transaction: React.FC = () => {
   const handleConfirmDelete = async () => {
     if (!deleteTransactionId) return;
 
+    setDeleting(true);
     try {
       const response = await deleteTransaction(deleteTransactionId);
       if (response.success) {
         showSuccess(response.message);
         // Refresh transactions
-        fetchTransactions(
-          isExpense ? "Expense" : "Income",
-          selectedCategory,
-          currentPage
-        );
+        refetchTransactions();
         setDeleteTransactionId(null);
       } else {
         showError(response.message || "Failed to delete transaction");
@@ -136,6 +86,8 @@ const Transaction: React.FC = () => {
     } catch (error) {
       console.error("Error deleting transaction:", error);
       showError("An unexpected error occurred while deleting the transaction");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -143,24 +95,6 @@ const Transaction: React.FC = () => {
     setSelectedCategory("All");
     setCurrentPage(1);
   }, [isExpense]);
-
-  useEffect(() => {
-    const type = isExpense ? "Expense" : "Income";
-    fetchCategories(type);
-  }, [isExpense]);
-
-  useEffect(() => {
-    const type = isExpense ? "Expense" : "Income";
-    fetchTransactions(type, selectedCategory, currentPage);
-  }, [
-    isExpense,
-    selectedCategory,
-    currentPage,
-    sortBy,
-    sortOrder,
-    fetchTransactions,
-    session?.user?.currency,
-  ]);
 
   return (
     <div className="w-full p-4 space-y-3">
@@ -218,7 +152,7 @@ const Transaction: React.FC = () => {
       {/* Table Section */}
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <Loader2 className="w-8 h-8 animate-spin" />
+          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
         </div>
       ) : transactions.length > 0 ? (
         <>
@@ -303,11 +237,7 @@ const Transaction: React.FC = () => {
         transaction={editTransactionData}
         onTransactionAdded={() => {
           setCurrentPage(1);
-          fetchTransactions(
-            isExpense ? "Expense" : "Income",
-            selectedCategory,
-            1
-          );
+          refetchTransactions();
         }}
       />
 
@@ -315,9 +245,12 @@ const Transaction: React.FC = () => {
         open={!!deleteTransactionId}
         onOpenChange={(open) => !open && setDeleteTransactionId(null)}
         onConfirm={handleConfirmDelete}
+        loading={deleting}
       />
     </div>
   );
-};
+});
+
+Transaction.displayName = 'Transaction';
 
 export default Transaction;

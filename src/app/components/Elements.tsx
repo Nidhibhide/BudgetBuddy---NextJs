@@ -159,7 +159,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
-          <Loader2 className="animate-spin" size={16} />
+          <Loader2 className="animate-spin text-foreground" size={16} />
           Loading...
         </div>
       ) : (
@@ -194,7 +194,7 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
-          <Loader2 className="animate-spin" size={16} />
+          <Loader2 className="animate-spin text-foreground" size={16} />
           Loading...
         </div>
       ) : (
