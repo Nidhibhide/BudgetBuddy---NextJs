@@ -22,6 +22,16 @@ const categorySchema = new mongoose.Schema(
     minlength: [1, "Icon cannot be empty"],
     maxlength: [100, "Icon cannot exceed 100 characters"],
   },
+  budgetLimit: {
+    type: Number,
+    default: 0,
+    min: [0, "Budget limit must be positive"],
+  },
+  goal: {
+    type: Number,
+    default: 0,
+    min: [0, "Goal must be positive"],
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

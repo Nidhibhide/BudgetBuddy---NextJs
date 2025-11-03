@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return JsonOne(400, "Category name is required", false);
     }
 
-    const prompt = `Suggest 3 relevant Lucide React icon names for the category "${categoryName}". Return only the icon names in PascalCase as a JSON array, e.g., ["Home", "Settings", "Star"]. Ensure all suggested icons are valid and exist in the Lucide React library.`;
+    const prompt = `Suggest 3 relevant icon names for the category "${categoryName}". Use icons from React Icons (e.g., "FaHome", "MdSettings", "IoStar"). Return only the icon names as a JSON array, e.g., ["FaHome", "MdSettings", "IoStar"]. Ensure all suggested icons are valid and exist in React Icons library.`;
 
     const model = googleAI.getGenerativeModel({
       model: "gemini-2.0-flash-lite",
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       .trim();
 
     let suggestions: string[] = [];
+
     try {
       suggestions = JSON.parse(textResponse);
     } catch {

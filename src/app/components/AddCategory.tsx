@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +42,16 @@ const AddCategory: React.FC<AddCategoryProps> = ({
       .max(50, "Name must not exceed 50 characters")
       .required("Name is required"),
     icon: Yup.string().required("Icon is required"),
+    budgetLimit: Yup.number().when(['type'], {
+      is: (type: string) => type === 'Expense',
+      then: (schema) => schema.min(0, "Budget limit must be positive").max(1000000, "Budget limit too high").required("Budget limit is required for Expense categories"),
+      otherwise: (schema) => schema.min(0, "Budget limit must be positive").max(1000000, "Budget limit too high"),
+    }),
+    goal: Yup.number().when(['type'], {
+      is: (type: string) => type === 'Income',
+      then: (schema) => schema.min(0, "Goal must be positive").max(1000000, "Goal too high").required("Goal is required for Income categories"),
+      otherwise: (schema) => schema.min(0, "Goal must be positive").max(1000000, "Goal too high"),
+    }),
     ...(isEdit ? {} : {
         type: Yup.string()
           .oneOf(TYPES, "Invalid type")
@@ -124,13 +134,13 @@ const AddCategory: React.FC<AddCategoryProps> = ({
         </DialogHeader>
         <Formik
           initialValues={
-            isEdit ? { name: category.name, icon: category.icon } : { name: "", type: TYPES[0], icon: "" }
+            isEdit ? { name: category.name, icon: category.icon, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: category.type } : { name: "", type: TYPES[0], icon: "", budgetLimit: 0, goal: 0 }
           }
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ handleSubmit, setFieldValue }) => (
+          {({ handleSubmit, setFieldValue, values }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputBox name="name" label="Category Name" onChange={handleNameChange} />
               {!isEdit && (
@@ -138,6 +148,12 @@ const AddCategory: React.FC<AddCategoryProps> = ({
                   <p className="text-sm text-foreground/70">Enter a category name to generate icon suggestions.</p>
                   <SelectBox name="type" label="Type" options={TYPES} />
                 </>
+              )}
+              {(isEdit ? category.type === "Expense" : values.type === "Expense") && (
+                <InputBox name="budgetLimit" label="Budget Limit" type="number" />
+              )}
+              {(isEdit ? category.type === "Income" : values.type === "Income") && (
+                <InputBox name="goal" label="Goal" type="number" />
               )}
               {isFetchingIcons && (
                 <div className="flex items-center space-x-2 text-sm text-foreground">
@@ -147,7 +163,17 @@ const AddCategory: React.FC<AddCategoryProps> = ({
               )}
               {iconSuggestions.length > 0 && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Select Icon</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">Select Icon</label>
+                    <button
+                      type="button"
+                      onClick={() => fetchIconSuggestions(values.name)}
+                      disabled={isFetchingIcons || values.name.length < 2}
+                      className="p-1 hover:bg-gray-100 rounded disabled:opacity-50"
+                    >
+                      <RefreshCw size={16} className={isFetchingIcons ? "animate-spin" : ""} />
+                    </button>
+                  </div>
                   <div className="flex space-x-2">
                     {iconSuggestions.map((iconName) => (
                       <button

@@ -18,7 +18,7 @@ export async function PUT(request: Request) {
       return JsonOne(400, error.details[0].message, false);
     }
 
-    const { name, icon } = body;
+    const { name, icon, budgetLimit, goal, type } = body;
 
     // Check if category exists and belongs to user
     const existingCategory = await Category.findOne({
@@ -34,7 +34,7 @@ export async function PUT(request: Request) {
     // Check if new name already exists for this user and type
     const duplicateCategory = await Category.findOne({
       name,
-      type: existingCategory.type,
+      type: type || existingCategory.type,
       user: userId,
       isArchived: false,
       _id: { $ne: categoryId },
@@ -46,6 +46,15 @@ export async function PUT(request: Request) {
 
     existingCategory.name = name;
     existingCategory.icon = icon;
+    if (type) {
+      existingCategory.type = type;
+    }
+    if (budgetLimit !== undefined) {
+      existingCategory.budgetLimit = type === 'Expense' || (!type && existingCategory.type === 'Expense') ? budgetLimit : 0;
+    }
+    if (goal !== undefined) {
+      existingCategory.goal = type === 'Income' || (!type && existingCategory.type === 'Income') ? goal : 0;
+    }
     await existingCategory.save();
 
     return JsonOne(200, "Category updated successfully", true, {

@@ -6,6 +6,7 @@ import { CreateTransaction } from "@/app/backend/validations/transaction";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR } from "@/app/backend/utils/currencyConverter";
+import { checkLimitForCreate } from "@/app/backend/utils/transactionChecks";
 
 export async function POST(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
@@ -36,6 +37,18 @@ export async function POST(request: Request) {
 
     if (!categoryDoc) {
       return JsonOne(400, "Category not found", false);
+    }
+
+    // Check budget limit or goal
+    const limitCheck = await checkLimitForCreate(
+      categoryDoc._id.toString(),
+      userId,
+      type,
+      amountInINR,
+      user.currency
+    );
+    if (!limitCheck.success) {
+      return JsonOne(400, limitCheck.message || "Limit check failed", false);
     }
 
     // Update user balance with converted amount
