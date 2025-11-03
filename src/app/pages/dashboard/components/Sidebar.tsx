@@ -5,7 +5,6 @@ import {
   MdCategory,
   MdLogout,
   MdDashboard,
-  MdOutlineRestore,
   MdAccountBalance,
   MdPayment,
 } from "react-icons/md";
@@ -23,11 +22,6 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       href: "/dashboard/home",
       label: "Dashboard",
       icon: MdDashboard,
-    },
-    {
-      href: "/dashboard/report",
-      label: "Reports",
-      icon: MdOutlineRestore,
     },
     {
       href: "/dashboard/category",

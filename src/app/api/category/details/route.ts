@@ -1,6 +1,6 @@
 import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
-import { JsonOne, JsonAll } from "@/app/backend/utils/ApiResponse";
+import {  JsonAll } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 
 export async function GET(request: Request) {
@@ -19,7 +19,7 @@ export async function GET(request: Request) {
       {
         $facet: {
           data: [
-            { $project: { _id: 1, name: 1, type: 1, icon: 1 } },
+            { $project: { _id: 1, name: 1, type: 1, icon: 1, budgetLimit: 1, goal: 1 } },
             { $sort: { name: 1 } },
             { $skip: skip },
             { $limit: limit },

@@ -7,6 +7,7 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR, convertFromINR } from "@/app/backend/utils/currencyConverter";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
+import { checkLimitForEdit } from "@/app/backend/utils/transactionChecks";
 
 export async function PUT(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
@@ -70,6 +71,21 @@ export async function PUT(request: Request) {
     if (date) updateData.date = new Date(date);
     if (title) updateData.title = title;
     if (description !== undefined) updateData.description = description;
+
+    // Check budget limit or goal if amount is increasing
+    if (balanceAdjustment > 0) {
+      const categoryId = updateData.category || existingTransaction.category;
+      const limitCheck = await checkLimitForEdit(
+        categoryId.toString(),
+        userId,
+        existingTransaction.type,
+        balanceAdjustment,
+        user.currency
+      );
+      if (!limitCheck.success) {
+        return JsonOne(400, limitCheck.message || "Limit check failed", false);
+      }
+    }
 
     // Update balance if amount changed
     if (balanceAdjustment !== 0) {

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, HelpCircle } from "lucide-react";
-import * as Icons from "lucide-react";
+import * as ReactIcons from "react-icons";
 import { useField } from "formik";
 import {
   Select,
@@ -155,7 +155,9 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className} ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+      className={`${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className} ${
+        loading ? "cursor-not-allowed opacity-50" : ""
+      }`}
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
@@ -190,7 +192,9 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     <Link
       href={href}
       onClick={onClick}
-      className={`bg-btn-background py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width} ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+      className={`bg-btn-background py-2.5 px-4 text-center text-base font-medium text-white rounded-xl hover:bg-btn-hover hover:shadow-md transition duration-500 ${width} ${
+        loading ? "cursor-not-allowed opacity-50" : ""
+      }`}
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
@@ -210,7 +214,7 @@ export const IconComponent: React.FC<IconComponentProps> = ({
   className = "",
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Icon = (Icons as any)[iconName];
+  const Icon = (ReactIcons as any)[iconName];
 
   if (!Icon) {
     return <HelpCircle size={size} className={className} />;
@@ -218,6 +222,3 @@ export const IconComponent: React.FC<IconComponentProps> = ({
 
   return <Icon size={size} className={className} />;
 };
-
-
-

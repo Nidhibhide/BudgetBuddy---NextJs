@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, MousePointer, Loader2, Pen, Trash2 } from "lucide-react";
+import { Plus, MousePointer, Loader2, Pen, Trash2, AlertTriangle } from "lucide-react";
 import {
   AddCategory,
   CustomPagination,
@@ -61,14 +61,27 @@ const Category: React.FC = React.memo(() => {
   const getCategoryTotal = useCallback(
     (categoryName: string) => {
       const typeTotals = totals.find((t) => t.type === currentType);
-      return (
-        typeTotals?.categories.find((c) => c.category === categoryName) || {
-          total: 0,
-          percentage: 0,
-        }
-      );
+      const categoryData = typeTotals?.categories.find((c) => c.category === categoryName);
+      const category = data.find((c) => c.name === categoryName);
+      const budgetLimit = category?.budgetLimit || 0;
+      const goal = category?.goal || 0;
+      const total = categoryData?.total || 0;
+      let percentage = categoryData?.percentage || 0;
+
+      if (currentType === "Expense" && budgetLimit > 0) {
+        percentage = Math.min((total / budgetLimit) * 100, 100);
+      } else if (currentType === "Income" && goal > 0) {
+        percentage = Math.min((total / goal) * 100, 100);
+      }
+
+      return {
+        total,
+        percentage,
+        budgetLimit,
+        goal,
+      };
     },
-    [totals, currentType]
+    [totals, currentType, data]
   );
 
   useEffect(() => {
@@ -128,7 +141,7 @@ const Category: React.FC = React.memo(() => {
         ) : (
           <>
             {data?.map((category: Category, index: number) => {
-              const { total, percentage } = getCategoryTotal(category.name);
+              const { total, percentage, budgetLimit, goal } = getCategoryTotal(category.name);
               return (
                 <Card
                   key={index}
@@ -201,17 +214,38 @@ const Category: React.FC = React.memo(() => {
                       <div className="text-2xl font-bold text-foreground">
                         {total.toLocaleString()} {currency}
                       </div>
-                      <div className="text-sm text-foreground">
-                        {percentage}%
-                      </div>
-                      <div className="w-full bg-foreground rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full ${
-                            isExpense ? "bg-red-500" : "bg-green-500"
-                          } transition-all duration-500`}
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
+                      {currentType === "Expense" && budgetLimit > 0 && (
+                        <div className="text-sm text-foreground/70">
+                          Budget: {budgetLimit.toLocaleString()} {currency}
+                        </div>
+                      )}
+                      {currentType === "Income" && goal > 0 && (
+                        <div className="text-sm text-foreground/70">
+                          Goal: {goal.toLocaleString()} {currency}
+                        </div>
+                      )}
+                      {(currentType === "Expense" && budgetLimit > 0) || (currentType === "Income" && goal > 0) ? (
+                        <>
+                          <div className="text-sm text-foreground">
+                            {percentage.toFixed(1)}%
+                          </div>
+                          <div className="w-full bg-foreground rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${
+                                isExpense ? "bg-red-500" : "bg-green-500"
+                              } transition-all duration-500`}
+                              style={{ width: `${Math.min(percentage, 100)}%` }}
+                            ></div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center space-x-1">
+                          <AlertTriangle className="w-6 h-6 text-yellow-600" strokeWidth={3} />
+                          <span className="text-base font-semibold text-foreground/60">
+                            {currentType === "Expense" ? "Set a budget to track your spending" : "Set a goal to track your income"}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

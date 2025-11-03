@@ -5,7 +5,7 @@ import { ChangePassword } from "@/app/backend/validations/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function POST(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (session) => {
     const body = await request.json();
     const { error } = ChangePassword.validate(body);
     if (error) {

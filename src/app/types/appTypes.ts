@@ -5,6 +5,10 @@ export interface HeaderProps {
   children?: React.ReactNode;
 }
 
+export interface LimitCheckResult {
+  success: boolean;
+  message?: string;
+}
 export interface ApiResponse<T = unknown> {
   message: string;
   success: boolean;
@@ -93,6 +97,8 @@ export interface Category {
   name: string;
   type: string;
   icon: string;
+  budgetLimit?: number;
+  goal?: number;
   _id?: string;
   user?: string;
   isArchived?: boolean;
