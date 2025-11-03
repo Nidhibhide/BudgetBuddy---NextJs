@@ -42,16 +42,8 @@ const AddCategory: React.FC<AddCategoryProps> = ({
       .max(50, "Name must not exceed 50 characters")
       .required("Name is required"),
     icon: Yup.string().required("Icon is required"),
-    budgetLimit: Yup.number().when(['type'], {
-      is: (type: string) => type === 'Expense',
-      then: (schema) => schema.min(0, "Budget limit must be positive").max(1000000, "Budget limit too high").required("Budget limit is required for Expense categories"),
-      otherwise: (schema) => schema.min(0, "Budget limit must be positive").max(1000000, "Budget limit too high"),
-    }),
-    goal: Yup.number().when(['type'], {
-      is: (type: string) => type === 'Income',
-      then: (schema) => schema.min(0, "Goal must be positive").max(1000000, "Goal too high").required("Goal is required for Income categories"),
-      otherwise: (schema) => schema.min(0, "Goal must be positive").max(1000000, "Goal too high"),
-    }),
+    budgetLimit: Yup.number().min(0, "Budget limit must be positive").max(1000000, "Budget limit too high"),
+    goal: Yup.number().min(0, "Goal must be positive").max(1000000, "Goal too high"),
     ...(isEdit ? {} : {
         type: Yup.string()
           .oneOf(TYPES, "Invalid type")
