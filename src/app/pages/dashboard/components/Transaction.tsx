@@ -6,7 +6,7 @@ import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button, SelectBox } from "@/app/components/Elements";
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, Download } from "lucide-react";
 import {
   Table,
   CustomPagination,
@@ -14,10 +14,32 @@ import {
   AddTransaction,
   Confirmation,
 } from "@/app/components/index";
+import { TransactionPDF } from "@/app/components/PDFGenerator";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
 import { showSuccess, showError } from "@/app/components/Utils";
 import { useCategories, useTransactions } from "@/app/hooks";
+
+const handlePDFDownload = async (
+  transactions: TransactionType[],
+  selectedCategory: string,
+  currentType: string,
+  currency: string,
+  categories: string[]
+) => {
+  try {
+    const { pdf } = await import('@react-pdf/renderer');
+    const blob = await pdf(<TransactionPDF transactions={transactions} selectedCategory={selectedCategory} currentType={currentType} currency={currency} categories={categories} />).toBlob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'budgetbuddy.pdf';
+    link.click();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+  }
+};
 
 const Transaction: React.FC = React.memo(() => {
   const { data: session } = useSession();
@@ -138,14 +160,24 @@ const Transaction: React.FC = React.memo(() => {
             )}
           </Formik>
 
-          <Button
-            width="w-full sm:w-[180px]"
-            className="flex items-center justify-center gap-2"
-            onClick={() => setIsAddTransactionOpen(true)}
-          >
-            <Plus className="w-4 h-4" />
-            Add Transaction
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              width="w-full sm:w-[180px]"
+              className="flex items-center justify-center gap-2"
+              onClick={() => setIsAddTransactionOpen(true)}
+            >
+              <Plus className="w-4 h-4" />
+              Add Transaction
+            </Button>
+            <Button
+              width="w-full sm:w-[180px]"
+              className="flex items-center justify-center gap-2"
+              onClick={() => handlePDFDownload(transactions, selectedCategory, currentType, session?.user?.currency || "INR", categories.map(cat => cat.name))}
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
+          </div>
         </div>
       </div>
 

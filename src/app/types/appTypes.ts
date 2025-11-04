@@ -4,7 +4,13 @@ import * as React from "react";
 export interface HeaderProps {
   children?: React.ReactNode;
 }
-
+export interface TransactionPDFProps {
+  transactions?: Transaction[];
+  selectedCategory?: string;
+  currentType?: string;
+  currency?: string;
+  categories?: string[];
+}
 export interface LimitCheckResult {
   success: boolean;
   message?: string;
@@ -96,7 +102,6 @@ export interface AppState {
 export interface Category {
   name: string;
   type: string;
-  icon: string;
   budgetLimit?: number;
   goal?: number;
   _id?: string;

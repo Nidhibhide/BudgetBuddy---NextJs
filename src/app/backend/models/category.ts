@@ -15,13 +15,6 @@ const categorySchema = new mongoose.Schema(
     enum: TYPES,
     required: true,
   },
-  icon: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: [1, "Icon cannot be empty"],
-    maxlength: [100, "Icon cannot exceed 100 characters"],
-  },
   budgetLimit: {
     type: Number,
     default: 0,
