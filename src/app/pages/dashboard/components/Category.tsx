@@ -158,13 +158,6 @@ const Category: React.FC = React.memo(() => {
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center justify-center  space-x-2">
-                        {category.icon && (
-                          <IconComponent
-                            iconName={category.icon}
-                            size={24}
-                            className="text-foreground"
-                          />
-                        )}
                         <CardTitle className="text-xl font-semibold text-foreground">
                           {category.name}
                         </CardTitle>

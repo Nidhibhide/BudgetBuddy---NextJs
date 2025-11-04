@@ -53,22 +53,6 @@ export async function editCategory(id: string, data: Category) {
   }
 }
 
-export async function getIconSuggestions(categoryName: string) {
-  try {
-    const response = await axios.post("/api/category/icon-suggestions", { categoryName });
-    return { ...response.data, statusCode: response.status };
-  } catch (error: unknown) {
-    console.error("Error fetching icon suggestions:", error);
-    const axiosError = error as AxiosError;
-    return {
-      message:
-        (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching icon suggestions",
-      success: false,
-      statusCode: axiosError.response?.status || 500,
-    };
-  }
-}
 
 export async function deleteCategory(id: string, reassignCategoryId?: string) {
   try {

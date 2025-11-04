@@ -18,7 +18,7 @@ export async function PUT(request: Request) {
       return JsonOne(400, error.details[0].message, false);
     }
 
-    const { name, icon, budgetLimit, goal, type } = body;
+    const { name, budgetLimit, goal, type } = body;
 
     // Check if category exists and belongs to user
     const existingCategory = await Category.findOne({
@@ -45,7 +45,6 @@ export async function PUT(request: Request) {
     }
 
     existingCategory.name = name;
-    existingCategory.icon = icon;
     if (type) {
       existingCategory.type = type;
     }
