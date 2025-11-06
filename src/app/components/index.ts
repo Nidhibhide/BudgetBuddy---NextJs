@@ -23,6 +23,11 @@ import IncomeVsExpenseTrend from "./IncomeVsExpenseTrend";
 import RecentTransactions from "./RecentTransactions";
 import BudgetCalendar from "./BudgetCalendar";
 import Insights from "./Insights";
+import UpcomingBill from "./UpcomingBill";
+import AddUpcomingBillForm from "./AddUpcomingBillForm";
+import RecurringPayment from "./RecurringPayment";
+import ViewUpcomingBill from "./ViewUpcomingBill";
+import ViewRecurringPayment from "./ViewRecurringPayment";
 export {
   Table,
   InputBox,
@@ -49,4 +54,9 @@ export {
   RecentTransactions,
   BudgetCalendar,
   Insights,
+UpcomingBill,
+AddUpcomingBillForm,
+RecurringPayment,
+ViewUpcomingBill,
+ViewRecurringPayment,
 };

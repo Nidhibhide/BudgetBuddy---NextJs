@@ -7,6 +7,7 @@ import {
   MdDashboard,
   MdAccountBalance,
   MdPayment,
+  MdNotifications,
 } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { Moon, Sun, X } from "lucide-react";
@@ -32,6 +33,11 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       href: "/dashboard/transaction",
       label: "Transaction",
       icon: MdPayment,
+    },
+    {
+      href: "/dashboard/bill-reminders",
+      label: "Set Alerts",
+      icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
