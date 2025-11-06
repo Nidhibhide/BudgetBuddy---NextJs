@@ -17,6 +17,12 @@ import CustomPagination from "./Pagination";
 import NotFound from "./NotFound";
 import DeleteCategory from "./DeleteCategory";
 import Confirmation from "./Confirmation";
+import TotalBalance from "./TotalBalance";
+import MonthlyExpensePieChart from "./MonthlyExpensePieChart";
+import IncomeVsExpenseTrend from "./IncomeVsExpenseTrend";
+import RecentTransactions from "./RecentTransactions";
+import BudgetCalendar from "./BudgetCalendar";
+import Insights from "./Insights";
 export {
   Table,
   InputBox,
@@ -37,4 +43,10 @@ export {
   NotFound,
   DeleteCategory,
   IconComponent,
+  TotalBalance,
+  MonthlyExpensePieChart,
+  IncomeVsExpenseTrend,
+  RecentTransactions,
+  BudgetCalendar,
+  Insights,
 };

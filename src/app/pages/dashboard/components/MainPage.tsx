@@ -2,36 +2,43 @@
 
 import { useRouter } from "next/navigation";
 import { IoAddSharp } from "react-icons/io5";
-import { Button, Tooltip } from "@/app/components"; // adjust path based on your folder structure
+import {
+  Button,
+  Tooltip,
+  TotalBalance,
+  MonthlyExpensePieChart,
+  IncomeVsExpenseTrend,
+  RecentTransactions,
+  BudgetCalendar,
+  Insights,
+} from "@/app/components";
+import { mockData } from "@/app/lib/mockData";
 
 const MainPage: React.FC = () => {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col m-4">
-      <div className="flex justify-end mb-4">
-        <Tooltip label="Add new Entry">
-          <Button
-            width="w-[150px]"
-            onClick={() => router.push("/dashboard/add-entry")}
-          >
-            <div className="flex justify-center items-center gap-1">
-              Add New
-              <IoAddSharp size={22} />
-            </div>
-          </Button>
-        </Tooltip>
+    <div className="w-full px-6 py-4 mx-auto space-y-6 overflow-y-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-foreground">Overview</h1>
       </div>
-      {/* <Cards /> */}
-      <div className="flex flex-col md:flex-row gap-4 mt-4">
-        <div className="w-full md:w-[50%]">{/* <Piechart /> */}</div>
-        <div className="w-full md:w-[50%]">{/* <Bargraph /> */}</div>
+
+      {/* Total Balance */}
+      <TotalBalance balance={mockData.totalBalance} />
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <MonthlyExpensePieChart expenses={mockData.monthlyExpenses} />
+        <IncomeVsExpenseTrend data={mockData.incomeVsExpenseTrend} />
       </div>
-      <div className="flex flex-col md:flex-row gap-4 mt-4">
-        <div className="w-full md:w-[50%]">{/* <ProgressBar /> */}</div>
-        <div className="w-full md:w-[50%]">{/* <SmartTips /> */}</div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <RecentTransactions transactions={mockData.recentTransactions} />
+        <BudgetCalendar transactions={mockData.recentTransactions} />
+        <Insights insights={mockData.insights} />
       </div>
-      <div className="mt-4">{/* <LatestTransaction /> */}</div>
     </div>
   );
 };
