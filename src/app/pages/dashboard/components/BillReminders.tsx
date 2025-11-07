@@ -3,7 +3,7 @@ import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
-import { UpcomingBill,RecurringPayment } from "@/app/components";
+import { UpcomingBill, RecurringPayment } from "@/app/features/common";
 
 const BillReminders: React.FC = () => {
   const CustomTabPanel: React.FC<CustomTabPanelProps> = ({

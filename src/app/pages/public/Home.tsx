@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { GetStartedLink } from "@/app/components";
+import { GetStartedLink } from "@/app/features/common/index";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);

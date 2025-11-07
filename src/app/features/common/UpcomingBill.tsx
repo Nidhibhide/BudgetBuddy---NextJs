@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { Edit, Trash2, Plus, Eye } from "lucide-react";
-import { Table, Button, ViewUpcomingBill } from "@/app/components/index";
-import AddUpcomingBillForm from "./AddUpcomingBillForm";
+import { Table, Button, ViewUpcomingBill, AddUpcomingBillForm } from "@/app/features/common/index";
 
 const UpcomingBill: React.FC = () => {
   const [upcomingBills, setUpcomingBills] = useState([

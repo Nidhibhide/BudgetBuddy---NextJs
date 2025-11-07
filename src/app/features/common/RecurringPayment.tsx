@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { Edit, Trash2, Plus, Eye } from "lucide-react";
-import { Table, Button, ViewRecurringPayment } from "@/app/components/index";
-import AddRecurringPaymentForm from "./AddRecurringPaymentForm";
+import { Table, Button, ViewRecurringPayment, AddRecurringPaymentForm } from "@/app/features/common/index";
 import { useSession } from "next-auth/react";
 
 const RecurringPayment: React.FC = () => {

@@ -5,19 +5,21 @@ import { useSession } from "next-auth/react";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button, SelectBox } from "@/app/components/Elements";
-import { Plus, Edit, Trash2, Loader2, Download } from "lucide-react";
+import { Button, SelectBox } from "@/app/features/common/Elements";
+import { Plus, Edit, Trash2, Loader2, Download, Eye } from "lucide-react";
 import {
   Table,
   CustomPagination,
   NotFound,
   AddTransaction,
   Confirmation,
-} from "@/app/components/index";
-import { TransactionPDF } from "@/app/components/PDFGenerator";
+  ViewTransaction,
+  showSuccess,
+  showError,
+} from "@/app/features/common";
+import { TransactionPDF } from "@/app/features/common/PDFGenerator";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
-import { showSuccess, showError } from "@/app/components/Utils";
 import { useCategories, useTransactions } from "@/app/hooks";
 
 const handlePDFDownload = async (
@@ -53,6 +55,8 @@ const Transaction: React.FC = React.memo(() => {
     null
   );
   const [deleting, setDeleting] = useState(false);
+  const [isViewTransactionOpen, setIsViewTransactionOpen] = useState(false);
+  const [viewTransactionData, setViewTransactionData] = useState<TransactionType | null>(null);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
@@ -85,6 +89,11 @@ const Transaction: React.FC = React.memo(() => {
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
     setIsAddTransactionOpen(true);
+  };
+
+  const handleViewClick = (transaction: TransactionType) => {
+    setViewTransactionData(transaction);
+    setIsViewTransactionOpen(true);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -202,7 +211,7 @@ const Transaction: React.FC = React.memo(() => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "description", label: "Description" },
+              { key: "title", label: "Title" },
               { key: "category", label: "Category" },
               {
                 key: "amount",
@@ -213,12 +222,18 @@ const Transaction: React.FC = React.memo(() => {
                   return `${value} ${currency}`;
                 },
               },
-              { key: "type", label: "Type" },
               {
                 key: "actions",
                 label: "Actions",
                 render: (value, row) => (
                   <div className="flex gap-2">
+                    <button
+                      onClick={() => handleViewClick(row as TransactionType)}
+                      className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                      title="View"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleEditClick(row as TransactionType)}
                       className="p-1 hover:bg-background/10  rounded transition-colors cursor-pointer"
@@ -271,6 +286,12 @@ const Transaction: React.FC = React.memo(() => {
           setCurrentPage(1);
           refetchTransactions();
         }}
+      />
+
+      <ViewTransaction
+        open={isViewTransactionOpen}
+        onOpenChange={setIsViewTransactionOpen}
+        transaction={viewTransactionData}
       />
 
       <Confirmation

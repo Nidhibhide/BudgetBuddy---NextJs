@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, SelectBox, Button, showSuccess, showError} from "./index";
+import { InputBox, SelectBox, Button, showSuccess, showError} from "@/app/features/common/index";
 import { TYPES } from "@/lib/constants";
 import { Category, AddCategoryProps} from "@/app/types/appTypes";
 import { createCategory, editCategory } from "@/app/lib/category";
@@ -69,7 +69,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
     }
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = () => {
     // No icon suggestions logic needed
   };
 

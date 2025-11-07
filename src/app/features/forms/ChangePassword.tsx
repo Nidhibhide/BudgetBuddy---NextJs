@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { InputBox, Button, showError, useHandleResponse } from "./index";
-import { changePassword } from "../lib/auth";
+import { InputBox, Button, showError, useHandleResponse } from "@/app/features/common/index";
+import { changePassword } from "@/app/lib/auth";
 import { User } from "@/app/types/appTypes";
 import { Lock } from "lucide-react";
 

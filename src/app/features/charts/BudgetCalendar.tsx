@@ -25,12 +25,12 @@ interface BudgetCalendarProps {
 const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
   const [date, setDate] = React.useState<Date | undefined>(new Date('2023-10-15'));
 
-  const getTransactionsForDate = (selectedDate: Date) => {
-    const dateString = selectedDate.toISOString().split("T")[0];
-    return transactions.filter((t) => t.date === dateString);
-  };
+  // const getTransactionsForDate = (selectedDate: Date) => {
+  //   const dateString = selectedDate.toISOString().split("T")[0];
+  //   return transactions.filter((t) => t.date === dateString);
+  // };
 
-  const selectedDateTransactions = date ? getTransactionsForDate(date) : [];
+  // const selectedDateTransactions = date ? getTransactionsForDate(date) : [];
 
   // Determine color based on net balance for each date
   const dateModifiers = React.useMemo(() => {

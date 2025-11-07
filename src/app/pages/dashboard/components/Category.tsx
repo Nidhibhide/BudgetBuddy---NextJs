@@ -11,9 +11,8 @@ import {
   CustomPagination,
   NotFound,
   DeleteCategory,
-  IconComponent,
-} from "@/app/components/index";
-import { Table } from "@/app/components/index";
+  Table,
+} from "@/app/features/common";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";

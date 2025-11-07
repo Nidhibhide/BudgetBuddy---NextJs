@@ -45,6 +45,7 @@ export interface SelectBoxProps {
   options: string[];
   onChange?: (value: string) => void;
   value?: string;
+  placeholder?: string;
 }
 
 export interface InputBoxProps {
@@ -139,6 +140,11 @@ export interface AddTransactionProps {
   onTransactionAdded?: () => void;
   transaction?: Transaction | null;
 }
+export interface ViewTransactionProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  transaction: Transaction | null;
+}
 export interface TableColumn {
   key: string;
   label: string;
@@ -216,4 +222,40 @@ export interface UseTransactionsProps {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+}
+
+export interface FieldDisplayProps {
+  label: string;
+  value: string | number;
+  labelWidth?: string;
+  valueClassName?: string;
+}
+
+export interface ViewUpcomingBillProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  bill: {
+    id: string;
+    dueDate: string;
+    reminderDate: string;
+    title: string;
+    description: string;
+    amount: number;
+    status: string;
+  } | null;
+}
+
+export interface ViewRecurringPaymentProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  payment: {
+    id: string;
+    nextDueDate: string;
+    reminderDate: string;
+    title: string;
+    description: string;
+    amount: number;
+    frequency: string;
+    status: string;
+  } | null;
 }
