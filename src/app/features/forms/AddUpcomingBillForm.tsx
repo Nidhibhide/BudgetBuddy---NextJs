@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, TextareaBox, SelectBox, Button } from "@/app/components/index";
+import { InputBox, TextareaBox, SelectBox, Button } from "@/app/features/common/index";
 
 interface AddUpcomingBillFormProps {
   open: boolean;

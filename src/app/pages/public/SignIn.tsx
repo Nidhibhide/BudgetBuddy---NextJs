@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { InputBox, Button, showError, showSuccess } from "@/app/components";
+import { InputBox, Button, showError, showSuccess } from "@/app/features/common/index";
 import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
 import Link from "next/link";
 import { User } from "@/app/types/appTypes";

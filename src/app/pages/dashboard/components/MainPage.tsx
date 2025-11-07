@@ -1,22 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { IoAddSharp } from "react-icons/io5";
 import {
-  Button,
-  Tooltip,
   TotalBalance,
   MonthlyExpensePieChart,
   IncomeVsExpenseTrend,
   RecentTransactions,
   BudgetCalendar,
   Insights,
-} from "@/app/components";
+} from "@/app/features/common";
 import { mockData } from "@/app/lib/mockData";
 
 const MainPage: React.FC = () => {
-  const router = useRouter();
-
   return (
     <div className="w-full px-6 py-4 mx-auto space-y-6 overflow-y-auto">
       {/* Header */}

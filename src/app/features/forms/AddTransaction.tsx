@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, SelectBox, TextareaBox, Button, showSuccess, showError } from "./index";
+import { InputBox, SelectBox, TextareaBox, Button, showSuccess, showError } from "@/app/features/common/index";
 import { TYPES} from "@/lib/constants";
 import { getCategoryDetails } from "@/app/lib/category";
 import { addTransaction, editTransaction } from "@/app/lib/transaction";
@@ -126,7 +126,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
             date: new Date(transaction?.date || Date.now()).toISOString().split("T")[0],
             title: transaction?.title || "",
             description: transaction?.description || "",
-            category: transaction?.category || categories[0]?.name || "",
+            category: transaction?.category || "NA",
             amount: transaction?.amount || 1,
             type: transaction?.type || TYPES[0],
           }}
@@ -146,7 +146,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
               <SelectBox
                 name="category"
                 label="Category"
-                options={categories.map((cat) => cat.name)}
+                options={categories.length === 0 ? ["NA"] : categories.map((cat) => cat.name)}
               />
               <InputBox name="title" label="Title" />
 

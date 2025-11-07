@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import { UserSetting, ChangePassword } from "@/app/components/index";
+import { UserSetting, ChangePassword } from "@/app/features/common";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { InputBox, Button, showError, useHandleResponse, SelectBox } from "./index";
-import { updateProfile } from "../lib/auth";
+import { updateProfile } from "@/app/lib/auth";
 import { User as UserIcon } from "lucide-react";
 import { User } from "@/app/types/appTypes";
 import { useSession } from "next-auth/react";

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
-import { Confirmation, SelectBox } from "./index";
+import { Confirmation, SelectBox } from "@/app/features/common/index";
 import { deleteCategory } from "@/app/lib/category";
 import { DeleteCategoryProps } from "@/app/types/appTypes";
 
