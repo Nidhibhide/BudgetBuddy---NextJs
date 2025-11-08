@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { InputBox, Button, showError, useHandleResponse, SelectBox } from "./index";
+import { InputBox, Button, showError, useHandleResponse, SelectBox } from "@/app/features/common/index";
 import { updateProfile } from "@/app/lib/auth";
 import { User as UserIcon } from "lucide-react";
 import { User } from "@/app/types/appTypes";

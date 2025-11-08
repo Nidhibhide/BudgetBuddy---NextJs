@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2, HelpCircle } from "lucide-react";
-import * as ReactIcons from "react-icons";
+import { Eye, EyeOff, Loader2} from "lucide-react";
 import { useField } from "formik";
 import {
   Select,
@@ -18,7 +17,6 @@ import {
   TextareaBoxProps,
   TooltipProps,
   GetStartedLinkProps,
-  IconComponentProps,
 } from "@/app/types/appTypes";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -208,17 +206,4 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
   );
 };
 
-export const IconComponent: React.FC<IconComponentProps> = ({
-  iconName,
-  size = 24,
-  className = "",
-}) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const Icon = (ReactIcons as any)[iconName];
 
-  if (!Icon) {
-    return <HelpCircle size={size} className={className} />;
-  }
-
-  return <Icon size={size} className={className} />;
-};

@@ -209,11 +209,6 @@ export interface ConfirmationProps {
   loading?: boolean;
 }
 
-export interface IconComponentProps {
-  iconName: string;
-  size?: number;
-  className?: string;
-}
 
 export interface UseTransactionsProps {
   type: string;
@@ -234,28 +229,66 @@ export interface FieldDisplayProps {
 export interface ViewUpcomingBillProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  bill: {
-    id: string;
-    dueDate: string;
-    reminderDate: string;
-    title: string;
-    description: string;
-    amount: number;
-    status: string;
-  } | null;
+  bill: UpcomingBill | null;
 }
 
 export interface ViewRecurringPaymentProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  payment: {
-    id: string;
-    nextDueDate: string;
-    reminderDate: string;
-    title: string;
-    description: string;
-    amount: number;
-    frequency: string;
-    status: string;
-  } | null;
+  payment: RecurringPayment | null;
+}
+
+export interface UpcomingBill {
+  title: string;
+  description: string;
+  amount: number;
+  dueDate: string;
+  reminderDate: string;
+  status: string;
+  _id?: string;
+  user?: string;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export interface AddUpcomingBillProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onBillAdded: (data: UpcomingBill) => void;
+  bill?: UpcomingBill | null;
+}
+
+export interface UseUpcomingBillsProps {
+  status?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+export interface RecurringPayment {
+  title: string;
+  description: string;
+  amount: number;
+  nextDueDate: string;
+  reminderDate: string;
+  frequency: string;
+  status: string;
+  _id?: string;
+  user?: string;
+  isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+export interface AddRecurringPaymentProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onPaymentAdded: (data: RecurringPayment) => void;
+  payment?: RecurringPayment | null;
 }

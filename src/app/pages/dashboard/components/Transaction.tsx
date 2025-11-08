@@ -11,12 +11,11 @@ import {
   Table,
   CustomPagination,
   NotFound,
-  AddTransaction,
-  Confirmation,
-  ViewTransaction,
   showSuccess,
   showError,
 } from "@/app/features/common";
+import { Confirmation,ViewTransaction } from "@/app/features/dialogs";
+import { Transaction as TransactionForm } from "@/app/features/forms";
 import { TransactionPDF } from "@/app/features/common/PDFGenerator";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
@@ -275,7 +274,7 @@ const Transaction: React.FC = React.memo(() => {
         />
       )}
 
-      <AddTransaction
+      <TransactionForm
         open={isAddTransactionOpen}
         onOpenChange={(open) => {
           setIsAddTransactionOpen(open);

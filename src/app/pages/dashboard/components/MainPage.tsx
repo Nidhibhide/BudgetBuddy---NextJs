@@ -1,13 +1,12 @@
 "use client";
 
+import { TotalBalance, RecentTransactions } from "@/app/features/common";
 import {
-  TotalBalance,
   MonthlyExpensePieChart,
   IncomeVsExpenseTrend,
-  RecentTransactions,
   BudgetCalendar,
   Insights,
-} from "@/app/features/common";
+} from "@/app/features/charts";
 import { mockData } from "@/app/lib/mockData";
 
 const MainPage: React.FC = () => {

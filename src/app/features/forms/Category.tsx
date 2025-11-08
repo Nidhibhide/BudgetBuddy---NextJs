@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { InputBox, SelectBox, Button, showSuccess, showError} from "@/app/features/common/index";
 import { TYPES } from "@/lib/constants";
-import { Category, AddCategoryProps} from "@/app/types/appTypes";
+import { Category as CategoryType, AddCategoryProps} from "@/app/types/appTypes";
 import { createCategory, editCategory } from "@/app/lib/category";
 
-const AddCategory: React.FC<AddCategoryProps> = ({
+const Category: React.FC<AddCategoryProps> = ({
   open,
   onOpenChange,
   onCategoryAdded,
@@ -40,14 +40,14 @@ const AddCategory: React.FC<AddCategoryProps> = ({
 
 
   const handleSubmit = async (
-    values: Category | { name: string },
+    values: CategoryType| { name: string },
     { resetForm }: { resetForm: () => void }
   ) => {
     setIsLoading(true);
     try {
       const response = isEdit
-        ? await editCategory(category._id!, values as Category)
-        : await createCategory(values as Category);
+        ? await editCategory(category._id!, values as CategoryType)
+        : await createCategory(values as CategoryType);
       if (response.success) {
         showSuccess(response.message);
         resetForm();
@@ -123,4 +123,4 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   );
 };
 
-export default AddCategory;
+export default Category;
