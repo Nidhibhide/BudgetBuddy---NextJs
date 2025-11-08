@@ -1,50 +1,81 @@
 "use client";
 
-import React, { useState } from "react";
-import { Edit, Trash2, Plus, Eye } from "lucide-react";
-import { Table, Button, ViewRecurringPayment, AddRecurringPaymentForm } from "@/app/features/common/index";
-import { useSession } from "next-auth/react";
+import React, { useState, useCallback } from "react";
+import { Formik } from "formik";
+import { Edit, Trash2, Plus, Eye, Loader2 } from "lucide-react";
+import { Table, CustomPagination, NotFound, Button, SelectBox } from "@/app/features/common/index";
+import { Confirmation,ViewRecurringPayment } from "../dialogs";
+import { RecurringPayment as RecurringPaymentForm } from "@/app/features/forms";
+import { useRecurringPayments } from "@/app/hooks";
+import { RecurringPayment as RecurringPaymentType } from "@/app/types/appTypes";
+import { deleteRecurringPayment } from "@/app/lib/recurringPayment";
+import { showSuccess, showError } from "@/app/features/common";
 
 const RecurringPayment: React.FC = () => {
-  const { data: session } = useSession();
-  const [recurringPayments, setRecurringPayments] = useState([
-    {
-      id: "1",
-      nextDueDate: "2023-12-01",
-      reminderDate: "2023-11-28",
-      title: "Gym Membership",
-      description: "Monthly gym fee",
-      amount: 500,
-      frequency: "Monthly",
-      status: "Active",
-    },
-    {
-      id: "2",
-      nextDueDate: "2023-12-15",
-      reminderDate: "2023-12-10",
-      title: "Insurance Premium",
-      description: "Annual insurance payment",
-      amount: 2000,
-      frequency: "Yearly",
-      status: "Active",
-    },
-    {
-      id: "3",
-      nextDueDate: "2023-12-20",
-      reminderDate: "2023-12-15",
-      title: "Subscription Service",
-      description: "Monthly subscription",
-      amount: 100,
-      frequency: "Monthly",
-      status: "Active",
-    },
-  ]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<typeof recurringPayments[0] | null>(null);
-  const [viewOpen, setViewOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<string>("nextDueDate");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedStatus, setSelectedStatus] = useState<string>("All");
 
-  const handlePaymentAdded = (data: { title: string; amount: number; frequency: string; nextDueDate: string; reminderDate: string; description?: string; status?: string }) => {
-    setRecurringPayments([...recurringPayments, { id: Date.now().toString(), ...data, status: data.status || "Active", description: data.description || "" }]);
+  const { recurringPayments, loading, pagination, refetch } = useRecurringPayments({
+    status: selectedStatus,
+    page: currentPage,
+    limit: 10,
+    sortBy,
+    sortOrder,
+  });
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<RecurringPaymentType | null>(null);
+  const [viewOpen, setViewOpen] = useState(false);
+  const [deleteRecurringPaymentId, setDeleteRecurringPaymentId] = useState<string | null>(
+    null
+  );
+  const [deleting, setDeleting] = useState(false);
+
+  const handleSort = useCallback((column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
+  }, [sortBy, sortOrder]);
+
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
+    setCurrentPage(1);
+  };
+
+  const handlePaymentAdded = () => {
+    refetch();
+    setSelectedPayment(null); // Reset selected payment after operation
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteRecurringPaymentId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteRecurringPaymentId) return;
+
+    setDeleting(true);
+    try {
+      const response = await deleteRecurringPayment(deleteRecurringPaymentId);
+      if (response.success) {
+        showSuccess(response.message);
+        // Refresh recurring payments
+        refetch();
+        setDeleteRecurringPaymentId(null);
+      } else {
+        showError(response.message || "Failed to delete recurring payment");
+      }
+    } catch (error) {
+      console.error("Error deleting recurring payment:", error);
+      showError("An unexpected error occurred while deleting the recurring payment");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -53,6 +84,21 @@ const RecurringPayment: React.FC = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-end">
           <div className="flex gap-2">
+            <Formik
+              initialValues={{ status: selectedStatus }}
+              onSubmit={() => {}}
+            >
+              {() => (
+                <div className="w-full sm:w-[180px]">
+                  <SelectBox
+                    name="status"
+                    options={["All", "Active", "Inactive"]}
+                    value={selectedStatus}
+                    onChange={handleStatusChange}
+                  />
+                </div>
+              )}
+            </Formik>
             <Button
               width="w-full sm:w-[220px]"
               className="flex items-center justify-center gap-2"
@@ -65,84 +111,117 @@ const RecurringPayment: React.FC = () => {
         </div>
       </div>
 
-      <Table
-        data={recurringPayments}
-        columns={[
-          {
-            key: "nextDueDate",
-            label: "Next Due Date",
-            render: (value) =>
-              value
-                ? new Date(value as string | number | Date).toLocaleDateString(
-                    "en-GB"
-                  )
-                : "",
-          },
-          {
-            key: "reminderDate",
-            label: "Reminder Date",
-            render: (value) =>
-              value
-                ? new Date(value as string | number | Date).toLocaleDateString(
-                    "en-GB"
-                  )
-                : "",
-          },
-          { key: "title", label: "Title" },
-          { key: "description", label: "Description" },
-          {
-            key: "amount",
-            label: "Amount",
-            render: (value) => `${value} ${session?.user?.currency || 'INR'}`,
-          },
-          { key: "frequency", label: "Frequency" },
-          {
-            key: "status",
-            label: "Status",
-            render: (value) => (
-              <span className={(value as string) === 'Active' ? 'text-green-500' : 'text-red-500'}>
-                {value as string}
-              </span>
-            ),
-          },
-          {
-            key: "actions",
-            label: "Actions",
-            render: (value, row) => (
-              <div className="flex gap-2">
-                <button
-                  className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                  title="View"
-                  onClick={() => {
-                    setSelectedPayment(row as typeof recurringPayments[0]);
-                    setViewOpen(true);
-                  }}
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                  title="Edit"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                  title="Delete"
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </button>
-              </div>
-            ),
-          },
-        ]}
+      {loading ? (
+        <div className="flex justify-center items-center py-10">
+          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+        </div>
+      ) : recurringPayments.length > 0 ? (
+        <>
+          <Table
+            data={recurringPayments as RecurringPaymentType[]}
+            columns={[
+            {
+              key: "nextDueDate",
+              label: "Next Due Date",
+              sortable: true,
+              render: (value) =>
+                value
+                  ? new Date(value as string | number | Date).toLocaleDateString(
+                      "en-GB"
+                    )
+                  : "",
+            },
+            {
+              key: "reminderDate",
+              label: "Reminder Date",
+              sortable: true,
+              render: (value) =>
+                value
+                  ? new Date(value as string | number | Date).toLocaleDateString(
+                      "en-GB"
+                    )
+                  : "",
+            },
+            { key: "title", label: "Title" },
+            {
+              key: "status",
+              label: "Status",
+              render: (value) => (
+                <span className={(value as string) === 'Active' ? 'text-green-500' : 'text-red-500'}>
+                  {value as string}
+                </span>
+              ),
+            },
+            {
+              key: "actions",
+              label: "Actions",
+              render: (value, row) => (
+                <div className="flex gap-2">
+                  <button
+                    className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                    title="View"
+                    onClick={() => {
+                      setSelectedPayment(row as unknown as RecurringPaymentType);
+                      setViewOpen(true);
+                    }}
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                    title="Edit"
+                    onClick={() => {
+                      setSelectedPayment(row as unknown as RecurringPaymentType);
+                      setIsOpen(true);
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(row._id as string)}
+                    className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
+              ),
+            },
+          ]}
+            onSort={handleSort}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+          />
 
-      />
-      <AddRecurringPaymentForm open={isOpen} onOpenChange={setIsOpen} onPaymentAdded={handlePaymentAdded} />
+          {/* Pagination */}
+          <div className="flex justify-end mt-4">
+            <CustomPagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              onPageChange={setCurrentPage}
+              className="justify-end"
+            />
+          </div>
+        </>
+      ) : (
+        <NotFound
+          title="No Recurring Payments Found"
+          message="It looks like there are no recurring payments. Add your first recurring payment to get started!"
+        />
+      )}
+      <RecurringPaymentForm open={isOpen} onOpenChange={setIsOpen} onPaymentAdded={handlePaymentAdded} payment={selectedPayment} />
       <ViewRecurringPayment
         open={viewOpen}
         onOpenChange={setViewOpen}
         payment={selectedPayment}
+      />
+
+      <Confirmation
+        open={!!deleteRecurringPaymentId}
+        onOpenChange={(open) => !open && setDeleteRecurringPaymentId(null)}
+        onConfirm={handleConfirmDelete}
+        loading={deleting}
+        description={`Are you sure you want to delete this recurring payment? This action cannot be undone.`}
       />
     </div>
   );

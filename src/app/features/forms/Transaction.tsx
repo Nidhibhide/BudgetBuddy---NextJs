@@ -15,12 +15,12 @@ import { TYPES} from "@/lib/constants";
 import { getCategoryDetails } from "@/app/lib/category";
 import { addTransaction, editTransaction } from "@/app/lib/transaction";
 import {
-Transaction,
+Transaction as TransactionType,
   AddTransactionProps,
   Category,
 } from "@/app/types/appTypes";
 
-const AddTransaction: React.FC<AddTransactionProps> = ({
+const Transaction: React.FC<AddTransactionProps> = ({
   open,
   onOpenChange,
   onTransactionAdded,
@@ -92,7 +92,7 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
     }
   }, [open, transaction]);
 
-  const handleSubmit = async (values: Transaction) => {
+  const handleSubmit = async (values: TransactionType) => {
     setLoading(true);
     try {
       const response = transaction?._id
@@ -173,4 +173,4 @@ const AddTransaction: React.FC<AddTransactionProps> = ({
   );
 };
 
-export default AddTransaction;
+export default Transaction;

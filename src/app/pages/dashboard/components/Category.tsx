@@ -7,12 +7,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Plus, MousePointer, Loader2, Pen, Trash2, AlertTriangle } from "lucide-react";
 import {
-  AddCategory,
   CustomPagination,
   NotFound,
-  DeleteCategory,
   Table,
 } from "@/app/features/common";
+import { DeleteCategory,Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
@@ -324,7 +323,7 @@ const Category: React.FC = React.memo(() => {
         />
       )}
 
-      <AddCategory
+      <CategoryForm
         open={isAddCategoryOpen}
         onOpenChange={setIsAddCategoryOpen}
         onCategoryAdded={() => refetchCategories()}

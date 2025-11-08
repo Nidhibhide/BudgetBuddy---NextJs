@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -9,17 +9,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, TextareaBox, SelectBox, Button } from "@/app/features/common/index";
+import { InputBox, TextareaBox, SelectBox, Button, showSuccess, showError } from "@/app/features/common/index";
 import { useSession } from "next-auth/react";
+import { addRecurringPayment, editRecurringPayment } from "@/app/lib/recurringPayment";
+import { AddRecurringPaymentProps } from "@/app/types/appTypes";
+import type { RecurringPayment } from "@/app/types/appTypes";
 
-interface AddRecurringPaymentFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onPaymentAdded: (data: { title: string; amount: number; frequency: string; nextDueDate: string; reminderDate: string; description?: string; status?: string }) => void;
-}
-
-const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open, onOpenChange, onPaymentAdded }) => {
+const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpenChange, onPaymentAdded, payment }) => {
   const { data: session } = useSession();
+  const [loading, setLoading] = useState(false);
+
   const validationSchema = Yup.object().shape({
     nextDueDate: Yup.date()
       .required("Next Due Date is required")
@@ -47,9 +46,24 @@ const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open,
       .optional(),
   });
 
-  const handleSubmit = (values: { title: string; amount: number; frequency: string; nextDueDate: string; reminderDate: string; description?: string; status?: string }) => {
-    onPaymentAdded(values);
-    onOpenChange(false);
+  const handleSubmit = async (values: RecurringPayment) => {
+    setLoading(true);
+    try {
+      const response = payment?._id
+        ? await editRecurringPayment(payment._id, values)
+        : await addRecurringPayment(values);
+      if (response.success) {
+        showSuccess(response.message);
+        onPaymentAdded(values);
+        onOpenChange(false);
+      } else {
+        showError(response.message || `Failed to ${payment?._id ? 'update' : 'add'} recurring payment`);
+      }
+    } catch {
+      showError(`Something went wrong while ${payment?._id ? 'updating' : 'adding'} recurring payment`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,18 +71,18 @@ const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open,
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            Add Recurring Payment
+            {payment?._id ? "Edit Recurring Payment" : "Add Recurring Payment"}
           </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={{
-            nextDueDate: "",
-            reminderDate: "",
-            title: "",
-            description: "",
-            amount: 1,
-            frequency: "",
-            status: "Active",
+            nextDueDate: payment?.nextDueDate ? new Date(payment.nextDueDate).toISOString().split("T")[0] : "",
+            reminderDate: payment?.reminderDate ? new Date(payment.reminderDate).toISOString().split("T")[0] : "",
+            title: payment?.title || "",
+            description: payment?.description || "",
+            amount: payment?.amount || 1,
+            frequency: payment?.frequency || "",
+            status: payment?.status || "Active",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -79,7 +93,7 @@ const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open,
               <InputBox name="reminderDate" label="Reminder Date" type="date" />
               <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
               <InputBox name="title" label="Title" />
-              <TextareaBox name="description" label="Description (Optional)" />
+              <TextareaBox name="description" label="Description" />
               <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
               <SelectBox name="frequency" label="Frequency" options={["Weekly", "Monthly", "Yearly"]} />
               <SelectBox
@@ -96,8 +110,8 @@ const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open,
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  Add Payment
+                <Button type="submit" loading={loading}>
+                  {payment?._id ? "Update Payment" : "Add Payment"}
                 </Button>
               </div>
             </form>
@@ -108,4 +122,4 @@ const AddRecurringPaymentForm: React.FC<AddRecurringPaymentFormProps> = ({ open,
   );
 };
 
-export default AddRecurringPaymentForm;
+export default RecurringPaymentForm;

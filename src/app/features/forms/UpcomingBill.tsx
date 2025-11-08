@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -9,15 +9,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, TextareaBox, SelectBox, Button } from "@/app/features/common/index";
+import { InputBox, TextareaBox, SelectBox, Button, showSuccess, showError } from "@/app/features/common/index";
+import { addUpcomingBill, editUpcomingBill } from "@/app/lib/upcomingBill";
+import { AddUpcomingBillProps, UpcomingBill } from "@/app/types/appTypes";
 
-interface AddUpcomingBillFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onBillAdded: (data: { dueDate: string; title: string; description: string; amount: number; reminderDate: string; status?: string }) => void;
-}
+const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, onBillAdded, bill }) => {
+  const [loading, setLoading] = useState(false);
 
-const AddUpcomingBillForm: React.FC<AddUpcomingBillFormProps> = ({ open, onOpenChange, onBillAdded }) => {
   const validationSchema = Yup.object().shape({
     dueDate: Yup.date()
       .required("Due Date is required")
@@ -42,9 +40,24 @@ const AddUpcomingBillForm: React.FC<AddUpcomingBillFormProps> = ({ open, onOpenC
       .optional(),
   });
 
-  const handleSubmit = (values: { dueDate: string; title: string; description: string; amount: number; reminderDate: string; status?: string }) => {
-    onBillAdded(values);
-    onOpenChange(false);
+  const handleSubmit = async (values: UpcomingBill) => {
+    setLoading(true);
+    try {
+      const response = bill?._id
+        ? await editUpcomingBill(bill._id, values)
+        : await addUpcomingBill(values);
+      if (response.success) {
+        showSuccess(response.message);
+        onBillAdded(values);
+        onOpenChange(false);
+      } else {
+        showError(response.message || `Failed to ${bill?._id ? 'update' : 'add'} upcoming bill`);
+      }
+    } catch {
+      showError(`Something went wrong while ${bill?._id ? 'updating' : 'adding'} upcoming bill`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,17 +65,17 @@ const AddUpcomingBillForm: React.FC<AddUpcomingBillFormProps> = ({ open, onOpenC
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            Add Upcoming Bill
+            {bill?._id ? "Edit Upcoming Bill" : "Add Upcoming Bill"}
           </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={{
-            dueDate: "",
-            reminderDate: "",
-            title: "",
-            description: "",
-            amount: 1,
-            status: "Unpaid",
+            dueDate: bill?.dueDate ? new Date(bill.dueDate).toISOString().split("T")[0] : "",
+            reminderDate: bill?.reminderDate ? new Date(bill.reminderDate).toISOString().split("T")[0] : "",
+            title: bill?.title || "",
+            description: bill?.description || "",
+            amount: bill?.amount || 1,
+            status: bill?.status || "Unpaid",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -89,8 +102,8 @@ const AddUpcomingBillForm: React.FC<AddUpcomingBillFormProps> = ({ open, onOpenC
                 >
                   Cancel
                 </Button>
-                <Button type="submit">
-                  Add Bill
+                <Button type="submit" loading={loading}>
+                  {bill?._id ? "Update Bill" : "Add Bill"}
                 </Button>
               </div>
             </form>
@@ -101,4 +114,4 @@ const AddUpcomingBillForm: React.FC<AddUpcomingBillFormProps> = ({ open, onOpenC
   );
 };
 
-export default AddUpcomingBillForm;
+export default UpcomingBillForm;
