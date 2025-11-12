@@ -5,8 +5,19 @@ import { useSession } from "next-auth/react";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button, SelectBox } from "@/app/features/common/Elements";
-import { Plus, Edit, Trash2, Loader2, Download, Eye } from "lucide-react";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { Button, SelectBox, InputBox } from "@/app/features/common/Elements";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Loader2,
+  Download,
+  Eye,
+  Search,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import {
   Table,
   CustomPagination,
@@ -14,12 +25,12 @@ import {
   showSuccess,
   showError,
 } from "@/app/features/common";
-import { Confirmation,ViewTransaction } from "@/app/features/dialogs";
+import { Confirmation, ViewTransaction } from "@/app/features/dialogs";
 import { Transaction as TransactionForm } from "@/app/features/forms";
 import { TransactionPDF } from "@/app/features/common/PDFGenerator";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
-import { useCategories, useTransactions } from "@/app/hooks";
+import { useCategories, useTransactions, useDebounce } from "@/app/hooks";
 
 const handlePDFDownload = async (
   transactions: TransactionType[],
@@ -29,16 +40,24 @@ const handlePDFDownload = async (
   categories: string[]
 ) => {
   try {
-    const { pdf } = await import('@react-pdf/renderer');
-    const blob = await pdf(<TransactionPDF transactions={transactions} selectedCategory={selectedCategory} currentType={currentType} currency={currency} categories={categories} />).toBlob();
+    const { pdf } = await import("@react-pdf/renderer");
+    const blob = await pdf(
+      <TransactionPDF
+        transactions={transactions}
+        selectedCategory={selectedCategory}
+        currentType={currentType}
+        currency={currency}
+        categories={categories}
+      />
+    ).toBlob();
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = 'budgetbuddy.pdf';
+    link.download = "budgetbuddy.pdf";
     link.click();
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    console.error("Error generating PDF:", error);
   }
 };
 
@@ -55,19 +74,41 @@ const Transaction: React.FC = React.memo(() => {
   );
   const [deleting, setDeleting] = useState(false);
   const [isViewTransactionOpen, setIsViewTransactionOpen] = useState(false);
-  const [viewTransactionData, setViewTransactionData] = useState<TransactionType | null>(null);
+  const [viewTransactionData, setViewTransactionData] =
+    useState<TransactionType | null>(null);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [filters, setFilters] = useState({
+    dateFrom: "",
+    dateTo: "",
+    minAmount: "",
+    maxAmount: "",
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
+
 
   const currentType = isExpense ? "Expense" : "Income";
   const { categories } = useCategories(currentType);
-  const { transactions, loading, pagination, refetch: refetchTransactions } = useTransactions({
+  const {
+    transactions,
+    loading,
+    pagination,
+    refetch: refetchTransactions,
+  } = useTransactions({
     type: currentType,
     category: selectedCategory === "All" ? undefined : selectedCategory,
     page: currentPage,
     limit: 10,
     sortBy,
     sortOrder,
+    search: debouncedSearch,
+    dateFrom: filters.dateFrom,
+    dateTo: filters.dateTo,
+    minAmount: filters.minAmount,
+    maxAmount: filters.maxAmount,
   });
 
   const handleCategoryChange = (value: string) => {
@@ -75,15 +116,44 @@ const Transaction: React.FC = React.memo(() => {
     setCurrentPage(1);
   };
 
-  const handleSort = useCallback((column: string) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(column);
-      setSortOrder("asc");
+  const handleSort = useCallback(
+    (column: string) => {
+      if (sortBy === column) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(column);
+        setSortOrder("asc");
+      }
+      setCurrentPage(1);
+    },
+    [sortBy, sortOrder]
+  );
+
+  const validateFilters = useCallback((newFilters: typeof filters) => {
+    const newErrors: { [key: string]: string } = {};
+    if (
+      newFilters.dateFrom &&
+      newFilters.dateTo &&
+      new Date(newFilters.dateFrom) > new Date(newFilters.dateTo)
+    ) {
+      newErrors.dateTo = "To date must be after From date";
     }
-    setCurrentPage(1);
-  }, [sortBy, sortOrder]);
+    if (
+      newFilters.minAmount &&
+      newFilters.maxAmount &&
+      parseFloat(newFilters.minAmount) > parseFloat(newFilters.maxAmount)
+    ) {
+      newErrors.maxAmount = "Max amount must be greater than Min amount";
+    }
+    if (newFilters.minAmount && parseFloat(newFilters.minAmount) < 0) {
+      newErrors.minAmount = "Min amount must be positive";
+    }
+    if (newFilters.maxAmount && parseFloat(newFilters.maxAmount) < 0) {
+      newErrors.maxAmount = "Max amount must be positive";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, []);
 
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
@@ -126,6 +196,23 @@ const Transaction: React.FC = React.memo(() => {
     setCurrentPage(1);
   }, [isExpense]);
 
+  useEffect(() => {
+    validateFilters(filters);
+  }, [filters, validateFilters]);
+
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) {
+      setCurrentPage(1);
+    }
+  }, [
+    debouncedSearch,
+    filters.dateFrom,
+    filters.dateTo,
+    filters.minAmount,
+    filters.maxAmount,
+    errors,
+  ]);
+
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
@@ -150,43 +237,137 @@ const Transaction: React.FC = React.memo(() => {
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-end">
-          <Formik
-            initialValues={{ category: selectedCategory }}
-            onSubmit={() => {}}
-          >
-            {() => (
-              <div className="w-full sm:w-[180px]">
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-4 items-center justify-end">
+          <div className="w-[180px]">
+            <Formik
+              initialValues={{ category: selectedCategory }}
+              onSubmit={() => {}}
+            >
+              {() => (
                 <SelectBox
                   name="category"
                   options={["All", ...categories.map((cat) => cat.name)]}
                   value={selectedCategory}
                   onChange={handleCategoryChange}
                 />
-              </div>
-            )}
-          </Formik>
-
-          <div className="flex gap-2">
-            <Button
-              width="w-full sm:w-[180px]"
-              className="flex items-center justify-center gap-2"
-              onClick={() => setIsAddTransactionOpen(true)}
-            >
-              <Plus className="w-4 h-4" />
-              Add Transaction
-            </Button>
-            <Button
-              width="w-full sm:w-[180px]"
-              className="flex items-center justify-center gap-2"
-              onClick={() => handlePDFDownload(transactions, selectedCategory, currentType, session?.user?.currency || "INR", categories.map(cat => cat.name))}
-            >
-              <Download className="w-4 h-4" />
-              Download PDF
-            </Button>
+              )}
+            </Formik>
           </div>
+          <Button
+            width="w-[180px]"
+            className="flex items-center justify-center gap-2"
+            onClick={() => setIsAddTransactionOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Add Transaction
+          </Button>
         </div>
+        <div className="flex justify-end">
+          <button
+            onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+            className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
+          >
+            Advanced Search
+            {isAdvancedOpen ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+        <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
+          <CollapsibleContent>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-4 items-center">
+                <div className="relative w-full">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground w-4 h-4 z-10" />
+                  <InputBox
+                    name="search"
+                    type="text"
+                    label=""
+                    placeholder="Search transactions..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    inputClassName="pl-8 rounded-full"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="flex flex-col w-full">
+                  <InputBox
+                    name="from"
+                    type="date"
+                    label="From"
+                    value={filters.dateFrom}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        dateFrom: e.target.value,
+                      }))
+                    }
+                  />
+                  {errors.dateFrom && (
+                    <p className="text-red-500 text-sm">{errors.dateFrom}</p>
+                  )}
+                </div>
+                <div className="flex flex-col w-full">
+                  <InputBox
+                    name="to"
+                    type="date"
+                    label="To"
+                    value={filters.dateTo}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        dateTo: e.target.value,
+                      }))
+                    }
+                  />
+                  {errors.dateTo && (
+                    <p className="text-red-500 text-sm">{errors.dateTo}</p>
+                  )}
+                </div>
+                <div className="flex flex-col w-full">
+                  <InputBox
+                    name="min"
+                    type="number"
+                    label="Min"
+                    placeholder="Min Amount"
+                    value={filters.minAmount}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        minAmount: e.target.value,
+                      }))
+                    }
+                  />
+                  {errors.minAmount && (
+                    <p className="text-red-500 text-sm">{errors.minAmount}</p>
+                  )}
+                </div>
+                <div className="flex flex-col w-full">
+                  <InputBox
+                    name="max"
+                    type="number"
+                    label="Max"
+                    placeholder="Max Amount"
+                    value={filters.maxAmount}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        maxAmount: e.target.value,
+                      }))
+                    }
+                  />
+                  {errors.maxAmount && (
+                    <p className="text-red-500 text-sm">{errors.maxAmount}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
 
       {/* Table Section */}
@@ -266,6 +447,26 @@ const Transaction: React.FC = React.memo(() => {
               className="justify-end"
             />
           </div>
+
+          {/* Download PDF Button */}
+          <div className="flex justify-center mt-4">
+            <Button
+              width="w-full sm:w-[180px]"
+              className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+              onClick={() =>
+                handlePDFDownload(
+                  transactions,
+                  selectedCategory,
+                  currentType,
+                  session?.user?.currency || "INR",
+                  categories.map((cat) => cat.name)
+                )
+              }
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
+          </div>
         </>
       ) : (
         <NotFound
@@ -303,6 +504,6 @@ const Transaction: React.FC = React.memo(() => {
   );
 });
 
-Transaction.displayName = 'Transaction';
+Transaction.displayName = "Transaction";
 
 export default Transaction;

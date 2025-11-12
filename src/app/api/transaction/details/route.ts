@@ -2,31 +2,82 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Transaction from "@/app/backend/models/transaction";
 import User from "@/app/backend/models/user";
 import { JsonOne, JsonAll } from "@/app/backend/utils/ApiResponse";
-import { PipelineStage, Types } from "mongoose";
-import { MatchStage, Transaction as TransactionType } from "@/app/types/appTypes";
-import { convertFromINR } from "@/app/backend/utils/currencyConverter";
+import { Types, PipelineStage } from "mongoose";
+import { MatchStage } from "@/app/types/appTypes";
+import { convertToINR } from "@/app/backend/utils/currencyConverter";
+import {
+  setParamValue,
+  parsePaginationParams,
+  createPaginationPipeline,
+  convertAmountsToUserCurrency,
+} from "@/app/backend/utils/PaginationUtils";
 
 export async function GET(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
     const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
-    const type = url.searchParams.get("type");
-    const category = url.searchParams.get("category");
-    const page = parseInt(url.searchParams.get("page") || "1");
-    const limit = parseInt(url.searchParams.get("limit") || "10");
-    const sortBy = url.searchParams.get("sortBy") || "date";
-    const sortOrder = url.searchParams.get("sortOrder") || "desc";
+
+    const type = setParamValue(url, "type");
+    const category = setParamValue(url, "category");
+    const { page, limit, sortBy, sortOrder, skip } = parsePaginationParams(
+      url,
+      "date"
+    );
+
+    const search = setParamValue(url, "search") || "";
+    const dateFrom = setParamValue(url, "dateFrom");
+    const dateTo = setParamValue(url, "dateTo");
+    const minAmount = setParamValue(url, "minAmount");
+    const maxAmount = setParamValue(url, "maxAmount");
 
     // Get user's currency
     const user = await User.findById(userIdObj);
     if (!user) return JsonOne(404, "User not found", false);
-
-    const skip = (page - 1) * limit;
     const matchStage: MatchStage = { user: userIdObj, isDeleted: false };
     if (type) matchStage.type = type;
-    if (category && category !== "All" && category !== "undefined") matchStage["category.name"] = category;
+    if (category && category !== "All") matchStage["category.name"] = category;
+    if (search) {
+      matchStage.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
 
-    const pipeline: PipelineStage[] = [
+    // Date range filter
+    if (dateFrom || dateTo) {
+      matchStage.date = {};
+      if (dateFrom) matchStage.date.$gte = new Date(dateFrom);
+      if (dateTo) matchStage.date.$lte = new Date(dateTo);
+    }
+
+    // Amount range filter
+    if (minAmount || maxAmount) {
+      matchStage.amount = {};
+      if (minAmount)
+        matchStage.amount.$gte = await convertToINR(
+          parseFloat(minAmount),
+          user.currency
+        );
+      if (maxAmount)
+        matchStage.amount.$lte = await convertToINR(
+          parseFloat(maxAmount),
+          user.currency
+        );
+    }
+
+    const projectFields = {
+      _id: 1,
+      title: 1,
+      amount: 1,
+      type: 1,
+      category: "$category.name",
+      date: 1,
+      description: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    };
+
+    const pipeline = [
       {
         $lookup: {
           from: "categories",
@@ -37,43 +88,26 @@ export async function GET(request: Request) {
       },
       { $unwind: "$category" },
       { $match: matchStage },
-      {
-        $facet: {
-          data: [
-            {
-              $project: {
-                _id: 1,
-                title: 1,
-                amount: 1,
-                type: 1,
-                category: "$category.name",
-                date: 1,
-                description: 1,
-                createdAt: 1,
-                updatedAt: 1,
-              },
-            },
-            { $sort: { [sortBy]: sortOrder === "asc" ? 1 : -1 } },
-            { $skip: skip },
-            { $limit: limit },
-          ],
-          totalCount: [{ $count: "count" }],
-        },
-      },
+      ...createPaginationPipeline(
+        {},
+        projectFields,
+        sortBy,
+        sortOrder,
+        skip,
+        limit
+      ).slice(1), // Skip the $match stage since we already have it
     ];
 
-    const result = await Transaction.aggregate(pipeline);
+    const result = await Transaction.aggregate(pipeline as PipelineStage[]);
 
     const rawTransactions = result[0]?.data || [];
     const totalTransactions = result[0]?.totalCount[0]?.count || 0;
     const totalPages = Math.ceil(totalTransactions / limit);
 
     // Convert amounts from INR to user's currency
-    const transactions = await Promise.all(
-      rawTransactions.map(async (transaction: TransactionType) => ({
-        ...transaction,
-        amount: transaction.amount ? await convertFromINR(transaction.amount, user.currency) : 0,
-      }))
+    const transactions = await convertAmountsToUserCurrency(
+      rawTransactions,
+      user.currency
     );
 
     return JsonAll(200, "Fetched successfully", true, transactions, {

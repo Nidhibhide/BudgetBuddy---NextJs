@@ -13,6 +13,11 @@ export const useTransactions = ({
   limit = 10,
   sortBy = "date",
   sortOrder = "desc",
+  search,
+  dateFrom,
+  dateTo,
+  minAmount,
+  maxAmount,
 }: UseTransactionsProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [totals, setTotals] = useState<TypeTotal[]>([]);
@@ -35,7 +40,12 @@ export const useTransactions = ({
         page,
         limit,
         sortBy,
-        sortOrder
+        sortOrder,
+        search,
+        dateFrom,
+        dateTo,
+        minAmount,
+        maxAmount
       );
       if (response.success) {
         setTransactions(response.data || []);
@@ -50,7 +60,7 @@ export const useTransactions = ({
     } finally {
       setLoading(false);
     }
-  }, [type, category, page, limit, sortBy, sortOrder]);
+  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount]);
 
   const fetchTotals = useCallback(async () => {
     try {

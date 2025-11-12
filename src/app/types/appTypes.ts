@@ -53,7 +53,9 @@ export interface InputBoxProps {
   name: string;
   type?: string;
   placeholder?: string;
+  value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  inputClassName?: string;
 }
 
 export interface TextareaBoxProps {
@@ -182,6 +184,10 @@ export interface MatchStage {
   isDeleted: boolean;
   type?: string;
   "category.name"?: string;
+  $or?: { [key: string]: unknown }[];
+  date?: { $gte?: Date; $lte?: Date };
+  amount?: { $gte?: number; $lte?: number };
+  [key: string]: unknown;
 }
 
 export interface PaginationProps {
@@ -217,6 +223,11 @@ export interface UseTransactionsProps {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  minAmount?: string;
+  maxAmount?: string;
 }
 
 export interface FieldDisplayProps {
