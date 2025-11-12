@@ -19,10 +19,10 @@ export async function addTransaction(data: Transaction) {
   }
 }
 
-export async function getTransactions(type: string, category?: string, page?: number, limit?: number, sortBy?: string, sortOrder?: string) {
+export async function getTransactions(type: string, category?: string, page?: number, limit?: number, sortBy?: string, sortOrder?: string, search?: string, dateFrom?: string, dateTo?: string, minAmount?: string, maxAmount?: string) {
   try {
     const response = await axios.get(
-      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`
+      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&search=${search}&dateFrom=${dateFrom}&dateTo=${dateTo}&minAmount=${minAmount}&maxAmount=${maxAmount}`
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {

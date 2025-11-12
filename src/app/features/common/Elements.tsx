@@ -70,12 +70,27 @@ export const InputBox: React.FC<InputBoxProps> = ({
   name,
   type = "text",
   placeholder,
+  value,
   onChange,
+  inputClassName,
 }) => {
-  const [field, meta] = useField(name);
+  let field, meta;
+  try {
+    [field, meta] = useField(name);
+  } catch {
+    field = null;
+    meta = null;
+  }
+  console.log('InputBox for', name, 'field:', field, 'value prop:', value);
   const [showPassword, setShowPassword] = useState(false);
 
+  const inputValue = value !== undefined ? value : field?.value || '';
   const inputType = type === "password" && showPassword ? "text" : type;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (field) field.onChange(e);
+    if (onChange) onChange(e);
+  };
 
   return (
     <div className="w-full flex flex-col gap-1 relative">
@@ -84,17 +99,14 @@ export const InputBox: React.FC<InputBoxProps> = ({
       </Label>
       <div className="relative">
         <Input
-          {...field}
+          value={inputValue}
           id={name}
           type={inputType}
           placeholder={placeholder || label}
-          onChange={(e) => {
-            field.onChange(e);
-            if (onChange) onChange(e);
-          }}
+          onChange={handleChange}
           className={`h-11 placeholder:text-base text-lg text-foreground ${
             type === "password" ? "pr-10" : ""
-          }`}
+          } ${inputClassName || ""}`}
         />
         {type === "password" && (
           <button
@@ -106,7 +118,7 @@ export const InputBox: React.FC<InputBoxProps> = ({
           </button>
         )}
       </div>
-      {meta.touched && meta.error && (
+      {meta?.touched && meta?.error && (
         <p className="text-red-500 text-sm">{meta.error}</p>
       )}
     </div>
