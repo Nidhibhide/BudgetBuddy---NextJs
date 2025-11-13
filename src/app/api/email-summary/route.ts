@@ -69,17 +69,19 @@ async function sendEmailSummary(user: UserType, period: string) {
     </div>
   `;
 
-  // Set up nodemailer
+  // Set up nodemailer with SendGrid SMTP
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: 'smtp.sendgrid.net',
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // App password
+      user: 'apikey',
+      pass: process.env.SENDGRID_API_KEY,
     },
   });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+    from: process.env.SENDGRID_FROM_EMAIL,
     to: user.email,
     subject: `${
       period.charAt(0).toUpperCase() + period.slice(1)
@@ -88,6 +90,35 @@ async function sendEmailSummary(user: UserType, period: string) {
   });
 }
 
+// export async function POST(request: Request) {
+//   const url = new URL(request.url);
+//   const cronSecret = url.searchParams.get("secret");
+//   const period = url.searchParams.get("period") || "monthly";
+
+//   if (cronSecret !== process.env.CRON_SECRET_KEY) {
+//     return JsonOne(403, "Unauthorized", false);
+//   }
+
+//   try {
+//     await dbConnect();
+//     const users = await User.find({});
+//     console.log("Sending emails to:", users.map(u => u.email));
+
+//     for (const user of users) {
+//       try {
+//         console.log(`Sending email to: ${user.email}`);
+//         await sendEmailSummary(user, period);
+//       } catch (error) {
+//         console.error(`Error sending email to ${user.email}:`, error);
+//       }
+//     }
+
+//     return JsonOne(200, "Email summaries sent to all users", true);
+//   } catch (error) {
+//     console.error("Error in email summary cron:", error);
+//     return JsonOne(500, "Failed to process email summaries", false);
+//   }
+// }
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const cronSecret = url.searchParams.get("secret");
@@ -102,14 +133,17 @@ export async function POST(request: Request) {
     const users = await User.find({});
     console.log("Sending emails to:", users.map(u => u.email));
 
-    for (const user of users) {
-      try {
-        console.log(`Sending email to: ${user.email}`);
-        await sendEmailSummary(user, period);
-      } catch (error) {
-        console.error(`Error sending email to ${user.email}:`, error);
-      }
-    }
+    // Send emails in parallel
+    await Promise.all(
+      users.map(async (user) => {
+        try {
+          console.log(`Sending email to: ${user.email}`);
+          await sendEmailSummary(user, period);
+        } catch (error) {
+          console.error(`Error sending email to ${user.email}:`, error);
+        }
+      })
+    );
 
     return JsonOne(200, "Email summaries sent to all users", true);
   } catch (error) {
