@@ -16,26 +16,33 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+       
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing email or password");
           throw new Error("Missing email or password");
         }
 
         const { error } = Login.validate({ email: credentials.email, password: credentials.password });
         if (error) {
+          console.log("Validation error:", error.details[0].message);
           throw new Error(error.details[0].message);
         }
 
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
+        console.log("User found:", user ? user.email : "none");
         if (!user) {
+          console.log("No user found");
           throw new Error("No user found with this email");
         }
 
         if (user.authProvider !== "local") {
+          console.log("Auth provider not local:", user.authProvider);
           throw new Error("This account uses a different login method");
         }
 
         if (!user.password) {
+          console.log("No password in user");
           throw new Error("No user found with this email");
         }
 
@@ -43,8 +50,10 @@ export const authOptions: NextAuthOptions = {
           credentials.password,
           user.password
         );
+        console.log("Password correct:", isPasswordCorrect);
 
         if (!isPasswordCorrect) {
+          console.log("Incorrect password");
           throw new Error("Incorrect password");
         }
 

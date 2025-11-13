@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 async function dbConnect() {
   // If already connected, skip reconnection
   if (mongoose.connection.readyState >= 1) {
-    console.log("Already connected to database");
     return;
   }
 
@@ -16,10 +15,8 @@ async function dbConnect() {
       maxIdleTimeMS: 30000,
       heartbeatFrequencyMS: 10000,
     });
-
-    console.log("DB connected Successfully");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.log("Database connection failed", error);
     process.exit(1); // Stops the app due to a DB connection error.
   }
 }

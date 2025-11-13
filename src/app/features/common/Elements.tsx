@@ -81,7 +81,6 @@ export const InputBox: React.FC<InputBoxProps> = ({
     field = null;
     meta = null;
   }
-  console.log('InputBox for', name, 'field:', field, 'value prop:', value);
   const [showPassword, setShowPassword] = useState(false);
 
   const inputValue = value !== undefined ? value : field?.value || '';
