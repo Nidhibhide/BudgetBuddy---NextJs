@@ -2,7 +2,7 @@ import dbConnect from "@/app/backend/config/MongoDB";
 import User from "@/app/backend/models/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { User as UserType } from "@/app/types/appTypes";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
 // Static data for email summary
 const staticSummaryData = {
@@ -69,56 +69,21 @@ async function sendEmailSummary(user: UserType, period: string) {
     </div>
   `;
 
-  // Set up nodemailer with SendGrid SMTP
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.sendgrid.net',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'apikey',
-      pass: process.env.SENDGRID_API_KEY,
-    },
-  });
+  // Set up SendGrid
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-  await transporter.sendMail({
-    from: process.env.SENDGRID_FROM_EMAIL,
+  const subject = `${
+    period.charAt(0).toUpperCase() + period.slice(1)
+  } Budget Summary - Budget Buddy`;
+
+  await sgMail.send({
     to: user.email,
-    subject: `${
-      period.charAt(0).toUpperCase() + period.slice(1)
-    } Budget Summary - Budget Buddy`,
+    from: process.env.SENDGRID_FROM_EMAIL!,
+    subject,
     html,
   });
 }
 
-// export async function POST(request: Request) {
-//   const url = new URL(request.url);
-//   const cronSecret = url.searchParams.get("secret");
-//   const period = url.searchParams.get("period") || "monthly";
-
-//   if (cronSecret !== process.env.CRON_SECRET_KEY) {
-//     return JsonOne(403, "Unauthorized", false);
-//   }
-
-//   try {
-//     await dbConnect();
-//     const users = await User.find({});
-//     console.log("Sending emails to:", users.map(u => u.email));
-
-//     for (const user of users) {
-//       try {
-//         console.log(`Sending email to: ${user.email}`);
-//         await sendEmailSummary(user, period);
-//       } catch (error) {
-//         console.error(`Error sending email to ${user.email}:`, error);
-//       }
-//     }
-
-//     return JsonOne(200, "Email summaries sent to all users", true);
-//   } catch (error) {
-//     console.error("Error in email summary cron:", error);
-//     return JsonOne(500, "Failed to process email summaries", false);
-//   }
-// }
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const cronSecret = url.searchParams.get("secret");
@@ -131,7 +96,10 @@ export async function POST(request: Request) {
   try {
     await dbConnect();
     const users = await User.find({});
-    console.log("Sending emails to:", users.map(u => u.email));
+    console.log(
+      "Sending emails to:",
+      users.map((u) => u.email)
+    );
 
     // Send emails in parallel
     await Promise.all(
