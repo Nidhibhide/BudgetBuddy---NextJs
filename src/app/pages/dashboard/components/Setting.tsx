@@ -4,8 +4,13 @@ import { Tabs, Tab, Box } from "@mui/material";
 import { UserSetting, ChangePassword } from "@/app/features/forms";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const Setting: React.FC = () => {
+  // Get translation function for the 'dashboard' namespace
+  // This provides access to all dashboard-related translations
+  const t = useTranslations('dashboard');
+
   const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
     children,
     value,
@@ -55,12 +60,12 @@ const Setting: React.FC = () => {
             className="bg-background"
           >
             <Tab
-              label="Edit Profile"
+              label={t('editProfile')}
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label="Change Password"
+              label={t('changePassword')}
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />

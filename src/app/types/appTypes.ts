@@ -46,6 +46,8 @@ export interface SelectBoxProps {
   onChange?: (value: string) => void;
   value?: string;
   placeholder?: string;
+  className?: string;
+  icon?: React.ReactNode;
 }
 
 export interface InputBoxProps {
@@ -302,4 +304,12 @@ export interface AddRecurringPaymentProps {
   onOpenChange: (open: boolean) => void;
   onPaymentAdded: (data: RecurringPayment) => void;
   payment?: RecurringPayment | null;
+}
+
+export interface ThemeToggleProps {
+  size?: "icon" | "icon-lg";
+}
+
+export interface LanguageSelectorProps {
+  className?: string;
 }

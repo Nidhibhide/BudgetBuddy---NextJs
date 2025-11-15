@@ -28,6 +28,8 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   options,
   onChange,
   value,
+  className,
+  icon,
 }) => {
   const [field, meta] = useField(name);
 
@@ -43,7 +45,8 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
           if (onChange) onChange(value);
         }}
       >
-        <SelectTrigger className="h-11 bg-background text-foreground border-foreground cursor-pointer">
+        <SelectTrigger className={`h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`}>
+          {icon}
           <SelectValue placeholder={label} />
         </SelectTrigger>
         <SelectContent className="bg-background text-foreground border-foreground">
@@ -81,7 +84,6 @@ export const InputBox: React.FC<InputBoxProps> = ({
     field = null;
     meta = null;
   }
-  console.log('InputBox for', name, 'field:', field, 'value prop:', value);
   const [showPassword, setShowPassword] = useState(false);
 
   const inputValue = value !== undefined ? value : field?.value || '';

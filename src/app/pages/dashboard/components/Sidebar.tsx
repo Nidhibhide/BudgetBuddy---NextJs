@@ -10,12 +10,11 @@ import {
   MdNotifications,
 } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
-import { Moon, Sun, X } from "lucide-react";
-import { useTheme } from "next-themes";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from '@/app/features/common';
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-  const { setTheme, theme } = useTheme();
   const pathname = usePathname();
 
   const sidebarLinks = [
@@ -60,18 +59,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
           <h2 className="text-2xl font-bold">BudgetBuddy</h2>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="icon-lg"
-            className="cursor-pointer"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? (
-              <Moon className="size-5" />
-            ) : (
-              <Sun className="size-5" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <ThemeToggle size="icon-lg" />
           {onClose && (
             <Button
               size="icon"

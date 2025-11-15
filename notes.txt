@@ -17,15 +17,52 @@
   - No separate refresh token needed for email/password login.  
   - Refresh logic only needed for OAuth providers (e.g., Google) since their access tokens expire quickly.  
 
-
 - App JWT lasts 1 hour; re-login needed afterward.
 - Google access token refreshes automatically when expired.
 - Refresh is independent of the 1-hour JWT; users stay logged in via Google.
-
--Hydration error in next js 
 
 -Server component vs Client component 
 -In Next js by default is Server component in app folder 
 -we cant use async with client component 
 -Server component - Data / api keys are kept secret on the server ( safe for private keys)
 -iF client component imports another component that imported one becomes a client component too if it doesnt have 'use client'
+- Next.js App Router:
+  - Folder structure defines routes (e.g., app/dashboard/page.tsx).
+  - Server components render initial HTML for SEO/performance.
+  - Client components hydrate for interactivity with 'use client'.
+
+- NextAuth Authentication:
+  - Credentials/Google providers in options.ts.
+  - authorize() validates user, returns session data.
+  - JWT callback manages tokens, session callback populates client.
+
+- Next-intl Internationalization:
+  - i18n.ts defines languages, defaultLanguage.
+  - First request: Middleware detects locale from URL (e.g., /en/dashboard) or Accept-Language header, defaults to 'mr'.
+  - Server-side only: getRequestConfig() (from next-intl/server) loads messages from JSON file (e.g., messages/en.json) via dynamic import; client requests don't execute this as it's server-only.
+  - RootLayout calls getMessages() to fetch translations server-side for initial render.
+  - ClientLayout receives messages as props, NextIntlClientProvider stores them in React context memory.
+  - Client components use useTranslations() hook to access t() function from context (no additional requests for same locale).
+  - Client-side navigation: Uses cached messages in memory; no server call unless locale changes.
+  - Locale change: Middleware redirects to new path (e.g., /hi), server reloads messages, re-renders app.
+
+- Middleware Execution:
+  - Runs before every request matching matcher.
+  - intlMiddleware handles locale routing.
+  - withAuth checks token for protected paths.
+
+
+
+
+
+
+
+
+
+
+- Theme Provider:
+  - next-themes detects system preference.
+  - attribute="class" toggles Tailwind classes.
+  - useTheme() hook switches modes.
+
+what actually done at builld time ??/
