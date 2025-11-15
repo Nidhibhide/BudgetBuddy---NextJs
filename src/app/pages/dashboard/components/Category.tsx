@@ -15,10 +15,15 @@ import { DeleteCategory,Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const Category: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
+
+  // Get translation function for the 'dashboard' namespace
+  // This provides access to all dashboard-related translations
+  const t = useTranslations('dashboard');
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -112,14 +117,14 @@ const Category: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-          Category Overview
+          {t('categoryOverview')}
         </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {currentType}
+            {t(currentType.toLowerCase())}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -207,12 +212,12 @@ const Category: React.FC = React.memo(() => {
                       </div>
                       {currentType === "Expense" && budgetLimit > 0 && (
                         <div className="text-sm text-foreground/70">
-                          Budget: {budgetLimit.toLocaleString()} {currency}
+                          {t('budget')}: {budgetLimit.toLocaleString()} {currency}
                         </div>
                       )}
                       {currentType === "Income" && goal > 0 && (
                         <div className="text-sm text-foreground/70">
-                          Goal: {goal.toLocaleString()} {currency}
+                          {t('goal')}: {goal.toLocaleString()} {currency}
                         </div>
                       )}
                       {(currentType === "Expense" && budgetLimit > 0) || (currentType === "Income" && goal > 0) ? (
@@ -233,7 +238,7 @@ const Category: React.FC = React.memo(() => {
                         <div className="flex items-center space-x-1">
                           <AlertTriangle className="w-6 h-6 text-yellow-600" strokeWidth={3} />
                           <span className="text-base font-semibold text-foreground/60">
-                            {currentType === "Expense" ? "Set a budget to track your spending" : "Set a goal to track your income"}
+                            {currentType === "Expense" ? t('setBudgetToTrack') : t('setGoalToTrack')}
                           </span>
                         </div>
                       )}
@@ -252,10 +257,10 @@ const Category: React.FC = React.memo(() => {
                     <Plus className="w-6 h-6 text-foreground" />
                   </div>
                   <div className="text-lg font-semibold text-foreground">
-                    Add Category
+                    {t('addCategory')}
                   </div>
                   <div className="text-sm text-foreground/70">
-                    Create a new category
+                    {t('createNewCategory')}
                   </div>
                 </CardContent>
               </Card>
@@ -277,7 +282,7 @@ const Category: React.FC = React.memo(() => {
               columns={[
                 {
                   key: "date",
-                  label: "Date",
+                  label: t('date'),
                   sortable: true,
                   render: (value) =>
                     value
@@ -286,16 +291,16 @@ const Category: React.FC = React.memo(() => {
                         ).toLocaleDateString("en-GB")
                       : "",
                 },
-                { key: "description", label: "Description" },
+                { key: "description", label: t('description') },
                 {
                   key: "amount",
-                  label: "Amount",
+                  label: t('amount'),
                   sortable: true,
                   render: (value) => `${value} ${currency}`,
                 },
-                { key: "type", label: "Type" },
+                { key: "type", label: t('type') },
               ]}
-              title={`Records for ${selectedCategory}`}
+              title={`${t('recordsFor')} ${selectedCategory}`}
               onSort={handleSort}
               sortBy={sortBy}
               sortOrder={sortOrder}
@@ -311,14 +316,14 @@ const Category: React.FC = React.memo(() => {
           </>
         ) : (
           <NotFound
-            title="No Records Found"
-            message={`There are no transaction records available for ${selectedCategory}. Try selecting a different category or add some transactions.`}
+            title={t('noRecordsFound')}
+            message={t('noRecordsMessage', { category: selectedCategory })}
           />
         )
       ) : (
         <NotFound
-          title="Select a Category"
-          message="Click on any category card above to view its detailed transaction records and insights."
+          title={t('selectCategory')}
+          message={t('selectCategoryMessage')}
           icon={MousePointer}
         />
       )}

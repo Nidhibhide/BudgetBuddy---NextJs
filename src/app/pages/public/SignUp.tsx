@@ -8,27 +8,32 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
 import { User } from "@/app/types/appTypes";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // validation schema
+  // Get translation function for the 'auth' namespace
+  // This provides access to all authentication-related translations
+  const t = useTranslations('auth');
+
+  // validation schema with translated error messages
   const validationSchema = Yup.object({
     name: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, "Only alphabets and spaces are allowed")
-      .min(3, "Name must be at least 3 characters")
-      .max(50, "Name should not exceed 50 characters")
-      .required("Name is required"),
+      .matches(/^[a-zA-Z\s]+$/, t('nameAlphabetsOnly'))
+      .min(3, t('nameMinLength'))
+      .max(50, t('nameMaxLength'))
+      .required(t('nameRequired')),
 
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    email: Yup.string().email(t('invalidEmail')).required(t('emailRequired')),
 
     password: Yup.string()
-      .matches(/^\d+$/, "Password must contain digits only")
-      .min(5, "Password must be at least 5 characters")
-      .max(10, "Password must not exceed 10 characters")
-      .required("Password is required"),
+      .matches(/^\d+$/, t('passwordDigitsOnly'))
+      .min(5, t('passwordMinLength'))
+      .max(10, t('passwordMaxLength'))
+      .required(t('passwordRequired')),
   });
 
   // handle sign up
@@ -60,7 +65,7 @@ const SignUp = () => {
   return (
     <div className="min-h-screen w-full text-foreground flex justify-center items-center p-4">
       <div className="w-full max-w-md bg-background  rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('signUp')}</h1>
         <Formik<User>
           initialValues={{ name: "", email: "", password: "", currency: "INR" }}
           validationSchema={validationSchema}
@@ -70,21 +75,21 @@ const SignUp = () => {
             <>
               <div className="flex flex-col mb-6 gap-4 w-full">
                 <InputBox
-                  label="Name"
+                  label={t('name')}
                   name="name"
-                  placeholder="Enter your name"
+                  placeholder={t('enterName')}
                 />
                 <InputBox
-                  label="Email"
+                  label={t('email')}
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('enterEmail')}
                 />
                 <InputBox
-                  label="Password"
+                  label={t('password')}
                   name="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t('enterPassword')}
                 />
               </div>
 
@@ -94,12 +99,12 @@ const SignUp = () => {
                 className="mt-4"
                 loading={loading}
               >
-                Sign Up
+                {t('signUp')}
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
-                Already have an account?{" "}
+                {t('alreadyHaveAccount')}{" "}
                 <Link href="/signin" className="font-semibold  hover:underline">
-                  Sign In
+                  {t('signIn')}
                 </Link>
               </p>
             </>

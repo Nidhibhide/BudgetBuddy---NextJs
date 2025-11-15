@@ -31,6 +31,7 @@ import { TransactionPDF } from "@/app/features/common/PDFGenerator";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
 import { useCategories, useTransactions, useDebounce } from "@/app/hooks";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const handlePDFDownload = async (
   transactions: TransactionType[],
@@ -64,6 +65,10 @@ const handlePDFDownload = async (
 const Transaction: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
+
+  // Get translation function for the 'dashboard' namespace
+  // This provides access to all dashboard-related translations
+  const t = useTranslations('dashboard');
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
@@ -218,14 +223,14 @@ const Transaction: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-          Transactions Overview
+          {t('transactionsOverview')}
         </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {isExpense ? "Expense" : "Income"}
+            {t(isExpense ? 'expense' : 'income')}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -260,7 +265,7 @@ const Transaction: React.FC = React.memo(() => {
             onClick={() => setIsAddTransactionOpen(true)}
           >
             <Plus className="w-4 h-4" />
-            Add Transaction
+            {t('addTransaction')}
           </Button>
         </div>
         <div className="flex justify-end">
@@ -268,7 +273,7 @@ const Transaction: React.FC = React.memo(() => {
             onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
             className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
           >
-            Advanced Search
+            {t('advancedSearch')}
             {isAdvancedOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -286,7 +291,7 @@ const Transaction: React.FC = React.memo(() => {
                     name="search"
                     type="text"
                     label=""
-                    placeholder="Search transactions..."
+                    placeholder={t('searchTransactions')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     inputClassName="pl-8 rounded-full"
@@ -298,7 +303,7 @@ const Transaction: React.FC = React.memo(() => {
                   <InputBox
                     name="from"
                     type="date"
-                    label="From"
+                    label={t('from')}
                     value={filters.dateFrom}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -315,7 +320,7 @@ const Transaction: React.FC = React.memo(() => {
                   <InputBox
                     name="to"
                     type="date"
-                    label="To"
+                    label={t('to')}
                     value={filters.dateTo}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -332,8 +337,8 @@ const Transaction: React.FC = React.memo(() => {
                   <InputBox
                     name="min"
                     type="number"
-                    label="Min"
-                    placeholder="Min Amount"
+                    label={t('min')}
+                    placeholder={`${t('min')} ${t('amount').toLowerCase()}`}
                     value={filters.minAmount}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -350,8 +355,8 @@ const Transaction: React.FC = React.memo(() => {
                   <InputBox
                     name="max"
                     type="number"
-                    label="Max"
-                    placeholder="Max Amount"
+                    label={t('max')}
+                    placeholder={`${t('max')} ${t('amount').toLowerCase()}`}
                     value={filters.maxAmount}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -382,7 +387,7 @@ const Transaction: React.FC = React.memo(() => {
             columns={[
               {
                 key: "date",
-                label: "Date",
+                label: t('date'),
                 sortable: true,
                 render: (value) =>
                   value
@@ -391,11 +396,11 @@ const Transaction: React.FC = React.memo(() => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "title", label: "Title" },
-              { key: "category", label: "Category" },
+              { key: "title", label: t('title') },
+              { key: "category", label: t('category') },
               {
                 key: "amount",
-                label: "Amount",
+                label: t('amount'),
                 sortable: true,
                 render: (value) => {
                   const currency = session?.user?.currency || "INR";
@@ -404,7 +409,7 @@ const Transaction: React.FC = React.memo(() => {
               },
               {
                 key: "actions",
-                label: "Actions",
+                label: t('actions'),
                 render: (value, row) => (
                   <div className="flex gap-2">
                     <button
@@ -432,7 +437,7 @@ const Transaction: React.FC = React.memo(() => {
                 ),
               },
             ]}
-            title="Transaction Records"
+            title={t('transactionRecords')}
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
@@ -464,14 +469,14 @@ const Transaction: React.FC = React.memo(() => {
               }
             >
               <Download className="w-4 h-4" />
-              Download PDF
+              {t('downloadPDF')}
             </Button>
           </div>
         </>
       ) : (
         <NotFound
-          title="No Transactions Found"
-          message="It looks like there are no transactions matching your current filters. Try selecting a different category or add your first transaction to get started!"
+          title={t('noTransactionsFound')}
+          message={t('noTransactionsMessage')}
         />
       )}
 

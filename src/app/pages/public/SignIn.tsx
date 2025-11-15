@@ -8,20 +8,25 @@ import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
 import Link from "next/link";
 import { User } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // validation schema
+  // Get translation function for the 'auth' namespace
+  // This provides access to all authentication-related translations
+  const t = useTranslations('auth');
+
+  // validation schema with translated error messages
   const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    email: Yup.string().email(t('invalidEmail')).required(t('emailRequired')),
     password: Yup.string()
-      .matches(/^\d+$/, "Password must contain digits only")
-      .min(5, "Password must be at least 5 characters")
-      .max(10, "Password must not exceed 10 characters")
-      .required("Password is required"),
+      .matches(/^\d+$/, t('passwordDigitsOnly'))
+      .min(5, t('passwordMinLength'))
+      .max(10, t('passwordMaxLength'))
+      .required(t('passwordRequired')),
   });
 
   // handle sign in
@@ -41,10 +46,10 @@ const SignIn = () => {
 
       if (res?.error) {
         showError(
-          res.error === "CredentialsSignin" ? "Login Failed" : res.error
+          res.error === "CredentialsSignin" ? t('loginFailed') : res.error
         );
       } else {
-        showSuccess("Login Successful");
+        showSuccess(t('loginSuccessful'));
         router.replace(res?.url || "/dashboard/home"); // redirect manually
       }
       actions.resetForm();
@@ -66,7 +71,7 @@ const SignIn = () => {
   return (
     <div className="min-h-screen w-full flex justify-center items-center p-4 text-foreground">
       <div className="w-full max-w-md bg-background rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6">Sign In</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('signIn')}</h1>
 
         <div className="mb-4 flex justify-center">
           <Button
@@ -75,13 +80,13 @@ const SignIn = () => {
             hoverColor="hover:bg-[#3367D6]"
             className="border px-4 w-full sm:w-[270px] flex items-center justify-center gap-2"
           >
-            Sign in with Google
+            {t('signInWithGoogle')}
           </Button>
         </div>
 
         <div className="flex items-center w-full my-4">
           <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="mx-4 text-muted font-semibold">OR</span>
+          <span className="mx-4 text-muted font-semibold">{t('or')}</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
         <Formik<User>
@@ -93,16 +98,16 @@ const SignIn = () => {
             <>
               <div className="flex flex-col mb-6 gap-4 w-full">
                 <InputBox
-                  label="Email"
+                  label={t('email')}
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('email')}
                 />
                 <InputBox
-                  label="Password"
+                  label={t('password')}
                   name="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t('password')}
                 />
               </div>
 
@@ -112,15 +117,15 @@ const SignIn = () => {
                 className="mt-4"
                 loading={loading}
               >
-                Sign In
+                {t('signIn')}
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
-                New User?{" "}
+                {t('newUser')}{" "}
                 <Link
                   href="/signup"
                   className="font-semibold text-primary hover:underline"
                 >
-                  Sign Up
+                  {t('signUp')}
                 </Link>
               </p>
             </>

@@ -14,3 +14,5 @@ export { default as TotalBalance } from "./TotalBalance";
 export { default as RecentTransactions } from "./RecentTransactions";
 export { default as UpcomingBill } from "./UpcomingBill";
 export { default as RecurringPayment } from "./RecurringPayment";
+export { default as ThemeToggle } from "./ThemeToggle";
+export { default as LanguageSelector } from "./LanguageSelector";

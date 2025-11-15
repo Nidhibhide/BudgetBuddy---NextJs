@@ -4,8 +4,13 @@ import { Tabs, Tab, Box } from "@mui/material";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
 import { UpcomingBill, RecurringPayment } from "@/app/features/common";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const BillReminders: React.FC = () => {
+  // Get translation function for the 'dashboard' namespace
+  // This provides access to all dashboard-related translations
+  const t = useTranslations('dashboard');
+
   const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
     children,
     value,
@@ -55,12 +60,12 @@ const BillReminders: React.FC = () => {
             className="bg-background"
           >
             <Tab
-              label="Upcoming Bills"
+              label={t('upcomingBills')}
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label="Recurring Payments"
+              label={t('recurringPayments')}
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />
