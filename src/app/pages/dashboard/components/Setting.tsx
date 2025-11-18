@@ -60,12 +60,12 @@ const Setting: React.FC = () => {
             className="bg-background"
           >
             <Tab
-              label={t('editProfile')}
+              label={t('profile.editProfile')}
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label={t('changePassword')}
+              label={t('profile.changePassword')}
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />

@@ -4,16 +4,18 @@ import User from "@/app/backend/models/user";
 import { JsonAll } from "@/app/backend/utils/ApiResponse";
 import { Types } from "mongoose";
 import { setParamValue, convertAmountsToUserCurrency, parsePaginationParams, createPaginationPipeline } from "@/app/backend/utils/PaginationUtils";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET(request: Request) {
-   return await withAuthAndDB(async (session, userId) => {
-     const userIdObj = new Types.ObjectId(userId);
-     const url = new URL(request.url);
-     const status = setParamValue(url, "status");
+  const t = await getT();
+  return await withAuthAndDB(async (session, userId) => {
+    const userIdObj = new Types.ObjectId(userId);
+    const url = new URL(request.url);
+    const status = setParamValue(url, "status");
 
-     // Get user's currency
-     const user = await User.findById(userIdObj);
-     if (!user) return JsonAll(404, "User not found", false, [], {});
+    // Get user's currency
+    const user = await User.findById(userIdObj);
+    if (!user) return JsonAll(404, t('backend.user.notFound'), false, [], {});
 
      const { page, limit, sortBy, sortOrder, skip } = parsePaginationParams(url, "dueDate");
 
@@ -44,9 +46,9 @@ export async function GET(request: Request) {
      const totalPages = Math.ceil(totalUpcomingBills / limit);
 
      // Convert amounts from INR to user's currency
-     const upcomingBills = await convertAmountsToUserCurrency(rawUpcomingBills, user.currency);
+     const upcomingBills = await convertAmountsToUserCurrency(rawUpcomingBills, user.currency, t);
 
-     return JsonAll(200, "Fetched successfully", true, upcomingBills, {
+     return JsonAll(200, t('backend.upcomingBill.fetchedSuccessfully'), true, upcomingBills, {
        currentPage: page,
        totalPages,
        totalUpcomingBills,

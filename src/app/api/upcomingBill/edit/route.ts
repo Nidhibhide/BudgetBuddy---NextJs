@@ -2,14 +2,16 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import UpcomingBill from "@/app/backend/models/upcomingBill";
 import { UpdateUpcomingBill } from "@/app/backend/validations/upcomingBill";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function PUT(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
+    const t = await getT();
     const url = new URL(request.url);
     const upcomingBillId = url.searchParams.get("id");
 
     if (!upcomingBillId) {
-      return JsonOne(400, "Upcoming bill ID is required", false);
+      return JsonOne(400, t('backend.upcomingBill.idRequired'), false);
     }
 
     const body = await request.json();
@@ -22,7 +24,7 @@ export async function PUT(request: Request) {
 
     // Validate that reminderDate is before dueDate
     if (new Date(reminderDate) >= new Date(dueDate)) {
-      return JsonOne(400, "Reminder date must be before due date", false);
+      return JsonOne(400, t('backend.upcomingBill.reminderDateBeforeDue'), false);
     }
 
     const existingUpcomingBill = await UpcomingBill.findOne({
@@ -32,7 +34,7 @@ export async function PUT(request: Request) {
     });
 
     if (!existingUpcomingBill) {
-      return JsonOne(404, "Upcoming bill not found", false);
+      return JsonOne(404, t('backend.upcomingBill.notFound'), false);
     }
 
     const updateData = {
@@ -50,7 +52,7 @@ export async function PUT(request: Request) {
       { new: true }
     );
 
-    return JsonOne(200, "Upcoming bill updated successfully", true, {
+    return JsonOne(200, t('backend.upcomingBill.updatedSuccessfully'), true, {
       upcomingBill: updatedUpcomingBill,
     });
   });

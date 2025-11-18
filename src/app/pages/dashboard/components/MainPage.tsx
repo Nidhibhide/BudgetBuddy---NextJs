@@ -5,8 +5,8 @@ import {
   MonthlyExpensePieChart,
   IncomeVsExpenseTrend,
   BudgetCalendar,
-  Insights,
 } from "@/app/features/charts";
+import { Insights } from "@/app/features/common";
 import { mockData } from "@/app/lib/mockData";
 import { useTranslations } from 'next-intl'; // Import for internationalization
 import { LanguageSelector } from '@/app/features/common';
@@ -22,7 +22,7 @@ const MainPage: React.FC = () => {
       {/* Header */}
       <div className="relative">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-foreground">{t('overview')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('overview.overview')}</h1>
         </div>
         <div className="absolute top-0 right-0">
           <LanguageSelector className="w-32 border-0" />

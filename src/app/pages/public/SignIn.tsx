@@ -21,12 +21,12 @@ const SignIn = () => {
 
   // validation schema with translated error messages
   const validationSchema = Yup.object({
-    email: Yup.string().email(t('invalidEmail')).required(t('emailRequired')),
+    email: Yup.string().email(t('login.invalidEmail')).required(t('login.emailRequired')),
     password: Yup.string()
-      .matches(/^\d+$/, t('passwordDigitsOnly'))
-      .min(5, t('passwordMinLength'))
-      .max(10, t('passwordMaxLength'))
-      .required(t('passwordRequired')),
+      .matches(/^\d+$/, t('login.passwordDigitsOnly'))
+      .min(5, t('login.passwordMinLength'))
+      .max(10, t('login.passwordMaxLength'))
+      .required(t('login.passwordRequired')),
   });
 
   // handle sign in
@@ -46,10 +46,10 @@ const SignIn = () => {
 
       if (res?.error) {
         showError(
-          res.error === "CredentialsSignin" ? t('loginFailed') : res.error
+          res.error === "CredentialsSignin" ? t('login.failed') : res.error
         );
       } else {
-        showSuccess(t('loginSuccessful'));
+        showSuccess(t('login.successful'));
         router.replace(res?.url || "/dashboard/home"); // redirect manually
       }
       actions.resetForm();
@@ -71,7 +71,7 @@ const SignIn = () => {
   return (
     <div className="min-h-screen w-full flex justify-center items-center p-4 text-foreground">
       <div className="w-full max-w-md bg-background rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6">{t('signIn')}</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('login.title')}</h1>
 
         <div className="mb-4 flex justify-center">
           <Button
@@ -80,13 +80,13 @@ const SignIn = () => {
             hoverColor="hover:bg-[#3367D6]"
             className="border px-4 w-full sm:w-[270px] flex items-center justify-center gap-2"
           >
-            {t('signInWithGoogle')}
+            {t('login.withGoogle')}
           </Button>
         </div>
 
         <div className="flex items-center w-full my-4">
           <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="mx-4 text-muted font-semibold">{t('or')}</span>
+          <span className="mx-4 text-muted font-semibold">{t('login.or')}</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
         <Formik<User>
@@ -98,16 +98,16 @@ const SignIn = () => {
             <>
               <div className="flex flex-col mb-6 gap-4 w-full">
                 <InputBox
-                  label={t('email')}
+                  label={t('login.email')}
                   name="email"
                   type="email"
-                  placeholder={t('email')}
+                  placeholder={t('login.enterEmail')}
                 />
                 <InputBox
-                  label={t('password')}
+                  label={t('login.password')}
                   name="password"
                   type="password"
-                  placeholder={t('password')}
+                  placeholder={t('login.enterPassword')}
                 />
               </div>
 
@@ -117,15 +117,15 @@ const SignIn = () => {
                 className="mt-4"
                 loading={loading}
               >
-                {t('signIn')}
+                {t('login.title')}
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
-                {t('newUser')}{" "}
+                {t('register.newUser')}{" "}
                 <Link
                   href="/signup"
                   className="font-semibold text-primary hover:underline"
                 >
-                  {t('signUp')}
+                  {t('register.title')}
                 </Link>
               </p>
             </>

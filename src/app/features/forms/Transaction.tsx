@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useSession } from "next-auth/react";
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InputBox, SelectBox, TextareaBox, Button, showSuccess, showError } from "@/app/features/common/index";
-import { TYPES} from "@/lib/constants";
+import { TYPES} from "@/constants";
 import { getCategoryDetails } from "@/app/lib/category";
 import { addTransaction, editTransaction } from "@/app/lib/transaction";
 import {
@@ -27,29 +28,32 @@ const Transaction: React.FC<AddTransactionProps> = ({
   transaction,
 }) => {
   const { data: session } = useSession();
+  const t = useTranslations();
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   const [loading, setLoading] = useState(false);
+
+  const translatedTypes = [t('constants.types.expense'), t('constants.types.income')];
 
   const validationSchema = Yup.object().shape({
     date: Yup.date()
-      .required("Date is required")
-      .max(new Date(), "Date cannot be in the future"),
+      .required(t('form.transaction.dateRequired'))
+      .max(new Date(), t('form.transaction.dateCannotBeFuture')),
     title: Yup.string()
-      .min(1, "Title must be at least 1 character")
-      .max(100, "Title must not exceed 100 characters")
-      .required("Title is required"),
+      .min(1, t('form.transaction.titleMinLength'))
+      .max(100, t('form.transaction.titleMaxLength'))
+      .required(t('form.transaction.titleRequired')),
     description: Yup.string()
-      .min(2, "Description must be at least 2 characters")
-      .max(200, "Description must not exceed 200 characters")
-      .required("Description is required"),
-    category: Yup.string().required("Category is required"),
+      .min(2, t('form.transaction.descriptionMinLength'))
+      .max(200, t('form.transaction.descriptionMaxLength'))
+      .required(t('form.transaction.descriptionRequired')),
+    category: Yup.string().required(t('form.transaction.categoryRequired')),
     amount: Yup.number()
-      .positive("Amount must be positive")
-      .required("Amount is required"),
+      .positive(t('form.transaction.amountPositive'))
+      .required(t('form.transaction.amountRequired')),
     type: Yup.string()
-      .oneOf(TYPES, "Invalid type")
-      .required("Type is required"),
+      .oneOf(translatedTypes, t('form.transaction.invalidType'))
+      .required(t('form.transaction.typeRequired')),
   });
 
   const fetchCategories = async (
@@ -107,7 +111,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
       }
     } catch (error) {
       console.error(`Error ${transaction?._id ? 'updating' : 'adding'} transaction:`, error);
-      showError("An unexpected error occurred while processing the transaction");
+      showError(t('common.messages.unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -118,7 +122,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {transaction?._id ? "Edit Transaction" : "Add New Transaction"}
+            {transaction?._id ? t('form.transaction.edit') : t('form.transaction.addNew')}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -136,22 +140,22 @@ const Transaction: React.FC<AddTransactionProps> = ({
         >
           {({ handleSubmit, setFieldValue }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="date" label="Date" type="date" />
+              <InputBox name="date" label={t('common.fields.date')} type="date" />
               <SelectBox
                 name="type"
-                label="Type"
-                options={TYPES}
+                label={t('common.fields.type')}
+                options={translatedTypes}
                 onChange={(value) => handleTypeChange(value, setFieldValue)}
               />
               <SelectBox
                 name="category"
-                label="Category"
+                label={t('common.fields.category')}
                 options={categories.length === 0 ? ["NA"] : categories.map((cat) => cat.name)}
               />
-              <InputBox name="title" label="Title" />
+              <InputBox name="title" label={t('common.fields.title')} />
 
-              <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
+              <TextareaBox name="description" label={t('common.fields.description')} />
+              <InputBox name="amount" label={`${t('common.fields.amount')} (${session?.user?.currency || 'INR'})`} type="number" />
 
               <div className="flex justify-end space-x-2">
                 <Button
@@ -159,10 +163,10 @@ const Transaction: React.FC<AddTransactionProps> = ({
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  Cancel
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {transaction?._id ? "Update Transaction" : "Add Transaction"}
+                  {transaction?._id ? t('form.transaction.update') : t('form.transaction.add')}
                 </Button>
               </div>
             </form>

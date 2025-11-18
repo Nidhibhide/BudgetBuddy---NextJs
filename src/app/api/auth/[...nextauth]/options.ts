@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/app/backend/config/MongoDB";
 import User from "@/app/backend/models/user";
 import { Login } from "@/app/backend/validations/user";
+import { getTranslations } from "next-intl/server";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,8 +17,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        const t = await getTranslations('auth.login');
+
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing email or password");
+          throw new Error(t('missingEmailOrPassword'));
         }
 
         const { error } = Login.validate({ email: credentials.email, password: credentials.password });
@@ -28,15 +31,15 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
-          throw new Error("No user found with this email");
+          throw new Error(t('noUserFound'));
         }
 
         if (user.authProvider !== "local") {
-          throw new Error("This account uses a different login method");
+          throw new Error(t('differentLoginMethod'));
         }
 
         if (!user.password) {
-          throw new Error("No user found with this email");
+          throw new Error(t('noUserFound'));
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -45,7 +48,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error("Incorrect password");
+          throw new Error(t('incorrectPassword'));
         }
 
         return {
@@ -121,6 +124,8 @@ export const authOptions: NextAuthOptions = {
 
       // Check if access token is expired and refresh if needed (Google only) - skip in dev
       if (process.env.NODE_ENV === 'production' && token.authProvider === "google" && token.accessTokenExpires && Date.now() > token.accessTokenExpires && token.refreshToken) {
+        const t = await getTranslations('auth.login');
+
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
@@ -137,7 +142,7 @@ export const authOptions: NextAuthOptions = {
           const refreshedTokens = await response.json();
 
           if (!response.ok) {
-            throw new Error('Failed to refresh token');
+            throw new Error(t('tokenRefreshFailed'));
           }
 
           token.accessToken = refreshedTokens.access_token;
@@ -146,7 +151,7 @@ export const authOptions: NextAuthOptions = {
             token.refreshToken = refreshedTokens.refresh_token;
           }
         } catch (error) {
-          throw new Error(`Token refresh failed: ${error instanceof Error ? error.message : String(error)}`);
+          throw new Error(`${t('tokenRefreshFailed')}: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 

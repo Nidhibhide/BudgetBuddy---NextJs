@@ -22,18 +22,18 @@ const SignUp = () => {
   // validation schema with translated error messages
   const validationSchema = Yup.object({
     name: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, t('nameAlphabetsOnly'))
-      .min(3, t('nameMinLength'))
-      .max(50, t('nameMaxLength'))
-      .required(t('nameRequired')),
+      .matches(/^[a-zA-Z\s]+$/, t('register.nameAlphabetsOnly'))
+      .min(3, t('register.nameMinLength'))
+      .max(50, t('register.nameMaxLength'))
+      .required(t('register.nameRequired')),
 
-    email: Yup.string().email(t('invalidEmail')).required(t('emailRequired')),
+    email: Yup.string().email(t('login.invalidEmail')).required(t('login.emailRequired')),
 
     password: Yup.string()
-      .matches(/^\d+$/, t('passwordDigitsOnly'))
-      .min(5, t('passwordMinLength'))
-      .max(10, t('passwordMaxLength'))
-      .required(t('passwordRequired')),
+      .matches(/^\d+$/, t('login.passwordDigitsOnly'))
+      .min(5, t('login.passwordMinLength'))
+      .max(10, t('login.passwordMaxLength'))
+      .required(t('login.passwordRequired')),
   });
 
   // handle sign up
@@ -65,7 +65,7 @@ const SignUp = () => {
   return (
     <div className="min-h-screen w-full text-foreground flex justify-center items-center p-4">
       <div className="w-full max-w-md bg-background  rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6">{t('signUp')}</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('register.title')}</h1>
         <Formik<User>
           initialValues={{ name: "", email: "", password: "", currency: "INR" }}
           validationSchema={validationSchema}
@@ -75,21 +75,21 @@ const SignUp = () => {
             <>
               <div className="flex flex-col mb-6 gap-4 w-full">
                 <InputBox
-                  label={t('name')}
+                  label={t('register.name')}
                   name="name"
-                  placeholder={t('enterName')}
+                  placeholder={t('register.enterName')}
                 />
                 <InputBox
-                  label={t('email')}
+                  label={t('login.email')}
                   name="email"
                   type="email"
-                  placeholder={t('enterEmail')}
+                  placeholder={t('login.enterEmail')}
                 />
                 <InputBox
-                  label={t('password')}
+                  label={t('login.password')}
                   name="password"
                   type="password"
-                  placeholder={t('enterPassword')}
+                  placeholder={t('login.enterPassword')}
                 />
               </div>
 
@@ -99,12 +99,12 @@ const SignUp = () => {
                 className="mt-4"
                 loading={loading}
               >
-                {t('signUp')}
+                {t('register.title')}
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
-                {t('alreadyHaveAccount')}{" "}
+                {t('register.alreadyHaveAccount')}{" "}
                 <Link href="/signin" className="font-semibold  hover:underline">
-                  {t('signIn')}
+                  {t('login.title')}
                 </Link>
               </p>
             </>

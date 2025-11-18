@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { TYPES } from "@/lib/constants";
+import { TYPES } from "@/constants";
 import { stringValidator, selectValidator, numberValidator } from "@/app/backend/utils/GlobalValidation";
 
 export const CreateCategory = Joi.object({

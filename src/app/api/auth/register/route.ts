@@ -3,8 +3,10 @@ import User from "@/app/backend/models/user";
 import bcrypt from "bcryptjs";
 import { Register } from "@/app/backend/validations/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function POST(request: Request) {
+  const t = await getT();
   await dbConnect();
   try {
     const body = await request.json();
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
     const existingUserByEmail = await User.findOne({ email });
 
     if (existingUserByEmail) {
-      return JsonOne(400, "User already exists with this email", false);
+      return JsonOne(400, t('backend.user.alreadyExists'), false);
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -27,9 +29,9 @@ export async function POST(request: Request) {
     });
     await newUser.save();
 
-    return JsonOne(201, "User registered successfully", true);
+    return JsonOne(201, t('backend.user.registeredSuccessfully'), true);
   } catch (error) {
     console.log("Error registering user", error);
-    return JsonOne(500, "Error registering user", false);
+    return JsonOne(500, t('backend.user.errorRegistering'), false);
   }
 }

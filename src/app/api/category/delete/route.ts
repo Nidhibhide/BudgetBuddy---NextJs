@@ -5,15 +5,17 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import User from "@/app/backend/models/user";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function DELETE(request: Request) {
+  const t = await getT();
   return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
     const reassignCategoryId = url.searchParams.get("reassignCategoryId");
 
     if (!categoryId) {
-      return JsonOne(400, "Category ID is required", false);
+      return JsonOne(400, t('backend.category.idRequired'), false);
     }
 
     // Check if category exists and belongs to user
@@ -24,13 +26,13 @@ export async function DELETE(request: Request) {
     });
 
     if (!category) {
-      return JsonOne(404, "Category not found", false);
+      return JsonOne(404, t('backend.category.notFound'), false);
     }
 
     // Get user's currency for balance updates
     const user = await User.findById(userId);
     if (!user) {
-      return JsonOne(404, "User not found", false);
+      return JsonOne(404, t('backend.user.notFound'), false);
     }
 
     // Find all associated transactions
@@ -49,11 +51,11 @@ export async function DELETE(request: Request) {
       });
 
       if (!reassignCategory) {
-        return JsonOne(400, "Reassign category not found", false);
+        return JsonOne(400, t('backend.category.reassignCategoryNotFound'), false);
       }
 
       if (reassignCategory.type !== category.type) {
-        return JsonOne(400, "Cannot reassign to a category of different type", false);
+        return JsonOne(400, t('backend.category.cannotReassignDifferentType'), false);
       }
 
       // Reassign transactions to the new category
@@ -67,7 +69,8 @@ export async function DELETE(request: Request) {
         // Convert amount back to INR for balance reversal
         const amountInINR = await convertToINR(
           transaction.amount,
-          user.currency
+          user.currency,
+          t
         );
 
         // Reverse the balance update
@@ -76,12 +79,13 @@ export async function DELETE(request: Request) {
         const balanceUpdate = await updateUserBalance(
           userId,
           amountInINR,
-          reverseType
+          reverseType,
+          t
         );
         if (!balanceUpdate.success) {
           return JsonOne(
             400,
-            balanceUpdate.message || "Balance update failed",
+            balanceUpdate.message || t('backend.transaction.balanceUpdateFailed'),
             false
           );
         }
@@ -95,6 +99,6 @@ export async function DELETE(request: Request) {
     // Soft delete the category by archiving it
     await Category.updateOne({ _id: categoryId }, { isArchived: true });
 
-    return JsonOne(200, "Category deleted successfully", true);
+    return JsonOne(200, t('backend.category.deletedSuccessfully'), true);
   });
 }

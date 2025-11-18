@@ -2,14 +2,16 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
 import { EditCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function PUT(request: Request) {
+  const t = await getT();
   return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
 
     if (!categoryId) {
-      return JsonOne(400, "Category ID is required", false);
+      return JsonOne(400, t('backend.category.idRequired'), false);
     }
 
     const body = await request.json();
@@ -28,7 +30,7 @@ export async function PUT(request: Request) {
     });
 
     if (!existingCategory) {
-      return JsonOne(404, "Category not found", false);
+      return JsonOne(404, t('backend.category.notFound'), false);
     }
 
     // Check if new name already exists for this user and type
@@ -41,7 +43,7 @@ export async function PUT(request: Request) {
     });
 
     if (duplicateCategory) {
-      return JsonOne(400, "Category name already exists", false);
+      return JsonOne(400, t('backend.category.nameAlreadyExists'), false);
     }
 
     existingCategory.name = name;
@@ -56,7 +58,7 @@ export async function PUT(request: Request) {
     }
     await existingCategory.save();
 
-    return JsonOne(200, "Category updated successfully", true, {
+    return JsonOne(200, t('backend.category.updatedSuccessfully'), true, {
       category: existingCategory
     });
   });
