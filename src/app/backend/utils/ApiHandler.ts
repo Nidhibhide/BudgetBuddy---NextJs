@@ -2,15 +2,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/app/backend/config/MongoDB";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { Session } from "@/app/types/appTypes";
 import Joi from "joi";
-
-interface Session {
-  user: {
-    id: string;
-    name?: string;
-    email?: string;
-  };
-}
 
 export async function withAuthAndDB<T>(
   handler: (session: Session, userId: string) => Promise<T>

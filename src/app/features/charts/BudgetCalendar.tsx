@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from 'next-intl';
 import { Card } from "@/components/ui/card";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import {
@@ -23,6 +24,7 @@ interface BudgetCalendarProps {
 }
 
 const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
+  const t = useTranslations('dashboard');
   const [date, setDate] = React.useState<Date | undefined>(new Date('2023-10-15'));
 
   // const getTransactionsForDate = (selectedDate: Date) => {
@@ -64,7 +66,7 @@ const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
 
   return (
     <Card className="p-6 text-foreground flex flex-col h-full">
-      <h3 className="text-lg font-semibold mb-4">Budget Calendar</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('ui.budgetCalendar')}</h3>
       <div className="flex-1">
         <div className="space-y-4">
           <TooltipProvider>
@@ -107,9 +109,9 @@ const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
                           </p>
                           {dayTransactions.length > 0 ? (
                             <>
-                              <p>Income: ${totalIncome.toLocaleString()}</p>
-                              <p>Expense: ${totalExpense.toLocaleString()}</p>
-                              <p>Net: ${netBalance.toLocaleString()}</p>
+                              <p>{t('ui.incomeLabel')}: ${totalIncome.toLocaleString()}</p>
+                              <p>{t('ui.expenseLabel')}: ${totalExpense.toLocaleString()}</p>
+                              <p>{t('ui.netLabel')}: ${netBalance.toLocaleString()}</p>
                               <div className="mt-2">
                                 {dayTransactions.map((t, idx) => (
                                   <p
@@ -127,7 +129,7 @@ const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
                               </div>
                             </>
                           ) : (
-                            <p>No transactions</p>
+                            <p>{t('ui.noTransactions')}</p>
                           )}
                         </div>
                       </TooltipContent>

@@ -2,8 +2,10 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import UpcomingBill from "@/app/backend/models/upcomingBill";
 import { CreateUpcomingBill } from "@/app/backend/validations/upcomingBill";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function POST(request: Request) {
+  const t = await getT();
   return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
     const { error } = CreateUpcomingBill.validate(body);
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
 
     // Validate that reminderDate is before dueDate
     if (new Date(reminderDate) >= new Date(dueDate)) {
-      return JsonOne(400, "Reminder date must be before due date", false);
+      return JsonOne(400, t('backend.upcomingBill.reminderDateBeforeDue'), false);
     }
 
     const newUpcomingBill = new UpcomingBill({
@@ -30,7 +32,7 @@ export async function POST(request: Request) {
 
     await newUpcomingBill.save();
 
-    return JsonOne(201, "Upcoming bill created successfully", true, {
+    return JsonOne(201, t('backend.upcomingBill.createdSuccessfully'), true, {
       upcomingBill: newUpcomingBill,
     });
   });

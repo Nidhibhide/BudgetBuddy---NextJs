@@ -7,7 +7,7 @@ import {
   numberValidator,
   arraySelectValidator,
 } from "../utils/GlobalValidation";
-import { CURRENCIES, CATEGORY_LIST } from "../../../lib/constants";
+import { CURRENCIES, CATEGORY_LIST } from "@/constants";
 
 const Register = Joi.object({
   name: stringValidator("Name", 3, 50, true),

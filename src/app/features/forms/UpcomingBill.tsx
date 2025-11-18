@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -14,29 +15,30 @@ import { addUpcomingBill, editUpcomingBill } from "@/app/lib/upcomingBill";
 import { AddUpcomingBillProps, UpcomingBill } from "@/app/types/appTypes";
 
 const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, onBillAdded, bill }) => {
+  const t = useTranslations();
   const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     dueDate: Yup.date()
-      .required("Due Date is required")
-      .min(new Date(), "Due Date cannot be in the past"),
+      .required(t('form.dateRequired'))
+      .min(new Date(), t('form.dateCannotBeFuture')),
     reminderDate: Yup.date()
-      .required("Reminder Date is required")
-      .min(new Date(), "Reminder Date cannot be in the past")
+      .required(t('form.dateRequired'))
+      .min(new Date(), t('form.dateCannotBeFuture'))
       .when('dueDate', (dueDate, schema) => dueDate ? schema.max(Yup.ref('dueDate'), 'Reminder date must be before due date') : schema),
     title: Yup.string()
-      .min(1, "Title must be at least 1 character")
-      .max(100, "Title must not exceed 100 characters")
-      .required("Title is required"),
+      .min(1, t('form.titleMinLength'))
+      .max(100, t('form.titleMaxLength'))
+      .required(t('form.titleRequired')),
     description: Yup.string()
-      .min(2, "Description must be at least 2 characters")
-      .max(200, "Description must not exceed 200 characters")
-      .required("Description is required"),
+      .min(2, t('form.descriptionMinLength'))
+      .max(200, t('form.descriptionMaxLength'))
+      .required(t('form.descriptionRequired')),
     amount: Yup.number()
-      .positive("Amount must be positive")
-      .required("Amount is required"),
+      .positive(t('form.amountPositive'))
+      .required(t('form.amountRequired')),
     status: Yup.string()
-      .oneOf(["Paid", "Unpaid"], "Invalid status")
+      .oneOf(["Paid", "Unpaid"], t('form.validation.invalidStatus'))
       .optional(),
   });
 
@@ -54,7 +56,7 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
         showError(response.message || `Failed to ${bill?._id ? 'update' : 'add'} upcoming bill`);
       }
     } catch {
-      showError(`Something went wrong while ${bill?._id ? 'updating' : 'adding'} upcoming bill`);
+      showError(bill?._id ? t('somethingWentWrongEditing', { item: 'upcoming bill', ns: 'common' }) : t('somethingWentWrongCreating', { item: 'upcoming bill', ns: 'common' }));
     } finally {
       setLoading(false);
     }
@@ -65,7 +67,7 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {bill?._id ? "Edit Upcoming Bill" : "Add Upcoming Bill"}
+            {bill?._id ? t('form.upcomingBill.edit') : t('form.upcomingBill.add')}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -82,15 +84,15 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
         >
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="dueDate" label="Due Date" type="date" />
-              <InputBox name="reminderDate" label="Reminder Date" type="date" />
-              <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
-              <InputBox name="title" label="Title" />
-              <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label="Amount" type="number" />
+              <InputBox name="dueDate" label={t('form.date')} type="date" />
+              <InputBox name="reminderDate" label={t('form.date')} type="date" />
+              <p className="text-sm text-gray-600 -mt-2">{t('common.ui.notificationsStartFrom')}</p>
+              <InputBox name="title" label={t('form.title')} />
+              <TextareaBox name="description" label={t('form.description')} />
+              <InputBox name="amount" label={t('form.amount')} type="number" />
               <SelectBox
                 name="status"
-                label="Status"
+                label={t('form.status')}
                 options={["Unpaid", "Paid"]}
               />
 
@@ -100,10 +102,10 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  Cancel
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {bill?._id ? "Update Bill" : "Add Bill"}
+                  {bill?._id ? t('form.upcomingBill.update') : t('form.upcomingBill.addBill')}
                 </Button>
               </div>
             </form>

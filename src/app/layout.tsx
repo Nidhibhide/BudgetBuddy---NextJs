@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import ClientLayout from "./ClientLayout";
-import { ThemeProvider } from "./features/common/theme-provider";
+import { ThemeProvider } from "./features/common";
 import { getMessages, getLocale } from 'next-intl/server';
 
 export const metadata: Metadata = {

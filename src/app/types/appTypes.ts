@@ -313,3 +313,11 @@ export interface ThemeToggleProps {
 export interface LanguageSelectorProps {
   className?: string;
 }
+
+export interface Session {
+  user: {
+    id: string;
+    name?: string;
+    email?: string;
+  };
+}

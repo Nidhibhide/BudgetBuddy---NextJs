@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   MdCategory,
   MdLogout,
@@ -16,36 +17,37 @@ import { ThemeToggle } from '@/app/features/common';
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const pathname = usePathname();
+  const t = useTranslations();
 
   const sidebarLinks = [
     {
       href: "/dashboard/home",
-      label: "Dashboard",
+      label: t('dashboard.sidebar.dashboard'),
       icon: MdDashboard,
     },
     {
       href: "/dashboard/category",
-      label: "Category",
+      label: t('dashboard.sidebar.category'),
       icon: MdCategory,
     },
     {
       href: "/dashboard/transaction",
-      label: "Transaction",
+      label: t('dashboard.sidebar.transaction'),
       icon: MdPayment,
     },
     {
       href: "/dashboard/bill-reminders",
-      label: "Set Alerts",
+      label: t('dashboard.sidebar.setAlerts'),
       icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
-      label: "Setting",
+      label: t('dashboard.sidebar.setting'),
       icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
-      label: "Logout",
+      label: t('dashboard.sidebar.logout'),
       icon: MdLogout,
     },
   ];
@@ -68,7 +70,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
               onClick={onClose}
             >
               <X className="size-6" />
-              <span className="sr-only">Close sidebar</span>
+              <span className="sr-only">{t('ui.closeSidebar')}</span>
             </Button>
           )}
         </div>

@@ -1,0 +1,77 @@
+{
+  "common": {
+    "actions": {
+      "cancel": "रद्द करा",
+      "save": "जतन करा",
+      "delete": "हटवा",
+      "edit": "संपादित करा",
+      "add": "जोडा",
+      "search": "शोधा",
+      "filter": "फिल्टर",
+      "view": "पहा",
+      "editAction": "संपादित करा",
+      "deleteAction": "हटवा"
+    },
+    "fields": {
+      "total": "एकूण",
+      "amount": "रक्कम",
+      "date": "तारीख",
+      "description": "वर्णन",
+      "name": "नाव",
+      "type": "प्रकार",
+      "status": "स्थिती",
+      "title": "शीर्षक",
+      "category": "वर्ग"
+    },
+    "messages": {
+      "error": "त्रुटी",
+      "success": "यश",
+      "unexpectedError": "एक अनपेक्षित त्रुटी आली",
+      "errorOccurred": "एक त्रुटी आली",
+      "somethingWentWrongEditing": "{item} संपादित करताना काहीतरी चूक झाली",
+      "somethingWentWrongCreating": "{item} तयार करताना काहीतरी चूक झाली",
+      "failedToFetchCategories": "वर्ग मिळवण्यात अयशस्वी",
+      "errorFetchingCategories": "वर्ग मिळवण्यात त्रुटी",
+      "failedToFetchRecurringPayments": "आवर्ती पेमेंट मिळवण्यात अयशस्वी",
+      "failedToFetchTransactions": "व्यवहार मिळवण्यात अयशस्वी",
+      "failedToFetchUpcomingBills": "आगामी बिल मिळवण्यात अयशस्वी",
+      "errorFetchingTotals": "एकूण मिळवण्यात त्रुटी"
+    },
+    "confirmation": {
+      "title": "तुम्हाला खात्री आहे का?",
+      "description": "हे व्यवहार कायमचा हटवेल."
+    },
+    "ui": {
+      "previous": "मागील",
+      "next": "पुढील",
+      "close": "बंद करा",
+      "morePages": "अधिक पृष्ठे",
+      "toggleTheme": "थीम टॉगल करा",
+      "closeSidebar": "साइडबार बंद करा",
+      "noTransactions": "कोणतेही व्यवहार नाहीत",
+      "billDetails": "बिल तपशील",
+      "recurringPaymentDetails": "आवर्ती पेमेंट तपशील",
+      "monthlyExpenses": "मासिक खर्च",
+      "budgetCalendar": "बजेट कॅलेंडर",
+      "transactionReport": "व्यवहार अहवाल",
+      "noTransactionsFound": "कोणतेही व्यवहार आढळले नाहीत",
+      "notificationsStartFrom": "सूचना या तारखेपासून सुरू होतील",
+      "viewTransaction": "व्यवहार पहा",
+      "incomeLabel": "उत्पन्न",
+      "expenseLabel": "खर्च",
+      "netLabel": "नेट"
+    }
+  },
+  "constants": {
+    "types": {
+      "expense": "खर्च",
+      "income": "उत्पन्न"
+    },
+    "currencies": {
+      "usd": "USD",
+      "eur": "EUR",
+      "inr": "INR",
+      "gbp": "GBP"
+    }
+  }
+}

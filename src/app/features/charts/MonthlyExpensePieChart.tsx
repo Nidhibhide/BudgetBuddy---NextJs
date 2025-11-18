@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Card } from '@/components/ui/card';
 
@@ -15,6 +16,7 @@ interface MonthlyExpensePieChartProps {
 }
 
 const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({ expenses }) => {
+  const t = useTranslations('dashboard');
   const data = expenses.map(exp => ({
     name: exp.category,
     value: exp.amount,
@@ -24,7 +26,7 @@ const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({ expense
 
   return (
     <Card className="p-6 text-foreground">
-      <h3 className="text-lg font-semibold mb-4">Monthly Expenses</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('ui.monthlyExpenses')}</h3>
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

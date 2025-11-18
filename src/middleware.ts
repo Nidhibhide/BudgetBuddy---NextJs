@@ -1,32 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server';
-import createMiddleware from 'next-intl/middleware';
-import { getToken } from 'next-auth/jwt';
+import { NextRequest, NextResponse } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { getToken } from "next-auth/jwt";
+import { cookies } from "next/headers";
+import { languages, defaultLanguage } from "./i18n";
+import { determineLocale } from "./app/features/common/helpers/i18nUtils";
+
+const locales = languages;
+const defaultLocale = defaultLanguage;
 
 const intlMiddleware = createMiddleware({
-  locales: ['en', 'hi', 'mr'],
-  defaultLocale: 'en',
-  localePrefix: 'as-needed'
+  locales,
+  defaultLocale,
+  localePrefix: "always",
 });
 
 export default async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
 
-  // Handle locale root redirects first (e.g., /en -> /)
-  if (pathname.match(/^\/(en|hi|mr)$/)) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Redirect root to default locale
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL(`/${defaultLocale}`, request.url));
   }
 
-  // Run intl middleware to handle locale routing
-  const intlResponse = intlMiddleware(request);
-  if (intlResponse) return intlResponse;
+  // Determine locale from pathname or cookie
+  const pathnameParts = pathname.split("/");
+  const pathnameLocale = pathnameParts[1] && locales.includes(pathnameParts[1] as (typeof locales)[number])
+    ? pathnameParts[1]
+    : undefined;
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
+  const locale = determineLocale(cookieLocale, undefined, pathnameLocale);
 
-  // Then check authentication for protected routes
-  if (pathname.startsWith("/dashboard")) {
+  // Auth check for dashboard routes
+  if (pathname.includes("/dashboard")) {
     const token = await getToken({ req: request });
     if (!token) {
-      return NextResponse.redirect(new URL('/signin', request.url));
+      const signinUrl = new URL(`/${locale}/signin`, request.url);
+      return NextResponse.redirect(signinUrl);
     }
   }
+
+  // Run next-intl middleware
+  const intlResponse = intlMiddleware(request);
+  if (intlResponse) return intlResponse;
 
   return NextResponse.next();
 }

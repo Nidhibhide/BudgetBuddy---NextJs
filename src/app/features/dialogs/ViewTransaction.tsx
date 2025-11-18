@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ const ViewTransaction: React.FC<ViewTransactionProps> = ({
   transaction,
 }) => {
   const { data: session } = useSession();
+  const t = useTranslations();
 
   if (!transaction) return null;
 
@@ -27,32 +29,32 @@ const ViewTransaction: React.FC<ViewTransactionProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="text-foreground">
         <DialogHeader>
-          <DialogTitle>View Transaction</DialogTitle>
+          <DialogTitle>{transaction.title}</DialogTitle>
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label="Date"
+            label={t('common.fields.date')}
             value={transaction.date ? formatDate(transaction.date) : ""}
           />
           <FieldDisplay
-            label="Title"
+            label={t('common.fields.title')}
             value={transaction.title || ""}
           />
           <FieldDisplay
-            label="Description"
+            label={t('common.fields.description')}
             value={transaction.description || ""}
           />
           <FieldDisplay
-            label="Category"
+            label={t('common.fields.category')}
             value={String(transaction.category || "")}
           />
           <FieldDisplay
-            label="Amount"
+            label={t('common.fields.amount')}
             value={`${transaction.amount} ${currency}`}
           />
           <FieldDisplay
-            label="Type"
-            value={transaction.type || ""}
+            label={t('common.fields.type')}
+            value={transaction.type === "Expense" ? t('constants.types.expense') : t('constants.types.income')}
           />
         </div>
       </DialogContent>

@@ -2,30 +2,32 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from 'next-intl';
 import { InputBox, Button, showError, useHandleResponse, SelectBox } from "@/app/features/common/index";
 import { updateProfile } from "@/app/lib/auth";
 import { User as UserIcon } from "lucide-react";
 import { User } from "@/app/types/appTypes";
 import { useSession } from "next-auth/react";
-import { CURRENCIES } from "@/lib/constants";
+import { CURRENCIES } from "@/constants";
 
 const UserSetting: React.FC = () => {
+  const t = useTranslations();
   const [profileLoading, setProfileLoading] = useState<boolean>(false);
   const Response = useHandleResponse();
   const { data: session, update } = useSession();
 
   const profileValidationSchema = Yup.object().shape({
     name: Yup.string()
-      .matches(/^[a-zA-Z\s]+$/, "Only alphabets and spaces are allowed")
-      .min(3, "Name must be at least 3 characters")
-      .max(50, "Name should not exceed 50 characters")
-      .required("Name is required"),
+      .matches(/^[a-zA-Z\s]+$/, t('auth.register.nameAlphabetsOnly'))
+      .min(3, t('auth.register.nameMinLength'))
+      .max(50, t('auth.register.nameMaxLength'))
+      .required(t('auth.register.nameRequired')),
 
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    email: Yup.string().email(t('auth.login.invalidEmail')).required(t('auth.login.emailRequired')),
 
     currency: Yup.string()
-      .oneOf(CURRENCIES, "Invalid currency")
-      .required("Currency is required"),
+      .oneOf(CURRENCIES, t('form.currency.invalid'))
+      .required(t('form.currency.required')),
   });
 
   const handleProfileSubmit = async (
@@ -42,7 +44,7 @@ const UserSetting: React.FC = () => {
         values.email === currentUser.email &&
         values.currency === currentUser.currency
       ) {
-        showError("No changes detected. Profile is already up to date.");
+        showError(t('form.profile.noChanges'));
         return;
       }
 
@@ -51,11 +53,11 @@ const UserSetting: React.FC = () => {
         email: values.email,
         currency: values.currency!,
       });
-      Response({ response, successMessage: "Profile updated successfully" });
+      Response({ response, successMessage: t('form.profile.success') });
       await update({ name: values.name, email: values.email, currency: values.currency });
     } catch (error: unknown) {
       const err = error as Error;
-      showError(err.message || "Something went wrong.");
+      showError(err.message || t('form.profile.error'));
     } finally {
       setProfileLoading(false);
     }
@@ -78,20 +80,20 @@ const UserSetting: React.FC = () => {
           <div className="w-full max-w-[600px] bg-background p-6 rounded-lg shadow-sm border">
             <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
               <UserIcon className="w-6 h-6 text-foreground" />
-              Edit Profile
+              {t('dashboard.profile.editProfile')}
             </h2>
             <div className="flex flex-col gap-6">
-              <InputBox name="name" label="Enter Your Name" type="text" />
-              <InputBox name="email" label="Enter Your Email" type="email" />
+              <InputBox name="name" label={t('auth.register.enterName')} type="text" />
+              <InputBox name="email" label={t('auth.login.enterEmail')} type="email" />
               <SelectBox
-                label="Select Currency"
+                label={t('form.currency.selectLabel')}
                 name="currency"
                 options={CURRENCIES}
               />
             </div>
             <div className="mt-4">
               <Button onClick={handleSubmit} width="w-full" loading={profileLoading}>
-                Update Profile
+                {t('form.profile.updateButton')}
               </Button>
             </div>
           </div>

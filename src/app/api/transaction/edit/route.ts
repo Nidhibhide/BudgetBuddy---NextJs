@@ -8,14 +8,16 @@ import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR, convertFromINR } from "@/app/backend/utils/currencyConverter";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
 import { checkLimitForEdit } from "@/app/backend/utils/transactionChecks";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function PUT(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
+    const t = await getT();
     const url = new URL(request.url);
     const transactionId = url.searchParams.get("id");
 
     if (!transactionId) {
-      return JsonOne(400, "Transaction ID is required", false);
+      return JsonOne(400, t('backend.transaction.idRequired'), false);
     }
 
     const body = await request.json();
@@ -37,10 +39,10 @@ export async function PUT(request: Request) {
     ]);
 
     if (!existingTransaction) {
-      return JsonOne(404, "Transaction not found", false);
+      return JsonOne(404, t('backend.transaction.notFound'), false);
     }
 
-    if (!user) return JsonOne(404, "User not found", false);
+    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
 
     const updateData: Partial<TransactionType> = {};
     let balanceAdjustment = 0;
@@ -55,14 +57,14 @@ export async function PUT(request: Request) {
       });
 
       if (!categoryDoc) {
-        return JsonOne(400, "Category not found", false);
+        return JsonOne(400, t('backend.category.notFound'), false);
       }
       updateData.category = categoryDoc._id;
     }
 
     // Handle amount update
     if (amount !== undefined) {
-      const newAmountInINR = await convertToINR(amount, user.currency);
+      const newAmountInINR = await convertToINR(amount, user.currency, t);
       balanceAdjustment = newAmountInINR - existingTransaction.amount;
       updateData.amount = newAmountInINR;
     }
@@ -80,28 +82,29 @@ export async function PUT(request: Request) {
         userId,
         existingTransaction.type,
         balanceAdjustment,
-        user.currency
+        user.currency,
+        t
       );
       if (!limitCheck.success) {
-        return JsonOne(400, limitCheck.message || "Limit check failed", false);
+        return JsonOne(400, limitCheck.message || t('backend.transaction.limitCheckFailed'), false);
       }
     }
 
     // Update balance if amount changed
     if (balanceAdjustment !== 0) {
-      const balanceUpdate = await updateUserBalance(userId, balanceAdjustment, existingTransaction.type);
+      const balanceUpdate = await updateUserBalance(userId, balanceAdjustment, existingTransaction.type, t);
       if (!balanceUpdate.success) {
-        return JsonOne(400, balanceUpdate.message || "Balance update failed", false);
+        return JsonOne(400, balanceUpdate.message || t('backend.transaction.balanceUpdateFailed'), false);
       }
     }
 
     // Update the transaction and convert amount back to user's currency in parallel
     const [updatedTransaction, responseAmount] = await Promise.all([
       Transaction.findByIdAndUpdate(transactionId, updateData, { new: true }),
-      amount !== undefined ? convertFromINR(updateData.amount!, user.currency) : convertFromINR(existingTransaction.amount, user.currency),
+      amount !== undefined ? convertFromINR(updateData.amount!, user.currency, t) : convertFromINR(existingTransaction.amount, user.currency, t),
     ]);
 
-    return JsonOne(200, "Transaction updated successfully", true, {
+    return JsonOne(200, t('backend.transaction.updatedSuccessfully'), true, {
       transaction: {
         ...updatedTransaction.toObject(),
         amount: responseAmount,

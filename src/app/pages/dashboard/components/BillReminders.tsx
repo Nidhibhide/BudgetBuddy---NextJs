@@ -60,12 +60,12 @@ const BillReminders: React.FC = () => {
             className="bg-background"
           >
             <Tab
-              label={t('upcomingBills')}
+              label={t('overview.upcomingBills')}
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label={t('recurringPayments')}
+              label={t('overview.recurringPayments')}
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />

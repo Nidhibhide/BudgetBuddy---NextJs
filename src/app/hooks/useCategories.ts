@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { getCategoryDetails } from "@/app/lib/category";
 import type { Category } from "@/app/types/appTypes";
+import { useTranslations } from 'next-intl'; // Import for internationalization
 
 export const useCategories = (type: string) => {
+  const t = useTranslations('common'); // Get translation function for the 'common' namespace
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,14 +17,14 @@ export const useCategories = (type: string) => {
       if (response.success && response.data) {
         setCategories(response.data);
       } else {
-        setError(response.message || "Failed to fetch categories");
+        setError(response.message || t('messages.failedToFetchCategories'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      setError(err instanceof Error ? err.message : t('messages.unexpectedError'));
     } finally {
       setLoading(false);
     }
-  }, [type]);
+  }, [type, t]);
 
   useEffect(() => {
     fetchCategories();

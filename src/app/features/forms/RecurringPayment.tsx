@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -17,32 +18,33 @@ import type { RecurringPayment } from "@/app/types/appTypes";
 
 const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpenChange, onPaymentAdded, payment }) => {
   const { data: session } = useSession();
+  const t = useTranslations();
   const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     nextDueDate: Yup.date()
-      .required("Next Due Date is required")
-      .min(new Date(), "Next Due Date cannot be in the past"),
+      .required(t('form.dateRequired'))
+      .min(new Date(), t('form.dateCannotBeFuture')),
     reminderDate: Yup.date()
-      .required("Reminder Date is required")
-      .min(new Date(), "Reminder Date cannot be in the past")
+      .required(t('form.dateRequired'))
+      .min(new Date(), t('form.dateCannotBeFuture'))
       .when('nextDueDate', (nextDueDate, schema) => nextDueDate ? schema.max(Yup.ref('nextDueDate'), 'Reminder date must be before next due date') : schema),
     title: Yup.string()
-      .min(1, "Title must be at least 1 character")
-      .max(100, "Title must not exceed 100 characters")
-      .required("Title is required"),
+      .min(1, t('form.titleMinLength'))
+      .max(100, t('form.titleMaxLength'))
+      .required(t('form.titleRequired')),
     description: Yup.string()
-      .min(2, "Description must be at least 2 characters")
-      .max(200, "Description must not exceed 200 characters")
+      .min(2, t('form.descriptionMinLength'))
+      .max(200, t('form.descriptionMaxLength'))
       .optional(),
     amount: Yup.number()
-      .positive("Amount must be positive")
-      .required("Amount is required"),
+      .positive(t('form.amountPositive'))
+      .required(t('form.amountRequired')),
     frequency: Yup.string()
-      .oneOf(["Weekly", "Monthly", "Yearly"], "Invalid frequency")
-      .required("Frequency is required"),
+      .oneOf(["Weekly", "Monthly", "Yearly"], t('form.validation.invalidFrequency'))
+      .required(t('form.validation.frequencyRequired')),
     status: Yup.string()
-      .oneOf(["Active", "Inactive"], "Invalid status")
+      .oneOf(["Active", "Inactive"], t('form.validation.invalidStatus'))
       .optional(),
   });
 
@@ -60,7 +62,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
         showError(response.message || `Failed to ${payment?._id ? 'update' : 'add'} recurring payment`);
       }
     } catch {
-      showError(`Something went wrong while ${payment?._id ? 'updating' : 'adding'} recurring payment`);
+      showError(payment?._id ? t('somethingWentWrongEditing', { item: 'recurring payment', ns: 'common' }) : t('somethingWentWrongCreating', { item: 'recurring payment', ns: 'common' }));
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {payment?._id ? "Edit Recurring Payment" : "Add Recurring Payment"}
+            {payment?._id ? t('form.recurringPayment.edit') : t('form.recurringPayment.add')}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -89,16 +91,16 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
         >
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="nextDueDate" label="Next Due Date" type="date" />
-              <InputBox name="reminderDate" label="Reminder Date" type="date" />
-              <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
-              <InputBox name="title" label="Title" />
-              <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
-              <SelectBox name="frequency" label="Frequency" options={["Weekly", "Monthly", "Yearly"]} />
+              <InputBox name="nextDueDate" label={t('form.date')} type="date" />
+              <InputBox name="reminderDate" label={t('form.date')} type="date" />
+              <p className="text-sm text-gray-600 -mt-2">{t('ui.notificationsStartFrom', { ns: 'common' })}</p>
+              <InputBox name="title" label={t('form.title')} />
+              <TextareaBox name="description" label={t('form.description')} />
+              <InputBox name="amount" label={`${t('form.amount')} (${session?.user?.currency || 'INR'})`} type="number" />
+              <SelectBox name="frequency" label={t('form.fields.type')} options={["Weekly", "Monthly", "Yearly"]} />
               <SelectBox
                 name="status"
-                label="Status"
+                label={t('form.status')}
                 options={["Active", "Inactive"]}
               />
 
@@ -108,10 +110,10 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  Cancel
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {payment?._id ? "Update Payment" : "Add Payment"}
+                  {payment?._id ? t('form.recurringPayment.update') : t('form.recurringPayment.addPayment')}
                 </Button>
               </div>
             </form>

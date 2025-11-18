@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
   onOpenChange,
   payment,
 }) => {
+  const t = useTranslations('common');
   if (!payment) return null;
 
   return (
@@ -25,36 +27,36 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
       <DialogContent className="text-foreground">
         <DialogHeader>
           <DialogTitle>{payment.title}</DialogTitle>
-          <DialogDescription>Recurring Payment Details</DialogDescription>
+          <DialogDescription>{t('ui.recurringPaymentDetails')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label="Next Due Date"
+            label={t('fields.date')}
             value={formatDate(payment.nextDueDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label="Reminder Date"
+            label={t('fields.date')}
             value={formatDate(payment.reminderDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label="Description"
+            label={t('fields.description')}
             value={payment.description}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label="Amount"
+            label={t('fields.amount')}
             value={`${payment.amount} INR`}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label="Frequency"
+            label={t('fields.type')}
             value={payment.frequency}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label="Status"
+            label={t('fields.status')}
             value={payment.status}
             valueClassName={payment.status === 'Active' ? 'text-green-500' : 'text-red-500'}
             labelWidth="w-[130px]"

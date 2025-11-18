@@ -11,9 +11,11 @@ import {
   createPaginationPipeline,
   convertAmountsToUserCurrency,
 } from "@/app/backend/utils/PaginationUtils";
+import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET(request: Request) {
   return await withAuthAndDB(async (session, userId) => {
+    const t = await getT();
     const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
 
@@ -32,7 +34,7 @@ export async function GET(request: Request) {
 
     // Get user's currency
     const user = await User.findById(userIdObj);
-    if (!user) return JsonOne(404, "User not found", false);
+    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
     const matchStage: MatchStage = { user: userIdObj, isDeleted: false };
     if (type) matchStage.type = type;
     if (category && category !== "All") matchStage["category.name"] = category;
@@ -56,12 +58,14 @@ export async function GET(request: Request) {
       if (minAmount)
         matchStage.amount.$gte = await convertToINR(
           parseFloat(minAmount),
-          user.currency
+          user.currency,
+          t
         );
       if (maxAmount)
         matchStage.amount.$lte = await convertToINR(
           parseFloat(maxAmount),
-          user.currency
+          user.currency,
+          t
         );
     }
 
@@ -107,10 +111,11 @@ export async function GET(request: Request) {
     // Convert amounts from INR to user's currency
     const transactions = await convertAmountsToUserCurrency(
       rawTransactions,
-      user.currency
+      user.currency,
+      t
     );
 
-    return JsonAll(200, "Fetched successfully", true, transactions, {
+    return JsonAll(200, t('backend.transaction.fetchedSuccessfully'), true, transactions, {
       currentPage: page,
       totalPages,
       totalTransactions,

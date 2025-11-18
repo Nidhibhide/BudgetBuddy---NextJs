@@ -40,11 +40,12 @@ export const createPaginationPipeline = (
 
 export const convertAmountsToUserCurrency = async <T extends { amount: number }>(
   items: T[],
-  userCurrency: string
+  userCurrency: string,
+  t: (key: string) => string
 ): Promise<T[]> =>
   Promise.all(
     items.map(async (item) => ({
       ...item,
-      amount: item.amount ? await convertFromINR(item.amount, userCurrency) : 0,
+      amount: item.amount ? await convertFromINR(item.amount, userCurrency, t) : 0,
     }))
   );

@@ -1,4 +1,4 @@
-export { Table } from "./Table";
+export { Table } from "./ui/Table";
 export {
   SelectBox,
   InputBox,
@@ -6,13 +6,15 @@ export {
   Button,
   Tooltip,
   GetStartedLink,
-} from "./Elements";
-export { showSuccess, showError, useHandleResponse, FieldDisplay } from "./Utils";
-export { default as CustomPagination } from "./Pagination";
-export { default as NotFound } from "./NotFound";
-export { default as TotalBalance } from "./TotalBalance";
-export { default as RecentTransactions } from "./RecentTransactions";
-export { default as UpcomingBill } from "./UpcomingBill";
-export { default as RecurringPayment } from "./RecurringPayment";
-export { default as ThemeToggle } from "./ThemeToggle";
-export { default as LanguageSelector } from "./LanguageSelector";
+} from "./ui/Elements";
+export { showSuccess, showError, useHandleResponse, FieldDisplay } from "./helpers/Utils";
+export { default as CustomPagination } from "./ui/Pagination";
+export { default as NotFound } from "./ui/NotFound";
+export { TotalBalance } from "./widgets/DashboardWidgets";
+export { RecentTransactions } from "./widgets/DashboardWidgets";
+export { Insights } from "./widgets/DashboardWidgets";
+export { default as UpcomingBill } from "./pages/UpcomingBill";
+export { default as RecurringPayment } from "./pages/RecurringPayment";
+export { ThemeProvider, default as ThemeToggle } from "./theme/Theme";
+export { default as LanguageSelector } from "./language/LanguageSelector";
+export { TransactionPDF } from "./helpers/PDFGenerator";

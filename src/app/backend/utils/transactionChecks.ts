@@ -9,18 +9,20 @@ export async function checkLimitForCreate(
   userId: string,
   type: "Expense" | "Income",
   amountInINR: number,
-  userCurrency: string
+  userCurrency: string,
+  t: (key: string) => string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
     if (!category) {
-      return { success: false, message: "Category not found" };
+      return { success: false, message: t('backend.category.notFound') };
     }
 
     if (type === "Expense" && category.budgetLimit > 0) {
       const budgetLimitInINR = await convertToINR(
         category.budgetLimit,
-        userCurrency
+        userCurrency,
+        t
       );
       const allTransactions = await Transaction.find({
         category: categoryId,
@@ -37,11 +39,11 @@ export async function checkLimitForCreate(
       if (totalSpent + amountInINR > budgetLimitInINR) {
         return {
           success: false,
-          message: "Adding this expense would exceed the budget limit",
+          message: t('backend.transaction.addingExpenseExceedBudget'),
         };
       }
     } else if (type === "Income" && category.goal > 0) {
-      const goalInINR = await convertToINR(category.goal, userCurrency);
+      const goalInINR = await convertToINR(category.goal, userCurrency, t);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -57,7 +59,7 @@ export async function checkLimitForCreate(
       if (totalIncome + amountInINR > goalInINR) {
         return {
           success: false,
-          message: "Adding this income would exceed the goal",
+          message: t('backend.transaction.addingIncomeExceedGoal'),
         };
       }
     }
@@ -69,8 +71,8 @@ export async function checkLimitForCreate(
       success: false,
       message:
         type === "Expense"
-          ? "Error checking budget limit"
-          : "Error checking goal",
+          ? t('backend.transaction.errorCheckingBudgetLimit')
+          : t('backend.transaction.errorCheckingGoal'),
     };
   }
 }
@@ -81,12 +83,13 @@ export async function checkLimitForEdit(
   userId: string,
   type: "Expense" | "Income",
   balanceAdjustment: number,
-  userCurrency: string
+  userCurrency: string,
+  t: (key: string) => string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
     if (!category) {
-      return { success: false, message: "Category not found" };
+      return { success: false, message: t('backend.category.notFound') };
     }
 
     if (
@@ -96,7 +99,8 @@ export async function checkLimitForEdit(
     ) {
       const budgetLimitInINR = await convertToINR(
         category.budgetLimit,
-        userCurrency
+        userCurrency,
+        t
       );
       const allTransactions = await Transaction.find({
         category: categoryId,
@@ -113,7 +117,7 @@ export async function checkLimitForEdit(
       if (totalSpent + balanceAdjustment > budgetLimitInINR) {
         return {
           success: false,
-          message: "Editing this expense would exceed the budget limit",
+          message: t('backend.transaction.editingExpenseExceedBudget'),
         };
       }
     } else if (
@@ -121,7 +125,7 @@ export async function checkLimitForEdit(
       category.goal > 0 &&
       balanceAdjustment > 0
     ) {
-      const goalInINR = await convertToINR(category.goal, userCurrency);
+      const goalInINR = await convertToINR(category.goal, userCurrency, t);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -137,7 +141,7 @@ export async function checkLimitForEdit(
       if (totalIncome + balanceAdjustment > goalInINR) {
         return {
           success: false,
-          message: "Editing this income would exceed the goal",
+          message: t('backend.transaction.editingIncomeExceedGoal'),
         };
       }
     }
@@ -149,8 +153,8 @@ export async function checkLimitForEdit(
       success: false,
       message:
         type === "Expense"
-          ? "Error checking budget limit"
-          : "Error checking goal",
+          ? t('backend.transaction.errorCheckingBudgetLimit')
+          : t('backend.transaction.errorCheckingGoal'),
     };
   }
 }
