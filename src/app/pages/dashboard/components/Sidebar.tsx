@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   MdCategory,
@@ -14,10 +13,15 @@ import { IoMdSettings } from "react-icons/io";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/app/features/common";
+import { useState } from "react";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-  const pathname = usePathname();
+  const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const t = useTranslations();
+
+  const handleLinkClick = (link: { href: string }) => {
+    setSelectedLink(link.href);
+  };
 
   const sidebarLinks = [
     {
@@ -53,7 +57,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   return (
-    <div className="w-80 h-full flex flex-col bg-background text-foreground">
+    <div className="w-96 h-full flex flex-col bg-background text-foreground">
       {/* App Header */}
       <div className="flex items-center py-6 px-4 mb-4 border-b border-foreground">
         <div className="flex-1 flex items-center justify-center gap-1">
@@ -79,7 +83,8 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       <div className="flex-1">
         <ul className="flex flex-col text-xl font-medium">
           {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href;
+            // const isActive = pathname === link.href;
+            const isActive = selectedLink === link.href;
             return (
               <li
                 key={link.href}
@@ -88,6 +93,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     ? "bg-foreground text-background"
                     : "hover:bg-sidebar-hover text-foreground"
                 }`}
+                onClick={() => handleLinkClick(link)}
               >
                 <Link
                   href={link.href}

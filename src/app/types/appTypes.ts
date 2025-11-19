@@ -321,3 +321,40 @@ export interface Session {
     email?: string;
   };
 }
+
+export interface TotalBalanceProps {
+  balance: number;
+}
+
+export interface MonthlyExpenseData {
+  category: string;
+  total: number;
+  percentage: number;
+}
+
+export interface MonthlyExpensesResponse {
+  totalExpenses: number;
+  categories: MonthlyExpenseData[];
+}
+
+export type ExpenseData = {
+  name: string;
+  value: number;
+  color: string;
+};
+
+export interface MonthlyExpensePieChartProps {
+  expenses: ExpenseData[];
+}
+
+export interface TrendData {
+  month: string;
+  income: number;
+  expense: number;
+}
+
+export interface IncomeVsExpenseTrendProps {
+  data: TrendData[];
+}
+
+export type MonthlySummaryResponse = TrendData[];
