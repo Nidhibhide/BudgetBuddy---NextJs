@@ -10,5 +10,5 @@ const messages = Object.assign(enCommon, enIndex);
 export async function getT() {
   const cookieStore = await cookies();
   const locale = determineLocale(cookieStore.get('NEXT_LOCALE')?.value);
-  return createTranslator({ locale, messages });
+  return createTranslator({ locale, messages }) as (key: string) => string;
 }

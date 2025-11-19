@@ -66,3 +66,7 @@
   - useTheme() hook switches modes.
 
 what actually done at builld time ??/
+
+We used `type` for `ExpenseData` to fix a Recharts compatibility issue, as `type` is more flexible than `interface` for library integrations. 
+
+**Quick diff**: `interface` for extensible object shapes; `type` for aliases, unions, and better third-party lib support.

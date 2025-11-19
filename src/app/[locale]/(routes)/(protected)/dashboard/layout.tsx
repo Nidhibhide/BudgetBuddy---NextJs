@@ -37,7 +37,7 @@ export default function DashboardLayout({
           />
         </div>
       )}
-      <div className="flex-1 overflow-y-auto xl:ml-80">{children}</div>
+      <div className="flex-1 overflow-y-auto xl:ml-96">{children}</div>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useTranslations } from 'next-intl';
+import { useTranslations } from "next-intl";
 import {
   MdCategory,
   MdLogout,
@@ -13,47 +12,52 @@ import {
 import { IoMdSettings } from "react-icons/io";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from '@/app/features/common';
+import { ThemeToggle } from "@/app/features/common";
+import { useState } from "react";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-  const pathname = usePathname();
+  const [selectedLink, setSelectedLink] = useState<string | null>(null);
   const t = useTranslations();
+
+  const handleLinkClick = (link: { href: string }) => {
+    setSelectedLink(link.href);
+  };
 
   const sidebarLinks = [
     {
       href: "/dashboard/home",
-      label: t('dashboard.sidebar.dashboard'),
+      label: t("dashboard.sidebar.dashboard"),
       icon: MdDashboard,
     },
     {
       href: "/dashboard/category",
-      label: t('dashboard.sidebar.category'),
+      label: t("dashboard.sidebar.category"),
       icon: MdCategory,
     },
     {
       href: "/dashboard/transaction",
-      label: t('dashboard.sidebar.transaction'),
+      label: t("dashboard.sidebar.transaction"),
       icon: MdPayment,
     },
     {
       href: "/dashboard/bill-reminders",
-      label: t('dashboard.sidebar.setAlerts'),
+      label: t("dashboard.sidebar.setAlerts"),
       icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
-      label: t('dashboard.sidebar.setting'),
+      label: t("dashboard.sidebar.setting"),
       icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
-      label: t('dashboard.sidebar.logout'),
+      label: t("dashboard.sidebar.logout"),
       icon: MdLogout,
     },
   ];
 
   return (
-    <div className="w-80 h-full flex flex-col bg-background text-foreground">
+    <div className="w-96 h-full flex flex-col bg-background text-foreground">
       {/* App Header */}
       <div className="flex items-center py-6 px-4 mb-4 border-b border-foreground">
         <div className="flex-1 flex items-center justify-center gap-1">
@@ -70,7 +74,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
               onClick={onClose}
             >
               <X className="size-6" />
-              <span className="sr-only">{t('ui.closeSidebar')}</span>
+              <span className="sr-only">{t("ui.closeSidebar")}</span>
             </Button>
           )}
         </div>
@@ -79,7 +83,8 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       <div className="flex-1">
         <ul className="flex flex-col text-xl font-medium">
           {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href;
+            // const isActive = pathname === link.href;
+            const isActive = selectedLink === link.href;
             return (
               <li
                 key={link.href}
@@ -88,12 +93,16 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     ? "bg-foreground text-background"
                     : "hover:bg-sidebar-hover text-foreground"
                 }`}
+                onClick={() => handleLinkClick(link)}
               >
                 <Link
                   href={link.href}
                   className="flex items-center gap-2 text-base md:text-lg"
                 >
-                  <link.icon size={28} className={isActive ? "text-background" : "text-foreground"} />
+                  <link.icon
+                    size={28}
+                    className={isActive ? "text-background" : "text-foreground"}
+                  />
                   {link.label}
                 </Link>
               </li>

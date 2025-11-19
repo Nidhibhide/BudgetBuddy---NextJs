@@ -112,13 +112,28 @@
     "ui": {
       "monthlyExpenses": "मासिक व्यय",
       "budgetCalendar": "बजट कैलेंडर",
-      "noTransactions": "कोई लेन-देन नहीं"
+      "noTransactions": "कोई लेन-देन नहीं",
+      "incomeVsExpenseTrend": "आय बनाम व्यय प्रवृत्ति (6 महीने)"
     },
     "constants": {
       "types": {
         "expense": "व्यय",
         "income": "आय"
       }
+    },
+    "months": {
+      "1": "जनवरी",
+      "2": "फ़रवरी",
+      "3": "मार्च",
+      "4": "अप्रैल",
+      "5": "मई",
+      "6": "जून",
+      "7": "जुलाई",
+      "8": "अगस्त",
+      "9": "सितंबर",
+      "10": "अक्टूबर",
+      "11": "नवंबर",
+      "12": "दिसंबर"
     }
   },
   "form": {
@@ -235,6 +250,7 @@
       "cannotUpdateEmailForGoogle": "Google अधिकृत उपयोगकर्ताओं के लिए ईमेल अपडेट नहीं कर सकते",
       "emailAlreadyInUse": "ईमेल पहले से उपयोग में है",
       "profileUpdatedSuccessfully": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+      "balanceFetchedSuccessfully": "शेष सफलतापूर्वक प्राप्त किया गया",
       "insufficientBalance": "अपर्याप्त शेष"
     },
     "category": {

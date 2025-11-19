@@ -112,13 +112,28 @@
     "ui": {
       "monthlyExpenses": "Monthly Expenses",
       "budgetCalendar": "Budget Calendar",
-      "noTransactions": "No transactions"
+      "noTransactions": "No transactions",
+      "incomeVsExpenseTrend": "Income vs Expense Trend (6 Months)"
     },
     "constants": {
       "types": {
         "expense": "Expense",
         "income": "Income"
       }
+    },
+    "months": {
+      "1": "Jan",
+      "2": "Feb",
+      "3": "Mar",
+      "4": "Apr",
+      "5": "May",
+      "6": "Jun",
+      "7": "Jul",
+      "8": "Aug",
+      "9": "Sep",
+      "10": "Oct",
+      "11": "Nov",
+      "12": "Dec"
     }
   },
   "form": {
@@ -229,6 +244,7 @@
       "cannotUpdateEmailForGoogle": "Cannot update email for Google authorized users",
       "emailAlreadyInUse": "Email already in use",
       "profileUpdatedSuccessfully": "Profile updated successfully",
+      "balanceFetchedSuccessfully": "Balance fetched successfully",
       "insufficientBalance": "Insufficient balance"
     },
     "category": {
