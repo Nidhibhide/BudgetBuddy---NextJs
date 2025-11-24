@@ -21,7 +21,7 @@
       "type": "Type",
       "status": "Status",
       "title": "Title",
-      "category": "Category"
+      "category": "Select Category"
     },
     "messages": {
       "error": "Error",

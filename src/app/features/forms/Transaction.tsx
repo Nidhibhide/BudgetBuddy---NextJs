@@ -63,6 +63,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
     
     try {
       const response = await getCategoryDetails(type);
+      console.log("response", response);
       if (response.success) {
         setCategories(response.data || []);
         if (setFieldValue && response.data && response.data.length > 0) {
@@ -86,7 +87,8 @@ const Transaction: React.FC<AddTransactionProps> = ({
     value: string,
     setFieldValue: (field: string, value: string) => void
   ) => {
-    fetchCategories(value, setFieldValue);
+    const englishType = value === t('constants.types.expense') ? 'Expense' : 'Income';
+    fetchCategories(englishType, setFieldValue);
   };
 
   useEffect(() => {
@@ -99,9 +101,11 @@ const Transaction: React.FC<AddTransactionProps> = ({
   const handleSubmit = async (values: TransactionType) => {
     setLoading(true);
     try {
+      const englishType = values.type === t('constants.types.expense') ? 'Expense' : 'Income';
+      const data = { ...values, type: englishType };
       const response = transaction?._id
-        ? await editTransaction(transaction._id, { ...values, type: undefined })
-        : await addTransaction(values);
+        ? await editTransaction(transaction._id, data)
+        : await addTransaction(data);
       if (response.success) {
         showSuccess(response.message);
         onOpenChange(false);
@@ -130,9 +134,9 @@ const Transaction: React.FC<AddTransactionProps> = ({
             date: new Date(transaction?.date || Date.now()).toISOString().split("T")[0],
             title: transaction?.title || "",
             description: transaction?.description || "",
-            category: transaction?.category || "NA",
+            category: transaction?.category || "",
             amount: transaction?.amount || 1,
-            type: transaction?.type || TYPES[0],
+            type: transaction?.type ? (transaction.type === 'Expense' ? t('constants.types.expense') : t('constants.types.income')) : t('constants.types.expense'),
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -150,7 +154,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
               <SelectBox
                 name="category"
                 label={t('common.fields.category')}
-                options={categories.length === 0 ? ["NA"] : categories.map((cat) => cat.name)}
+                options={categories.map((cat) => cat.name)}
               />
               <InputBox name="title" label={t('common.fields.title')} />
 
