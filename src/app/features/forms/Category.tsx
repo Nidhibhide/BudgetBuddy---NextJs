@@ -11,7 +11,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InputBox, SelectBox, Button, showSuccess, showError} from "@/app/features/common/index";
-import { TYPES } from "@/constants";
 import { Category as CategoryType, AddCategoryProps} from "@/app/types/appTypes";
 import { createCategory, editCategory } from "@/app/lib/category";
 
@@ -36,7 +35,7 @@ const Category: React.FC<AddCategoryProps> = ({
     goal: Yup.number().min(0, t('category.goalPositive')).max(1000000, t('category.goalTooHigh')),
     ...(isEdit ? {} : {
         type: Yup.string()
-          .oneOf(TYPES, t('transaction.invalidType'))
+          .oneOf([tConstants('types.expense'), tConstants('types.income')], t('transaction.invalidType'))
           .required(t('transaction.typeRequired')),
       }),
   });
@@ -48,9 +47,12 @@ const Category: React.FC<AddCategoryProps> = ({
   ) => {
     setIsLoading(true);
     try {
+      // Map translated type back to English for API
+      const englishType = (values as CategoryType).type === tConstants('types.expense') ? 'Expense' : 'Income';
+      const data = { ...values, type: englishType };
       const response = isEdit
-        ? await editCategory(category._id!, values as CategoryType)
-        : await createCategory(values as CategoryType);
+        ? await editCategory(category._id!, data as CategoryType)
+        : await createCategory(data as CategoryType);
       if (response.success) {
         showSuccess(response.message);
         resetForm();
@@ -86,7 +88,7 @@ const Category: React.FC<AddCategoryProps> = ({
         </DialogHeader>
         <Formik
           initialValues={
-            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: category.type } : { name: "", type: TYPES[0], budgetLimit: 0, goal: 0 }
+            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: tConstants(category.type.toLowerCase() === 'expense' ? 'types.expense' : 'types.income') } : { name: "", type: tConstants('types.expense'), budgetLimit: 0, goal: 0 }
           }
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -100,10 +102,10 @@ const Category: React.FC<AddCategoryProps> = ({
                   <SelectBox name="type" label={t('fields.type')} options={[tConstants('types.expense'), tConstants('types.income')]} />
                 </>
               )}
-              {(isEdit ? category.type === "Expense" : values.type === "Expense") && (
+              {(isEdit ? category.type === "Expense" : values.type === tConstants('types.expense')) && (
                 <InputBox name="budgetLimit" label={t('category.budgetLimit')} type="number" />
               )}
-              {(isEdit ? category.type === "Income" : values.type === "Income") && (
+              {(isEdit ? category.type === "Income" : values.type === tConstants('types.income')) && (
                 <InputBox name="goal" label={t('category.goal')} type="number" />
               )}
               <div className="flex justify-end space-x-2">
