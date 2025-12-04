@@ -2,7 +2,7 @@ import { createTranslator } from 'next-intl';
 import { cookies } from 'next/headers';
 import { determineLocale } from '@/app/features/common/helpers/i18nUtils';
 
-import enCommon from '@/messages/en/common.json';
+
 import enIndex from '@/messages/en/index.json';
 
 const messages = Object.assign(enCommon, enIndex);

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useTranslations } from 'next-intl';
 import { Card } from "@/components/ui/card";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import {
@@ -10,63 +9,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useBudgetCalendar } from "@/app/hooks/useBudgetCalendar";
 
-interface Transaction {
-  id: number;
-  date: string;
-  description: string;
-  amount: number;
-  category: string;
-}
+const BudgetCalendar: React.FC = () => {
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const month = date ? date.getMonth() + 1 : new Date().getMonth() + 1;
+  const year = date ? date.getFullYear() : new Date().getFullYear();
+  const { daysData } = useBudgetCalendar(month, year);
 
-interface BudgetCalendarProps {
-  transactions: Transaction[];
-}
-
-const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
-  const t = useTranslations('dashboard');
-  const [date, setDate] = React.useState<Date | undefined>(new Date('2023-10-15'));
-
-  // const getTransactionsForDate = (selectedDate: Date) => {
-  //   const dateString = selectedDate.toISOString().split("T")[0];
-  //   return transactions.filter((t) => t.date === dateString);
-  // };
-
-  // const selectedDateTransactions = date ? getTransactionsForDate(date) : [];
-
-  // Determine color based on net balance for each date
-  const dateModifiers = React.useMemo(() => {
-    const modifiers: { [key: string]: Date[] } = {};
-    const classNames: { [key: string]: string } = {};
-
-    transactions.forEach((t) => {
-      const date = new Date(t.date);
-      const dateString = t.date;
-      if (!modifiers[dateString]) {
-        modifiers[dateString] = [];
-      }
-      modifiers[dateString].push(date);
-    });
-
-    // Calculate net balance for each date
-    Object.keys(modifiers).forEach((dateString) => {
-      const dayTransactions = transactions.filter((t) => t.date === dateString);
-      const netBalance = dayTransactions.reduce((sum, t) => sum + t.amount, 0);
-      if (netBalance > 0) {
-        classNames[dateString] = "bg-green-200 text-green-800 font-semibold";
-      } else if (netBalance < 0) {
-        classNames[dateString] = "bg-red-200 text-red-800 font-semibold";
-      } else {
-        classNames[dateString] = "bg-yellow-200 text-yellow-800 font-semibold";
-      }
-    });
-
-    return { modifiers, classNames };
-  }, [transactions]);
+  const modifiers = React.useMemo(() => ({
+    hasData: daysData.map(day => new Date(day.date))
+  }), [daysData]);
 
   return (
     <Card className="p-6 text-foreground flex flex-col h-full">
-      <h3 className="text-lg font-semibold mb-4">{t('ui.budgetCalendar')}</h3>
+      <h3 className="text-lg font-semibold mb-4">Budget Calendar</h3>
       <div className="flex-1">
         <div className="space-y-4">
           <TooltipProvider>
@@ -78,62 +35,38 @@ const BudgetCalendar: React.FC<BudgetCalendarProps> = ({ transactions }) => {
                 className="rounded-md border shadow-sm w-full"
                 style={{ height: '100%' }}
                 captionLayout="dropdown"
-                modifiers={dateModifiers.modifiers}
-                modifiersClassNames={dateModifiers.classNames}
+                modifiers={modifiers}
                 formatters={{
-                  formatMonthDropdown: (date) => t(`months.${date.getMonth() + 1}`),
+                  formatMonthDropdown: (date) => date.toLocaleString('default', { month: 'long' }),
                 }}
                 components={{
                   DayButton: ({ day, modifiers, ...props }) => {
-                    const dateString = day.date.toISOString().split("T")[0];
-                    const dayTransactions = transactions.filter(
-                      (t) => t.date === dateString
-                    );
-                    const totalIncome = dayTransactions
-                      .filter((t) => t.amount > 0)
-                      .reduce((sum, t) => sum + t.amount, 0);
-                    const totalExpense = dayTransactions
-                      .filter((t) => t.amount < 0)
-                      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-                    const netBalance = totalIncome - totalExpense;
+                    const dateString = day.date.toLocaleDateString('en-CA');
+                    const dayData = daysData.find((d) => d.date === dateString);
 
                     return (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <CalendarDayButton
-                            day={day}
-                            modifiers={modifiers}
-                            {...props}
-                          />
+                          <div className={modifiers.hasData ? 'bg-blue-400 text-white font-bold rounded' : ''}>
+                            <CalendarDayButton
+                              day={day}
+                              modifiers={modifiers}
+                              {...props}
+                            />
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           <div className="text-sm">
                             <p className="font-semibold">
                               {day.date.toLocaleDateString()}
                             </p>
-                            {dayTransactions.length > 0 ? (
+                            {dayData ? (
                               <>
-                                <p>{t('ui.incomeLabel')}: ${totalIncome.toLocaleString()}</p>
-                                <p>{t('ui.expenseLabel')}: ${totalExpense.toLocaleString()}</p>
-                                <p>{t('ui.netLabel')}: ${netBalance.toLocaleString()}</p>
-                                <div className="mt-2">
-                                  {dayTransactions.map((t, idx) => (
-                                    <p
-                                      key={idx}
-                                      className={`text-xs ${
-                                        t.amount > 0
-                                          ? "text-green-600"
-                                          : "text-red-600"
-                                      }`}
-                                    >
-                                      {t.description}: {t.amount > 0 ? "+" : "-"}$
-                                      {Math.abs(t.amount).toLocaleString()}
-                                    </p>
-                                  ))}
-                                </div>
+                                <p>Income: ${dayData.income.toLocaleString()}</p>
+                                <p>Expense: ${dayData.expense.toLocaleString()}</p>
                               </>
                             ) : (
-                              <p>{t('ui.noTransactions')}</p>
+                              <p>Transaction not found</p>
                             )}
                           </div>
                         </TooltipContent>

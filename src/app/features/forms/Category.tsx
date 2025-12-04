@@ -3,14 +3,13 @@
 import React, { useState} from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { InputBox, SelectBox, Button, showSuccess, showError} from "@/app/features/common/index";
+import { InputBox, SelectBox, Button, useToast} from "@/app/features/common/index";
 import { Category as CategoryType, AddCategoryProps} from "@/app/types/appTypes";
 import { createCategory, editCategory } from "@/app/lib/category";
 
@@ -21,22 +20,21 @@ const Category: React.FC<AddCategoryProps> = ({
   category,
   onCategoryEdited,
 }) => {
-  const t = useTranslations('form');
-  const tConstants = useTranslations('constants');
+  const { showSuccess, showError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!category;
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
-      .min(2, t('category.nameMinLength'))
-      .max(50, t('category.nameMaxLength'))
-      .required(t('category.nameRequired')),
-    budgetLimit: Yup.number().min(0, t('category.budgetLimitPositive')).max(1000000, t('category.budgetLimitTooHigh')),
-    goal: Yup.number().min(0, t('category.goalPositive')).max(1000000, t('category.goalTooHigh')),
+      .min(2, "Name must be at least 2 characters")
+      .max(50, "Name must be at most 50 characters")
+      .required("Name is required"),
+    budgetLimit: Yup.number().min(0, "Budget limit must be positive").max(1000000, "Budget limit is too high"),
+    goal: Yup.number().min(0, "Goal must be positive").max(1000000, "Goal is too high"),
     ...(isEdit ? {} : {
         type: Yup.string()
-          .oneOf([tConstants('types.expense'), tConstants('types.income')], t('transaction.invalidType'))
-          .required(t('transaction.typeRequired')),
+          .oneOf(["Expense", "Income"], "Invalid type")
+          .required("Type is required"),
       }),
   });
 
@@ -48,7 +46,7 @@ const Category: React.FC<AddCategoryProps> = ({
     setIsLoading(true);
     try {
       // Map translated type back to English for API
-      const englishType = (values as CategoryType).type === tConstants('types.expense') ? 'Expense' : 'Income';
+      const englishType = (values as CategoryType).type === 'Expense' ? 'Expense' : 'Income';
       const data = { ...values, type: englishType };
       const response = isEdit
         ? await editCategory(category._id!, data as CategoryType)
@@ -67,7 +65,7 @@ const Category: React.FC<AddCategoryProps> = ({
       }
     } catch {
       showError(
-      isEdit ? t('somethingWentWrongEditing', { item: 'category' }) : t('somethingWentWrongCreating', { item: 'category' })
+"Error Occurred"
     );
     } finally {
       setIsLoading(false);
@@ -83,12 +81,12 @@ const Category: React.FC<AddCategoryProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {isEdit ? t('category.edit') : t('category.addNew')}
+            {isEdit ? "Edit Form" : "Add Form"}
           </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={
-            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: tConstants(category.type.toLowerCase() === 'expense' ? 'types.expense' : 'types.income') } : { name: "", type: tConstants('types.expense'), budgetLimit: 0, goal: 0 }
+            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: category.type.toLowerCase() === 'expense' ? 'Expense' : 'Income' } : { name: "", type: "Expense", budgetLimit: 0, goal: 0 }
           }
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -96,17 +94,17 @@ const Category: React.FC<AddCategoryProps> = ({
         >
           {({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="name" label={t('category.name')} onChange={handleNameChange} />
+              <InputBox name="name" label="Name" onChange={handleNameChange} />
               {!isEdit && (
                 <>
-                  <SelectBox name="type" label={t('fields.type')} options={[tConstants('types.expense'), tConstants('types.income')]} />
+                  <SelectBox name="type" label="Type" options={["Expense", "Income"]} />
                 </>
               )}
-              {(isEdit ? category.type === "Expense" : values.type === tConstants('types.expense')) && (
-                <InputBox name="budgetLimit" label={t('category.budgetLimit')} type="number" />
+              {(isEdit ? category.type === "Expense" : values.type === "Expense") && (
+                <InputBox name="budgetLimit" label="Budget Limit" type="number" />
               )}
-              {(isEdit ? category.type === "Income" : values.type === tConstants('types.income')) && (
-                <InputBox name="goal" label={t('category.goal')} type="number" />
+              {(isEdit ? category.type === "Income" : values.type === "Income") && (
+                <InputBox name="goal" label="Goal" type="number" />
               )}
               <div className="flex justify-end space-x-2">
                 <Button
@@ -114,10 +112,10 @@ const Category: React.FC<AddCategoryProps> = ({
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  {t('cancel')}
+                  Cancel
                 </Button>
                 <Button type="submit" loading={isLoading}>
-                  {isEdit ? t('category.update') : t('category.add')}
+                  {isEdit ? "Update" : "Add"}
                 </Button>
               </div>
             </form>

@@ -4,31 +4,39 @@ import React from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-export const showSuccess = (message = "Operation Success") => {
-  toast.success(message);
-};
-export const showError = (message = "Operation Failed") => {
-  toast.error(message);
+export const useToast = () => {
+  const showSuccess = (message?: string) => {
+    toast.success(message || "Success");
+  };
+
+  const showError = (message?: string) => {
+    toast.error(message || "Error Occurred");
+  };
+
+  return { showSuccess, showError };
 };
 
 export const useHandleResponse = () => {
   const router = useRouter();
+  const { showSuccess, showError } = useToast();
 
   const Response = ({
     response,
-    successMessage = "Changes Saved",
+    successMessage,
   }: {
     response: { message: string; statusCode: number; success: boolean };
     successMessage?: string;
   }) => {
     const { message, success } = response;
+    const defaultSuccessMessage = "Success";
+    const defaultErrorMessage = "Error Occurred";
 
     if (success) {
-      showSuccess(successMessage);
+      showSuccess(successMessage || defaultSuccessMessage);
       setTimeout(() => router.push("/dashboard/home"), 3000);
       return true;
     } else {
-      showError(message || "Something went wrong");
+      showError(message || defaultErrorMessage);
       return false;
     }
   };

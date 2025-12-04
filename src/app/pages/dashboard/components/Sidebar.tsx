@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import {
   MdCategory,
   MdLogout,
@@ -13,12 +12,14 @@ import { IoMdSettings } from "react-icons/io";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/app/features/common";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
-  const t = useTranslations();
 
+  useEffect(() => {
+    setSelectedLink("/dashboard/home");
+  }, []);
   const handleLinkClick = (link: { href: string }) => {
     setSelectedLink(link.href);
   };
@@ -26,32 +27,32 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const sidebarLinks = [
     {
       href: "/dashboard/home",
-      label: t("dashboard.sidebar.dashboard"),
+      label: "Dashboard",
       icon: MdDashboard,
     },
     {
       href: "/dashboard/category",
-      label: t("dashboard.sidebar.category"),
+      label: "Category",
       icon: MdCategory,
     },
     {
       href: "/dashboard/transaction",
-      label: t("dashboard.sidebar.transaction"),
+      label: "Transaction",
       icon: MdPayment,
     },
     {
       href: "/dashboard/bill-reminders",
-      label: t("dashboard.sidebar.setAlerts"),
+      label: "Set Alerts",
       icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
-      label: t("dashboard.sidebar.setting"),
+      label: "Setting",
       icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
-      label: t("dashboard.sidebar.logout"),
+      label: "Logout",
       icon: MdLogout,
     },
   ];
@@ -74,7 +75,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
               onClick={onClose}
             >
               <X className="size-6" />
-              <span className="sr-only">{t("ui.closeSidebar")}</span>
+              <span className="sr-only">Close sidebar</span>
             </Button>
           )}
         </div>

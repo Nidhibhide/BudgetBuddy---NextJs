@@ -11,13 +11,9 @@ import {
   IncomeVsExpenseTrend,
   BudgetCalendar,
 } from "@/app/features/charts";
-import { mockData } from "@/app/lib/mockData";
-import { useTranslations } from "next-intl"; // Import for internationalization
 import { useBalance, usePieChart, useBarGraph } from "@/app/hooks";
 
 const MainPage: React.FC = () => {
-  const t = useTranslations("dashboard");
-
   const {
     balance,
     // loading: balanceLoading,
@@ -40,7 +36,7 @@ const MainPage: React.FC = () => {
       <div className="relative">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-foreground">
-            {t("overview.overview")}
+            Overview
           </h1>
         </div>
         <div className="absolute top-0 right-0">
@@ -60,8 +56,8 @@ const MainPage: React.FC = () => {
       {/* Bottom Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <RecentTransactions />
-        <BudgetCalendar transactions={mockData.recentTransactions} />
-        <Insights insights={mockData.insights} />
+        <BudgetCalendar/>
+        <Insights />
       </div>
     </div>
   );

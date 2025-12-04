@@ -5,7 +5,6 @@ import type {
   TypeTotal,
   UseTransactionsProps,
 } from "@/app/types/appTypes";
-import { useTranslations } from 'next-intl'; // Import for internationalization
 
 export const useTransactions = ({
   type,
@@ -20,7 +19,6 @@ export const useTransactions = ({
   minAmount,
   maxAmount,
 }: UseTransactionsProps) => {
-  const t = useTranslations('common'); // Get translation function for the 'common' namespace
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [totals, setTotals] = useState<TypeTotal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -53,16 +51,16 @@ export const useTransactions = ({
         setTransactions(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('messages.failedToFetchTransactions'));
+        setError(response.message || "Failed to fetch transactions");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : "An unexpected error occurred"
       );
     } finally {
       setLoading(false);
     }
-  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount, t]);
+  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount]);
 
   const fetchTotals = useCallback(async () => {
     try {
@@ -71,9 +69,9 @@ export const useTransactions = ({
         setTotals(totalsResult.data);
       }
     } catch (err) {
-      console.error(t('messages.errorFetchingTotals'), err);
+      console.error("Error fetching totals", err);
     }
-  }, [type, t]);
+  }, [type]);
 
   useEffect(() => {
     fetchTransactions();

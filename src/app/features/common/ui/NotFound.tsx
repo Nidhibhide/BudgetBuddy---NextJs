@@ -5,10 +5,15 @@ import { SearchX } from "lucide-react";
 import { NotFoundProps } from "@/app/types/appTypes";
 
 const NotFound: React.FC<NotFoundProps> = ({
-  title = "No Data Found",
-  message = "There are no items matching your current filters. Try adjusting your filters or add a new item.",
+  title,
+  message,
   icon: Icon = SearchX,
 }) => {
+  const defaultTitle = "No Data Found";
+  const defaultMessage = "We couldn't find any data matching your criteria. Try adjusting your filters or add some new items.";
+
+  const displayTitle = title || defaultTitle;
+  const displayMessage = message || defaultMessage;
   return (
     <div className="w-full mt-8 bg-gradient-to-br from-background/50 to-background/30 border-dashed border-2 border-foreground/20 rounded-xl shadow-lg backdrop-blur-sm">
       <div className="flex flex-col items-center justify-center py-16 space-y-6">
@@ -20,10 +25,10 @@ const NotFound: React.FC<NotFoundProps> = ({
         </div>
         <div className="text-center space-y-3 max-w-lg">
           <h3 className="text-2xl font-bold text-foreground/90 bg-gradient-to-r from-foreground/90 to-foreground/70 bg-clip-text">
-            {title}
+            {displayTitle}
           </h3>
           <p className="text-base text-foreground/70 leading-relaxed">
-            {message}
+            {displayMessage}
           </p>
         </div>
       </div>

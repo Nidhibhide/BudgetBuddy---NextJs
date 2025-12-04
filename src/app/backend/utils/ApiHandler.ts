@@ -4,20 +4,23 @@ import dbConnect from "@/app/backend/config/MongoDB";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { Session } from "@/app/types/appTypes";
 import Joi from "joi";
+import { getTranslations } from "next-intl/server";
 
 export async function withAuthAndDB<T>(
-  handler: (session: Session, userId: string) => Promise<T>
+  handler: (session: Session, userId: string, t: (key: string) => string) => Promise<T>
 ): Promise<T | Response> {
   try {
     await dbConnect();
     const session = await getServerSession(authOptions);
+    const t = await getTranslations();
     if (!session?.user) {
-      return JsonOne(401, "Unauthorized", false);
+      return JsonOne(401, t("backend.api.unauthorized"), false);
     }
-    return await handler(session as Session, session.user.id);
+    return await handler(session as Session, session.user.id, t);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error("API Error:", error);
-    return JsonOne(500, "Internal Server Error", false);
+    const t = await getTranslations();
+    return JsonOne(500, t("backend.api.errorOccurred"), false);
   }
 }
 

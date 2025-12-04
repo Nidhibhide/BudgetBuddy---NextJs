@@ -50,3 +50,37 @@ export async function getPieChart() {
     };
   }
 }
+
+export async function getBudgetCalendar(month: number, year: number) {
+  try {
+    const response = await axios.get(`/api/dashboard/budgetCalendar?month=${month}&year=${year}`);
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error fetching budget calendar data:", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Something went wrong while fetching budget calendar data",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}
+
+export async function getInsights() {
+  try {
+    const response = await axios.get("/api/dashboard/insights");
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error fetching insights:", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Something went wrong while fetching insights",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}

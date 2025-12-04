@@ -5,18 +5,16 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 import { MatchStage } from "@/app/types/appTypes";
 import { convertFromINR } from "@/app/backend/utils/currencyConverter";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
-    const t = await getT();
+  return await withAuthAndDB(async (session, userId, t) => {
     const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
     const type = url.searchParams.get("type");
 
     // Get user's currency
     const user = await User.findById(userIdObj);
-    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
+    if (!user) return JsonOne(404, t("backend.api.userNotFound"), false);
 
     const matchStage: MatchStage = {
       user: userIdObj,
@@ -90,6 +88,6 @@ export async function GET(request: Request) {
       }
     }
 
-    return JsonOne(200, t('backend.transaction.totalsFetchedSuccessfully'), true, totals);
+    return JsonOne(200, t("backend.api.success"), true, totals);
   });
 }

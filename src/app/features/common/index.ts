@@ -7,7 +7,7 @@ export {
   Tooltip,
   GetStartedLink,
 } from "./ui/Elements";
-export { showSuccess, showError, useHandleResponse, FieldDisplay } from "./helpers/Utils";
+export { useToast, useHandleResponse, FieldDisplay } from "./helpers/Utils";
 export { default as CustomPagination } from "./ui/Pagination";
 export { default as NotFound } from "./ui/NotFound";
 export { TotalBalance } from "./widgets/DashboardWidgets";

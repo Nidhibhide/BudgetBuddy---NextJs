@@ -8,11 +8,11 @@ export async function updateUserBalance(
 ): Promise<{ success: boolean; message?: string }> {
   const user = await UserModel.findById(userId);
   if (!user) {
-    return { success: false, message: t('backend.user.notFound') };
+    return { success: false, message: t('backend.api.userNotFound') };
   }
 
   if (type === "Expense" && user.totalBalance < amount) {
-    return { success: false, message: t('backend.user.insufficientBalance') };
+    return { success: false, message: t('backend.api.insufficientBalance') };
   }
 
   if (type === "Income") {

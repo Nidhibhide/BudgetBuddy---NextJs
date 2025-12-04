@@ -26,7 +26,7 @@ export default function DashboardLayout({
       {showSidebar && (
         <div className="fixed inset-0 z-50 flex">
           {/* Sidebar slides in from the left */}
-          <div className="w-72 h-full">
+          <div className="w-96 h-full">
             <Sidebar onClose={() => setShowSidebar(false)} />
           </div>
 

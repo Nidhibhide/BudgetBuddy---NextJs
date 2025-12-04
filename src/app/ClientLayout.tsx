@@ -14,7 +14,7 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
   messages: AbstractIntlMessages; // Translation messages for the current locale
-  locale: string; // Current language locale (e.g., 'en', 'hi', 'mr')
+  locale: string; // Current language locale (e.g., 'en', 'hi')
 }) {
   return (
     // NextIntlClientProvider provides internationalization context to the app

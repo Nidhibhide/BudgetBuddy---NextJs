@@ -2,19 +2,19 @@ import Joi from "joi";
 import { TYPES } from "@/constants";
 import { stringValidator, numberValidator, selectValidator } from "@/app/backend/utils/GlobalValidation";
 
-export const CreateTransaction = Joi.object({
-  date: Joi.date().iso().required().label("Date"),
-  title: stringValidator("Title", 1, 100, true),
-  description: stringValidator("Description", 2, 200, true),
-  category: stringValidator("Category", 1, 50, true),
-  amount: numberValidator("Amount", 0.01, 1000000, true),
-  type: selectValidator("Type", TYPES, true),
+export const CreateTransaction = (t: (key: string) => string) => Joi.object({
+  date: Joi.date().iso().required().label(t("backend.validation.date")),
+  title: stringValidator("backend.validation.title", 1, 100, true)(t),
+  description: stringValidator("backend.validation.description", 2, 200, true)(t),
+  category: stringValidator("backend.validation.category", 1, 50, true)(t),
+  amount: numberValidator("backend.validation.amount", 0.01, 1000000, true)(t),
+  type: selectValidator("backend.validation.type", TYPES, true)(t),
 });
 
-export const UpdateTransaction = Joi.object({
-  date: Joi.date().iso().optional().label("Date"),
-  title: stringValidator("Title", 1, 100, false),
-  description: stringValidator("Description", 2, 200, false),
-  category: stringValidator("Category", 1, 50, false),
-  amount: numberValidator("Amount", 0.01, 1000000, false),
+export const UpdateTransaction = (t: (key: string) => string) => Joi.object({
+  date: Joi.date().iso().optional().label(t("backend.validation.date")),
+  title: stringValidator("backend.validation.title", 1, 100, false)(t),
+  description: stringValidator("backend.validation.description", 2, 200, false)(t),
+  category: stringValidator("backend.validation.category", 1, 50, false)(t),
+  amount: numberValidator("backend.validation.amount", 0.01, 1000000, false)(t),
 });

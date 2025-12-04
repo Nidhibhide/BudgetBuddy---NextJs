@@ -4,18 +4,16 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { useSession } from 'next-auth/react';
-import { useTranslations } from 'next-intl';
 import { MonthlyExpensePieChartProps } from '@/app/types/appTypes';
 
 const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({ expenses }) => {
   const { data: session } = useSession();
-  const t = useTranslations();
   const currency = session?.user?.currency || 'INR';
   const data = expenses;
 
   return (
     <Card className="p-6 text-foreground">
-      <h3 className="text-lg font-semibold mb-4">{t('common.ui.monthlyExpenses')}</h3>
+      <h3 className="text-lg font-semibold mb-4">Monthly Expenses</h3>
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -32,7 +30,7 @@ const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({ expense
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip formatter={(value: number) => [`${value.toLocaleString()} ${currency}`, t('common.fields.amount')]} />
+            <Tooltip formatter={(value: number) => [`${value.toLocaleString()} ${currency}`, 'Amount']} />
             <Legend />
           </PieChart>
         </ResponsiveContainer>

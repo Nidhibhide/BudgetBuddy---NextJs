@@ -7,10 +7,8 @@ import {
   parsePaginationParams,
   createPaginationPipeline,
 } from "@/app/backend/utils/PaginationUtils";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET(request: Request) {
-  const t = await getT();
   return await withAuthAndDB(async (session, userId) => {
     const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
@@ -37,7 +35,7 @@ export async function GET(request: Request) {
     const totalCategories = result[0]?.totalCount[0]?.count || 0;
     const totalPages = Math.ceil(totalCategories / limit);
 
-    return JsonAll(200, t('backend.category.fetchedSuccessfully'), true, categories, {
+    return JsonAll(200, "Fetched successfully", true, categories, {
       currentPage: page,
       totalPages,
       totalCategories,

@@ -2,36 +2,35 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useTranslations } from 'next-intl';
-import { InputBox, Button, showError, useHandleResponse } from "@/app/features/common/index";
+import { InputBox, Button, useToast, useHandleResponse } from "@/app/features/common/index";
 import { changePassword } from "@/app/lib/auth";
 import { User } from "@/app/types/appTypes";
 import { Lock } from "lucide-react";
 
 const ChangePassword: React.FC = () => {
-  const t = useTranslations();
   const [passwordLoading, setPasswordLoading] = useState<boolean>(false);
+  const { showError } = useToast();
   const Response = useHandleResponse();
 
   const passwordBaseSchema = Yup.string()
-    .matches(/^\d+$/, t('auth.login.passwordDigitsOnly'))
-    .min(5, t('auth.login.passwordMinLength'))
-    .max(10, t('auth.login.passwordMaxLength'));
+    .matches(/^\d+$/, "Password must contain only digits")
+    .min(5, "Password must be at least 5 characters")
+    .max(10, "Password must be at most 10 characters");
 
   const passwordValidationSchema = Yup.object().shape({
     OldPassword: passwordBaseSchema.notRequired(),
 
     NewPassword: Yup.string().when("OldPassword", {
       is: (val: string | undefined) => val && val.length > 0,
-      then: () => passwordBaseSchema.required(t('auth.changePassword.newPasswordRequired')),
+      then: () => passwordBaseSchema.required("New password is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
 
     ConfirmPassword: Yup.string()
-      .oneOf([Yup.ref("NewPassword"), undefined], t('auth.changePassword.passwordsMustMatch'))
+      .oneOf([Yup.ref("NewPassword"), undefined], "Passwords must match")
       .when("OldPassword", {
         is: (val: string | undefined) => val && val.length > 0,
-        then: () => passwordBaseSchema.required(t('auth.changePassword.confirmPasswordRequired')),
+        then: () => passwordBaseSchema.required("Confirm password is required"),
         otherwise: (schema) => schema.notRequired(),
       }),
   }) as Yup.ObjectSchema<
@@ -51,7 +50,7 @@ const ChangePassword: React.FC = () => {
       const { OldPassword, NewPassword } = values;
       if (OldPassword && NewPassword) {
         if (OldPassword === NewPassword) {
-          showError(t('auth.changePassword.newPasswordDifferent'));
+          showError("New password must be different from old password");
           setPasswordLoading(false);
           return;
         }
@@ -59,11 +58,11 @@ const ChangePassword: React.FC = () => {
           oldPassword: OldPassword,
           newPassword: NewPassword,
         });
-        Response({ response, successMessage: t('auth.changePassword.success') });
+        Response({ response, successMessage: "Success" });
       }
     } catch (error: unknown) {
       const err = error as Error;
-      showError(err.message || t('auth.changePassword.error'));
+      showError(err.message || "Error Occurred");
     } finally {
       setPasswordLoading(false);
     }
@@ -83,28 +82,28 @@ const ChangePassword: React.FC = () => {
         <div className="w-full max-w-[600px] mx-auto bg-background p-6 rounded-lg shadow-sm border">
           <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
             <Lock className="w-6 h-6 text-foreground" />
-            {t('dashboard.profile.changePassword')}
+            Change Password
           </h2>
           <div className="flex flex-col gap-6">
             <InputBox
               name="OldPassword"
-              label={t('dashboard.profile.currentPasswordLabel')}
+              label="Current Password"
               type="password"
             />
             <InputBox
               name="NewPassword"
-              label={t('dashboard.profile.newPasswordLabel')}
+              label="New Password"
               type="password"
             />
             <InputBox
               name="ConfirmPassword"
-              label={t('dashboard.profile.confirmPasswordLabel')}
+              label="Confirm Password"
               type="password"
             />
           </div>
           <div className="mt-4">
             <Button onClick={handleSubmit} width="w-full" loading={passwordLoading}>
-              {t('dashboard.profile.changePassword')}
+          Save
             </Button>
           </div>
         </div>

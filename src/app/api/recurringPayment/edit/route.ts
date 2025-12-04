@@ -2,20 +2,14 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import RecurringPayment from "@/app/backend/models/recurringPayment";
 import { UpdateRecurringPayment } from "@/app/backend/validations/recurringPayment";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function PUT(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
-    const t = await getT();
+  return await withAuthAndDB(async (session, userId, t) => {
     const url = new URL(request.url);
     const recurringPaymentId = url.searchParams.get("id");
 
-    if (!recurringPaymentId) {
-      return JsonOne(400, t('backend.recurringPayment.idRequired'), false);
-    }
-
     const body = await request.json();
-    const { error } = UpdateRecurringPayment.validate(body);
+    const { error } = UpdateRecurringPayment(t).validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -24,7 +18,7 @@ export async function PUT(request: Request) {
 
     // Validate that reminderDate is before nextDueDate
     if (new Date(reminderDate) >= new Date(nextDueDate)) {
-      return JsonOne(400, t('backend.recurringPayment.reminderDateBeforeNextDue'), false);
+      return JsonOne(400, t("backend.api.reminderBeforeDue"), false);
     }
 
     const existingRecurringPayment = await RecurringPayment.findOne({
@@ -34,7 +28,7 @@ export async function PUT(request: Request) {
     });
 
     if (!existingRecurringPayment) {
-      return JsonOne(404, t('backend.recurringPayment.notFound'), false);
+      return JsonOne(404, t("backend.api.recurringPaymentNotFound"), false);
     }
 
     const updateData = {
@@ -53,7 +47,7 @@ export async function PUT(request: Request) {
       { new: true }
     );
 
-    return JsonOne(200, t('backend.recurringPayment.updatedSuccessfully'), true, {
+    return JsonOne(200, t("backend.api.success"), true, {
       recurringPayment: updatedRecurringPayment,
     });
   });

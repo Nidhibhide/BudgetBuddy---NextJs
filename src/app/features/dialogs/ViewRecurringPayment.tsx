@@ -1,11 +1,9 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -19,7 +17,6 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
   onOpenChange,
   payment,
 }) => {
-  const t = useTranslations('common');
   if (!payment) return null;
 
   return (
@@ -27,38 +24,39 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
       <DialogContent className="text-foreground">
         <DialogHeader>
           <DialogTitle>{payment.title}</DialogTitle>
-          <DialogDescription>{t('ui.recurringPaymentDetails')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label={t('fields.date')}
+            label="Next Due Date"
             value={formatDate(payment.nextDueDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('fields.date')}
+            label="Reminder Date"
             value={formatDate(payment.reminderDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('fields.description')}
+            label="Description"
             value={payment.description}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('fields.amount')}
+            label="Amount"
             value={`${payment.amount} INR`}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('fields.type')}
+            label="Frequency"
             value={payment.frequency}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('fields.status')}
+            label="Status"
             value={payment.status}
-            valueClassName={payment.status === 'Active' ? 'text-green-500' : 'text-red-500'}
+            valueClassName={
+              payment.status === "Active" ? "text-green-500" : "text-red-500"
+            }
             labelWidth="w-[130px]"
           />
         </div>

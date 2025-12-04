@@ -1,24 +1,21 @@
 "use client";
 import React from "react";
-import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import { Lightbulb } from "lucide-react";
 import { TotalBalanceProps } from "@/app/types/appTypes";
 import { useTransactions } from "@/app/hooks/useTransactions";
+import { useInsights } from "@/app/hooks/useInsights";
 
-interface InsightsProps {
-  insights: string[];
-}
+export const Insights: React.FC = () => {
+  const { insights } = useInsights();
 
-export const Insights: React.FC<InsightsProps> = ({ insights }) => {
-  const t = useTranslations("widgets");
   return (
-    <Card className="p-6 text-foreground flex flex-col h-[710px]">
+    <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
       <div className="flex items-center mb-4">
         <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
         <h3 className="text-lg font-semibold">
-          {t("insights.financialInsights")}
+          Financial Insights
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -39,7 +36,6 @@ export const Insights: React.FC<InsightsProps> = ({ insights }) => {
 };
 
 export const RecentTransactions: React.FC = () => {
-  const t = useTranslations("widgets");
   const { data: session } = useSession();
   const currency = session?.user?.currency || "INR";
   const { transactions } = useTransactions({
@@ -50,9 +46,9 @@ export const RecentTransactions: React.FC = () => {
   });
 
   return (
-    <Card className="p-6 text-foreground flex flex-col h-[710px]">
+    <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
       <h3 className="text-lg font-semibold mb-4">
-        {t("insights.recentTransactions")}
+        Recent Transactions
       </h3>
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-3">
@@ -89,7 +85,6 @@ export const RecentTransactions: React.FC = () => {
 };
 
 export const TotalBalance: React.FC<TotalBalanceProps> = ({ balance }) => {
-  const t = useTranslations("widgets");
   const { data: session } = useSession();
   const currency = session?.user?.currency || "INR";
 
@@ -98,7 +93,7 @@ export const TotalBalance: React.FC<TotalBalanceProps> = ({ balance }) => {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            {t("insights.totalBalance")}
+            Total Balance
           </h3>
           <p className="text-3xl font-bold">
             {balance.toLocaleString()} {currency}
