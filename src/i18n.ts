@@ -5,7 +5,7 @@ import { LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_OPTIONS } from "@/constants";
 
 export const languages = LANGUAGES;
 export const defaultLanguage = DEFAULT_LANGUAGE;
-export type Language = "en" | "hi" | "mr";
+export type Language = "en" | "hi";
 
 export const languageOptions = LANGUAGE_OPTIONS;
 
@@ -18,12 +18,8 @@ export default getRequestConfig(async ({ locale: lang }) => {
   return {
     locale: supportedLang,
     timeZone: "UTC",
-    // Merge common and index translation files into a single messages object
-    // common.json: shared/reusable translations (actions, fields, messages, constants, UI)
+    // Load index translation file
     // index.json: feature/page-specific translations (auth, dashboard, forms, backend, etc.)
-    messages: Object.assign(
-      (await import(`./messages/${supportedLang}/common.json`)).default,
-      (await import(`./messages/${supportedLang}/index.json`)).default
-    ),
+    messages: (await import(`./messages/${supportedLang}/index.json`)).default,
   };
 });

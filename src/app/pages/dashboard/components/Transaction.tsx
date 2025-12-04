@@ -22,8 +22,7 @@ import {
   Table,
   CustomPagination,
   NotFound,
-  showSuccess,
-  showError,
+  useToast,
 } from "@/app/features/common";
 import { Confirmation, ViewTransaction } from "@/app/features/dialogs";
 import { Transaction as TransactionForm } from "@/app/features/forms";
@@ -68,6 +67,7 @@ const Transaction: React.FC = React.memo(() => {
 
   // Get translation function for all namespaces
   const t = useTranslations();
+  const { showSuccess, showError } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
@@ -140,24 +140,24 @@ const Transaction: React.FC = React.memo(() => {
       newFilters.dateTo &&
       new Date(newFilters.dateFrom) > new Date(newFilters.dateTo)
     ) {
-      newErrors.dateTo = "To date must be after From date";
+      newErrors.dateTo = t('common.messages.toDateAfterFrom');
     }
     if (
       newFilters.minAmount &&
       newFilters.maxAmount &&
       parseFloat(newFilters.minAmount) > parseFloat(newFilters.maxAmount)
     ) {
-      newErrors.maxAmount = "Max amount must be greater than Min amount";
+      newErrors.maxAmount = t('common.messages.maxGreaterThanMin');
     }
     if (newFilters.minAmount && parseFloat(newFilters.minAmount) < 0) {
-      newErrors.minAmount = "Min amount must be positive";
+      newErrors.minAmount = t('common.messages.minPositive');
     }
     if (newFilters.maxAmount && parseFloat(newFilters.maxAmount) < 0) {
-      newErrors.maxAmount = "Max amount must be positive";
+      newErrors.maxAmount = t('common.messages.maxPositive');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, []);
+  }, [t]);
 
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
@@ -189,7 +189,7 @@ const Transaction: React.FC = React.memo(() => {
       }
     } catch (error) {
       console.error("Error deleting transaction:", error);
-      showError("An unexpected error occurred while deleting the transaction");
+      showError("Unexpected error deleting transaction");
     } finally {
       setDeleting(false);
     }
@@ -222,8 +222,8 @@ const Transaction: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-           {t('dashboard.overview.transactionsOverview')}
-         </h2>
+           Transactions Overview
+          </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
@@ -242,37 +242,37 @@ const Transaction: React.FC = React.memo(() => {
 
       {/* Controls */}
       <div className="flex flex-col gap-2">
-        <div className="flex gap-4 items-center justify-end">
-          <div className="w-[180px]">
-            <Formik
-              initialValues={{ category: selectedCategory }}
-              onSubmit={() => {}}
-            >
-              {() => (
-                <SelectBox
-                  name="category"
-                  options={["All", ...categories.map((cat) => cat.name)]}
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                />
-              )}
-            </Formik>
-          </div>
-          <Button
-            width="w-[180px]"
-            className="flex items-center justify-center gap-2"
-            onClick={() => setIsAddTransactionOpen(true)}
-          >
-            <Plus className="w-4 h-4" />
-            {t('dashboard.transaction.addTransaction')}
-          </Button>
-        </div>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:justify-end">
+           <div className="w-full sm:w-[180px]">
+             <Formik
+               initialValues={{ category: selectedCategory }}
+               onSubmit={() => {}}
+             >
+               {() => (
+                 <SelectBox
+                   name="category"
+                   options={[t('common.ui.all'), ...categories.map((cat) => cat.name)]}
+                   value={selectedCategory}
+                   onChange={handleCategoryChange}
+                 />
+               )}
+             </Formik>
+           </div>
+           <Button
+             width="w-full sm:w-[180px]"
+             className="flex items-center justify-center gap-2"
+             onClick={() => setIsAddTransactionOpen(true)}
+           >
+             <Plus className="w-4 h-4" />
+             Add Transaction
+           </Button>
+         </div>
         <div className="flex justify-end">
           <button
             onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
             className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
           >
-            {t('dashboard.transaction.advancedSearch')}
+            Advanced Search
             {isAdvancedOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -290,85 +290,85 @@ const Transaction: React.FC = React.memo(() => {
                     name="search"
                     type="text"
                     label=""
-                    placeholder={t('dashboard.transaction.searchTransactions')}
+                    placeholder="Search transactions"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     inputClassName="pl-8 rounded-full"
                   />
                 </div>
               </div>
-              <div className="flex gap-4 items-start">
-                <div className="flex flex-col w-full">
-                  <InputBox
-                    name="from"
-                    type="date"
-                    label={t('dashboard.transaction.from')}
-                    value={filters.dateFrom}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        dateFrom: e.target.value,
-                      }))
-                    }
-                  />
-                  {errors.dateFrom && (
-                    <p className="text-red-500 text-sm">{errors.dateFrom}</p>
-                  )}
-                </div>
-                <div className="flex flex-col w-full">
-                  <InputBox
-                    name="to"
-                    type="date"
-                    label={t('dashboard.transaction.to')}
-                    value={filters.dateTo}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        dateTo: e.target.value,
-                      }))
-                    }
-                  />
-                  {errors.dateTo && (
-                    <p className="text-red-500 text-sm">{errors.dateTo}</p>
-                  )}
-                </div>
-                <div className="flex flex-col w-full">
-                  <InputBox
-                    name="min"
-                    type="number"
-                    label={t('dashboard.transaction.min')}
-                    placeholder={`${t('dashboard.transaction.min')} ${t('common.fields.amount').toLowerCase()}`}
-                    value={filters.minAmount}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        minAmount: e.target.value,
-                      }))
-                    }
-                  />
-                  {errors.minAmount && (
-                    <p className="text-red-500 text-sm">{errors.minAmount}</p>
-                  )}
-                </div>
-                <div className="flex flex-col w-full">
-                  <InputBox
-                    name="max"
-                    type="number"
-                    label={t('dashboard.transaction.max')}
-                    placeholder={`${t('dashboard.transaction.max')} ${t('common.fields.amount').toLowerCase()}`}
-                    value={filters.maxAmount}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        maxAmount: e.target.value,
-                      }))
-                    }
-                  />
-                  {errors.maxAmount && (
-                    <p className="text-red-500 text-sm">{errors.maxAmount}</p>
-                  )}
-                </div>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                 <div className="flex flex-col w-full">
+                   <InputBox
+                     name="from"
+                     type="date"
+                     label="From"
+                     value={filters.dateFrom}
+                     onChange={(e) =>
+                       setFilters((prev) => ({
+                         ...prev,
+                         dateFrom: e.target.value,
+                       }))
+                     }
+                   />
+                   {errors.dateFrom && (
+                     <p className="text-red-500 text-sm">{errors.dateFrom}</p>
+                   )}
+                 </div>
+                 <div className="flex flex-col w-full">
+                   <InputBox
+                     name="to"
+                     type="date"
+                     label="To"
+                     value={filters.dateTo}
+                     onChange={(e) =>
+                       setFilters((prev) => ({
+                         ...prev,
+                         dateTo: e.target.value,
+                       }))
+                     }
+                   />
+                   {errors.dateTo && (
+                     <p className="text-red-500 text-sm">{errors.dateTo}</p>
+                   )}
+                 </div>
+                 <div className="flex flex-col w-full">
+                   <InputBox
+                     name="min"
+                     type="number"
+                     label="Min"
+                     placeholder="Min amount"
+                     value={filters.minAmount}
+                     onChange={(e) =>
+                       setFilters((prev) => ({
+                         ...prev,
+                         minAmount: e.target.value,
+                       }))
+                     }
+                   />
+                   {errors.minAmount && (
+                     <p className="text-red-500 text-sm">{errors.minAmount}</p>
+                   )}
+                 </div>
+                 <div className="flex flex-col w-full">
+                   <InputBox
+                     name="max"
+                     type="number"
+                     label="Max"
+                     placeholder="Max amount"
+                     value={filters.maxAmount}
+                     onChange={(e) =>
+                       setFilters((prev) => ({
+                         ...prev,
+                         maxAmount: e.target.value,
+                       }))
+                     }
+                   />
+                   {errors.maxAmount && (
+                     <p className="text-red-500 text-sm">{errors.maxAmount}</p>
+                   )}
+                 </div>
+               </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -386,7 +386,7 @@ const Transaction: React.FC = React.memo(() => {
             columns={[
               {
                 key: "date",
-                label: t('common.fields.date'),
+                label: "Date",
                 sortable: true,
                 render: (value) =>
                   value
@@ -395,11 +395,11 @@ const Transaction: React.FC = React.memo(() => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "title", label: t('common.fields.title') },
-              { key: "category", label: t('common.fields.category') },
+              { key: "title", label: "Title" },
+              { key: "category", label: "Category" },
               {
                 key: "amount",
-                label: t('common.fields.amount'),
+                label: "Amount",
                 sortable: true,
                 render: (value) => {
                   const currency = session?.user?.currency || "INR";
@@ -408,7 +408,7 @@ const Transaction: React.FC = React.memo(() => {
               },
               {
                 key: "actions",
-                label: t('dashboard.transaction.actions'),
+                label: "Actions",
                 render: (value, row) => (
                   <div className="flex gap-2">
                     <button
@@ -436,7 +436,7 @@ const Transaction: React.FC = React.memo(() => {
                 ),
               },
             ]}
-            title={t('dashboard.transaction.transactionRecords')}
+            title="Transaction Records"
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
@@ -468,14 +468,14 @@ const Transaction: React.FC = React.memo(() => {
               }
             >
               <Download className="w-4 h-4" />
-              {t('dashboard.transaction.downloadPDF')}
+              Download PDF
             </Button>
           </div>
         </>
       ) : (
         <NotFound
-          title={t('dashboard.transaction.noTransactionsFound')}
-          message={t('dashboard.transaction.noTransactionsMessage')}
+          title="No Transactions Found"
+          message="You haven't added any transactions yet. Start by adding your first transaction."
         />
       )}
 

@@ -17,13 +17,12 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const t = await getTranslations('auth.login');
-
+        const t = await getTranslations();
         if (!credentials?.email || !credentials?.password) {
-          throw new Error(t('missingEmailOrPassword'));
+          throw new Error("Missing email or password");
         }
 
-        const { error } = Login.validate({ email: credentials.email, password: credentials.password });
+        const { error } = Login(t).validate({ email: credentials.email, password: credentials.password });
         if (error) {
           throw new Error(error.details[0].message);
         }
@@ -31,15 +30,15 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
-          throw new Error(t('noUserFound'));
+          throw new Error("No user found");
         }
 
         if (user.authProvider !== "local") {
-          throw new Error(t('differentLoginMethod'));
+          throw new Error("This account uses a different login method");
         }
 
         if (!user.password) {
-          throw new Error(t('noUserFound'));
+          throw new Error("No user found");
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -48,7 +47,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error(t('incorrectPassword'));
+          throw new Error("Incorrect password");
         }
 
         return {
@@ -124,8 +123,6 @@ export const authOptions: NextAuthOptions = {
 
       // Check if access token is expired and refresh if needed (Google only) - skip in dev
       if (process.env.NODE_ENV === 'production' && token.authProvider === "google" && token.accessTokenExpires && Date.now() > token.accessTokenExpires && token.refreshToken) {
-        const t = await getTranslations('auth.login');
-
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
@@ -142,7 +139,7 @@ export const authOptions: NextAuthOptions = {
           const refreshedTokens = await response.json();
 
           if (!response.ok) {
-            throw new Error(t('tokenRefreshFailed'));
+            throw new Error("Failed to refresh token");
           }
 
           token.accessToken = refreshedTokens.access_token;
@@ -151,7 +148,7 @@ export const authOptions: NextAuthOptions = {
             token.refreshToken = refreshedTokens.refresh_token;
           }
         } catch (error) {
-          throw new Error(`${t('tokenRefreshFailed')}: ${error instanceof Error ? error.message : String(error)}`);
+          throw new Error(`Failed to refresh token: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 

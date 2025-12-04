@@ -358,3 +358,13 @@ export interface IncomeVsExpenseTrendProps {
 }
 
 export type MonthlySummaryResponse = TrendData[];
+
+export interface DayData {
+  date: string;
+  income: number;
+  expense: number;
+}
+
+export interface BudgetCalendarResponse {
+  days: DayData[];
+}

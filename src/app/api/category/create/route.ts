@@ -2,13 +2,12 @@ import { withAuthAndDB, validateBody } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
 import { CreateCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
-import { getT } from "@/app/backend/utils/getTranslations";
+
 
 export async function POST(request: Request) {
-  const t = await getT();
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (session, userId, t) => {
     const body = await request.json();
-    const { error, value } = validateBody<{ name: string; type: string; budgetLimit?: number; goal?: number }>(body, CreateCategory);
+    const { error, value } = validateBody<{ name: string; type: string; budgetLimit?: number; goal?: number }>(body, CreateCategory(t));
 
     if (error) {
       return JsonOne(400, error.details[0].message, false);
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
     });
 
     if (existingCategory) {
-      return JsonOne(400, t('backend.category.alreadyExists'), false);
+      return JsonOne(400, t("backend.api.categoryAlreadyExists"), false);
     }
 
     const newCategory = new Category({
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
 
     await newCategory.save();
 
-    return JsonOne(201, t('backend.category.createdSuccessfully'), true, {
+    return JsonOne(201, t("backend.api.success"), true, {
       category: newCategory
     });
   });

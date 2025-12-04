@@ -2,13 +2,11 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import RecurringPayment from "@/app/backend/models/recurringPayment";
 import { CreateRecurringPayment } from "@/app/backend/validations/recurringPayment";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function POST(request: Request) {
-  const t = await getT();
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (session, userId, t) => {
     const body = await request.json();
-    const { error } = CreateRecurringPayment.validate(body);
+    const { error } = CreateRecurringPayment(t).validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -17,7 +15,7 @@ export async function POST(request: Request) {
 
     // Validate that reminderDate is before nextDueDate
     if (new Date(reminderDate) >= new Date(nextDueDate)) {
-      return JsonOne(400, t('backend.recurringPayment.reminderDateBeforeNextDue'), false);
+      return JsonOne(400, t("backend.api.reminderBeforeDue"), false);
     }
 
     const newRecurringPayment = new RecurringPayment({
@@ -33,7 +31,7 @@ export async function POST(request: Request) {
 
     await newRecurringPayment.save();
 
-    return JsonOne(201, t('backend.recurringPayment.createdSuccessfully'), true, {
+    return JsonOne(201, t("backend.api.success"), true, {
       recurringPayment: newRecurringPayment,
     });
   });

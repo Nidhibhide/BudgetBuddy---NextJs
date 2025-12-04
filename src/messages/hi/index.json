@@ -1,372 +1,59 @@
 {
-  "auth": {
-    "login": {
-      "title": "साइन इन",
-      "withGoogle": "Google के साथ साइन इन करें",
-      "or": "या",
-      "failed": "लॉगिन विफल",
-      "successful": "लॉगिन सफल",
-      "invalidEmail": "अमान्य ईमेल",
-      "emailRequired": "ईमेल आवश्यक है",
-      "passwordRequired": "पासवर्ड आवश्यक है",
-      "passwordMinLength": "पासवर्ड कम से कम 5 अक्षर का होना चाहिए",
-      "passwordMaxLength": "पासवर्ड 10 अक्षर से अधिक नहीं होना चाहिए",
-      "passwordDigitsOnly": "पासवर्ड में केवल अंक होने चाहिए",
-      "email": "ईमेल",
-      "password": "पासवर्ड",
-      "enterEmail": "अपना ईमेल दर्ज करें",
-      "enterPassword": "अपना पासवर्ड दर्ज करें",
-      "missingEmailOrPassword": "ईमेल या पासवर्ड गायब है",
-      "noUserFound": "इस ईमेल के साथ कोई उपयोगकर्ता नहीं मिला",
-      "differentLoginMethod": "यह खाता एक अलग लॉगिन विधि का उपयोग करता है",
-      "incorrectPassword": "गलत पासवर्ड",
-      "tokenRefreshFailed": "टोकन रिफ्रेश विफल"
-    },
-    "register": {
-      "title": "साइन अप",
-      "newUser": "नया उपयोगकर्ता?",
-      "alreadyHaveAccount": "पहले से खाता है?",
-      "nameRequired": "नाम आवश्यक है",
-      "nameMinLength": "नाम कम से कम 3 अक्षर का होना चाहिए",
-      "nameMaxLength": "नाम 50 अक्षर से अधिक नहीं होना चाहिए",
-      "nameAlphabetsOnly": "केवल अक्षर और रिक्त स्थान की अनुमति है",
-      "name": "नाम",
-      "enterName": "अपना नाम दर्ज करें"
-    },
-    "changePassword": {
-      "newPasswordRequired": "नया पासवर्ड आवश्यक है",
-      "passwordsMustMatch": "पासवर्ड मेल खाने चाहिए",
-      "confirmPasswordRequired": "पुष्टि पासवर्ड आवश्यक है",
-      "newPasswordDifferent": "नया पासवर्ड वर्तमान पासवर्ड से अलग होना चाहिए।",
-      "success": "पासवर्ड सफलतापूर्वक बदला गया",
-      "error": "कुछ गलत हो गया।"
-    }
-  },
-  "dashboard": {
-    "nav": {
-      "home": "होम",
-      "transaction": "लेन-देन",
-      "category": "श्रेणी",
-      "billReminders": "बिल रिमाइंडर",
-      "setting": "सेटिंग"
-    },
-    "hero": {
-      "welcome": "BudgetBuddy में आपका स्वागत है",
-      "yourBudgetManager": "आपका बजट प्रबंधन ऐप"
-    },
-    "overview": {
-      "overview": "अवलोकन",
-      "categoryOverview": "श्रेणी अवलोकन",
-      "transactionsOverview": "लेन-देन अवलोकन",
-      "upcomingBills": "आगामी बिल",
-      "recurringPayments": "आवर्ती भुगतान"
-    },
-    "profile": {
-      "editProfile": "प्रोफ़ाइल संपादित करें",
-      "changePassword": "पासवर्ड बदलें",
-      "currentPasswordLabel": "वर्तमान पासवर्ड दर्ज करें",
-      "newPasswordLabel": "नया पासवर्ड दर्ज करें",
-      "confirmPasswordLabel": "पुष्टि पासवर्ड दर्ज करें"
-    },
-    "category": {
-      "addCategory": "श्रेणी जोड़ें",
-      "createNewCategory": "एक नई श्रेणी बनाएं",
-      "recordsFor": "के लिए रिकॉर्ड",
-      "noRecordsFound": "कोई रिकॉर्ड नहीं मिला",
-      "noRecordsMessage": "{category} के लिए कोई लेन-देन रिकॉर्ड उपलब्ध नहीं हैं। एक अलग श्रेणी चुनने या कुछ लेन-देन जोड़ने का प्रयास करें।",
-      "selectCategory": "श्रेणी चुनें",
-      "selectCategoryMessage": "उपरोक्त किसी भी श्रेणी कार्ड पर क्लिक करके इसके विस्तृत लेन-देन रिकॉर्ड और अंतर्दृष्टि देखें।"
-    },
-    "budget": {
-      "budget": "बजट",
-      "goal": "लक्ष्य",
-      "setBudgetToTrack": "अपने खर्च को ट्रैक करने के लिए बजट सेट करें",
-      "setGoalToTrack": "अपनी आय को ट्रैक करने के लिए लक्ष्य सेट करें"
-    },
-    "transaction": {
-      "addTransaction": "लेन-देन जोड़ें",
-      "advancedSearch": "उन्नत खोज",
-      "searchTransactions": "लेन-देन खोजें...",
-      "from": "से",
-      "to": "तक",
-      "min": "न्यूनतम",
-      "max": "अधिकतम",
-      "toDateAfterFrom": "तक की तारीख से तारीख के बाद होनी चाहिए",
-      "maxGreaterThanMin": "अधिकतम राशि न्यूनतम से अधिक होनी चाहिए",
-      "minPositive": "न्यूनतम राशि सकारात्मक होनी चाहिए",
-      "maxPositive": "अधिकतम राशि सकारात्मक होनी चाहिए",
-      "actions": "क्रियाएँ",
-      "transactionRecords": "लेन-देन रिकॉर्ड",
-      "downloadPDF": "PDF डाउनलोड करें",
-      "noTransactionsFound": "कोई लेन-देन नहीं मिला",
-      "noTransactionsMessage": "ऐसा लगता है कि आपके वर्तमान फ़िल्टर से मेल खाने वाले कोई लेन-देन नहीं हैं। एक अलग श्रेणी चुनने या अपना पहला लेन-देन जोड़ने का प्रयास करें!"
-    },
-    "sidebar": {
-      "dashboard": "डैशबोर्ड",
-      "category": "श्रेणी",
-      "transaction": "लेन-देन",
-      "setAlerts": "अलर्ट सेट करें",
-      "setting": "सेटिंग",
-      "logout": "लॉगआउट"
-    },
-    "ui": {
-      "monthlyExpenses": "मासिक व्यय",
-      "budgetCalendar": "बजट कैलेंडर",
-      "noTransactions": "कोई लेन-देन नहीं",
-      "incomeVsExpenseTrend": "आय बनाम व्यय प्रवृत्ति (6 महीने)"
-    },
-    "constants": {
-      "types": {
-        "expense": "व्यय",
-        "income": "आय"
-      }
-    },
-    "months": {
-      "1": "जनवरी",
-      "2": "फ़रवरी",
-      "3": "मार्च",
-      "4": "अप्रैल",
-      "5": "मई",
-      "6": "जून",
-      "7": "जुलाई",
-      "8": "अगस्त",
-      "9": "सितंबर",
-      "10": "अक्टूबर",
-      "11": "नवंबर",
-      "12": "दिसंबर"
-    }
-  },
-  "form": {
-    "dateRequired": "तारीख आवश्यक है",
-    "dateCannotBeFuture": "तारीख भविष्य में नहीं हो सकती",
-    "titleRequired": "शीर्षक आवश्यक है",
-    "titleMinLength": "शीर्षक कम से कम 1 वर्ण का होना चाहिए",
-    "titleMaxLength": "शीर्षक 100 वर्ण से अधिक नहीं होना चाहिए",
-    "descriptionRequired": "विवरण आवश्यक है",
-    "descriptionMinLength": "विवरण कम से कम 2 वर्ण का होना चाहिए",
-    "descriptionMaxLength": "विवरण 200 वर्ण से अधिक नहीं होना चाहिए",
-    "amountRequired": "राशि आवश्यक है",
-    "amountPositive": "राशि सकारात्मक होनी चाहिए",
-    "date": "तारीख",
-    "title": "शीर्षक",
-    "description": "विवरण",
-    "amount": "राशि",
-    "status": "स्थिति",
-    "editUpcomingBill": "आगामी बिल संपादित करें",
-    "addUpcomingBill": "आगामी बिल जोड़ें",
-    "updateBill": "बिल अपडेट करें",
-    "addBill": "बिल जोड़ें",
-    "editRecurringPayment": "आवर्ती भुगतान संपादित करें",
-    "addRecurringPayment": "आवर्ती भुगतान जोड़ें",
-    "transaction": {
-      "edit": "लेन-देन संपादित करें",
-      "addNew": "नया लेन-देन जोड़ें",
-      "update": "लेन-देन अपडेट करें",
-      "add": "लेन-देन जोड़ें",
-      "dateRequired": "तारीख आवश्यक है",
-      "dateCannotBeFuture": "तारीख भविष्य में नहीं हो सकती",
-      "titleRequired": "शीर्षक आवश्यक है",
-      "titleMinLength": "शीर्षक कम से कम 1 वर्ण का होना चाहिए",
-      "titleMaxLength": "शीर्षक 100 वर्ण से अधिक नहीं होना चाहिए",
-      "descriptionRequired": "विवरण आवश्यक है",
-      "descriptionMinLength": "विवरण कम से कम 2 वर्ण का होना चाहिए",
-      "descriptionMaxLength": "विवरण 200 वर्ण से अधिक नहीं होना चाहिए",
-      "categoryRequired": "श्रेणी आवश्यक है",
-      "amountRequired": "राशि आवश्यक है",
-      "amountPositive": "राशि सकारात्मक होनी चाहिए",
-      "typeRequired": "प्रकार आवश्यक है",
-      "invalidType": "अमान्य प्रकार"
-    },
-    "category": {
-      "edit": "श्रेणी संपादित करें",
-      "addNew": "नई श्रेणी जोड़ें",
-      "update": "श्रेणी अपडेट करें",
-      "add": "श्रेणी जोड़ें",
-      "delete": "श्रेणी हटाएं",
-      "deleteConfirmation": "क्या आप वाकई \"{name}\" को हटाना चाहते हैं?",
-      "associatedTransactions": "इस श्रेणी में {count} संबद्ध लेन-देन हैं।",
-      "chooseAction": "लेन-देन के साथ क्या करें चुनें:",
-      "deleteAllTransactions": "सभी लेन-देन हटाएं",
-      "reassignToCategory": "दूसरी श्रेणी में पुन: असाइन करें",
-      "selectCategory": "एक श्रेणी चुनें",
-      "noAssociatedTransactions": "क्या आप वाकई \"{name}\" ({type}) को हटाना चाहते हैं? इस श्रेणी में कोई संबद्ध लेन-देन नहीं हैं।",
-      "failedToDelete": "श्रेणी हटाने में विफल",
-      "name": "श्रेणी नाम",
-      "nameMinLength": "नाम कम से कम 2 अक्षर का होना चाहिए",
-      "nameMaxLength": "नाम 50 अक्षर से अधिक नहीं होना चाहिए",
-      "nameRequired": "नाम आवश्यक है",
-      "budgetLimit": "बजट सीमा",
-      "budgetLimitPositive": "बजट सीमा सकारात्मक होनी चाहिए",
-      "budgetLimitTooHigh": "बजट सीमा बहुत अधिक",
-      "goal": "लक्ष्य",
-      "goalPositive": "लक्ष्य सकारात्मक होना चाहिए",
-      "goalTooHigh": "लक्ष्य बहुत अधिक"
-    },
-    "upcomingBill": {
-      "edit": "आगामी बिल संपादित करें",
-      "add": "आगामी बिल जोड़ें",
-      "update": "बिल अपडेट करें",
-      "addBill": "बिल जोड़ें"
-    },
-    "recurringPayment": {
-      "edit": "आवर्ती भुगतान संपादित करें",
-      "add": "आवर्ती भुगतान जोड़ें",
-      "update": "भुगतान अपडेट करें",
-      "addPayment": "भुगतान जोड़ें"
-    },
-    "currency": {
-      "required": "मुद्रा आवश्यक है",
-      "invalid": "अमान्य मुद्रा",
-      "selectLabel": "मुद्रा चुनें"
-    },
-    "profile": {
-      "noChanges": "कोई परिवर्तन नहीं पाया गया। प्रोफ़ाइल पहले से अपडेट है।",
-      "success": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
-      "error": "कुछ गलत हो गया।",
-      "updateButton": "प्रोफ़ाइल अपडेट करें"
-    },
-    "validation": {
-      "invalidFrequency": "अमान्य आवृत्ति",
-      "frequencyRequired": "आवृत्ति आवश्यक है",
-      "invalidStatus": "अमान्य स्थिति"
-    },
-    "fields": {
-      "type": "प्रकार"
-    },
-    "cancel": "रद्द करें",
-    "somethingWentWrongEditing": "{item} संपादित करने में कुछ गलत हुआ",
-    "somethingWentWrongCreating": "{item} बनाने में कुछ गलत हुआ"
-  },
   "backend": {
-    "user": {
+    "insights": {
+      "totalIncome": "इस महीने आपकी कुल आय है",
+      "dailyAverageExpense": "आपका दैनिक औसत व्यय है",
+      "topCategory": "आपका शीर्ष खर्च श्रेणी है",
+      "noExpenses": "इस महीने कोई व्यय दर्ज नहीं किया गया।",
+      "totalExpenses": "इस महीने आपका कुल व्यय है",
+      "saved": "आपने बचाया है",
+      "overspent": "आपने अधिक खर्च किया है",
+      "brokenEven": "आपने संतुलन बनाया है"
+    },
+    "api": {
+      "success": "सफलता",
+      "userNotFound": "उपयोगकर्ता नहीं मिला",
+      "categoryNotFound": "श्रेणी नहीं मिली",
+      "categoryAlreadyExists": "श्रेणी पहले से मौजूद है",
       "unauthorized": "अनधिकृत",
-      "alreadyExists": "यह ईमेल पहले से मौजूद है",
-      "registeredSuccessfully": "उपयोगकर्ता सफलतापूर्वक पंजीकृत",
-      "errorRegistering": "उपयोगकर्ता पंजीकरण में त्रुटि",
-      "notFound": "उपयोगकर्ता नहीं मिला",
-      "oldPasswordNotFound": "पुराना पासवर्ड नहीं मिला",
-      "incorrectOldPassword": "गलत पुराना पासवर्ड",
-      "passwordChangedSuccessfully": "पासवर्ड सफलतापूर्वक बदला गया",
-      "cannotUpdateEmailForGoogle": "Google अधिकृत उपयोगकर्ताओं के लिए ईमेल अपडेट नहीं कर सकते",
-      "emailAlreadyInUse": "ईमेल पहले से उपयोग में है",
-      "profileUpdatedSuccessfully": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
-      "balanceFetchedSuccessfully": "शेष सफलतापूर्वक प्राप्त किया गया",
-      "insufficientBalance": "अपर्याप्त शेष"
-    },
-    "category": {
-      "alreadyExists": "श्रेणी पहले से मौजूद है",
-      "createdSuccessfully": "श्रेणी सफलतापूर्वक बनाई गई",
-      "notFound": "श्रेणी नहीं मिली",
-      "idRequired": "श्रेणी ID आवश्यक है",
-      "reassignCategoryNotFound": "रीअसाइन श्रेणी नहीं मिली",
-      "cannotReassignDifferentType": "विभिन्न प्रकार की श्रेणी में रीअसाइन नहीं कर सकते",
-      "deletedSuccessfully": "श्रेणी सफलतापूर्वक हटाई गई"
-    },
-    "transaction": {
-      "createdSuccessfully": "लेन-देन सफलतापूर्वक बनाया गया",
-      "addingExpenseExceedBudget": "यह व्यय बजट सीमा से अधिक हो जाएगा",
-      "addingIncomeExceedGoal": "यह आय लक्ष्य से अधिक हो जाएगी",
-      "errorCheckingBudgetLimit": "बजट सीमा जांचने में त्रुटि",
-      "errorCheckingGoal": "लक्ष्य जांचने में त्रुटि",
-      "editingExpenseExceedBudget": "यह व्यय संपादित करने से बजट सीमा से अधिक हो जाएगा",
-      "editingIncomeExceedGoal": "यह आय संपादित करने से लक्ष्य से अधिक हो जाएगी",
+      "errorOccurred": "त्रुटि हुई",
       "limitCheckFailed": "सीमा जांच विफल",
       "balanceUpdateFailed": "बैलेंस अपडेट विफल",
-      "idRequired": "Transaction ID is required",
-      "notFound": "Transaction not found",
-      "fetchedSuccessfully": "Fetched successfully",
-      "totalsFetchedSuccessfully": "Totals fetched successfully",
-      "deletedSuccessfully": "Transaction deleted successfully",
-      "updatedSuccessfully": "Transaction updated successfully"
+      "reassignCategoryNotFound": "रीअसाइन श्रेणी नहीं मिली",
+      "cannotReassignDifferentType": "विभिन्न प्रकार की श्रेणी में पुन: असाइन नहीं किया जा सकता",
+      "failedToConvertCurrency": "मुद्रा परिवर्तन विफल",
+      "insufficientBalance": "अपर्याप्त शेष",
+      "oldPasswordNotFound": "पुराना पासवर्ड नहीं मिला",
+      "incorrectPassword": "गलत पासवर्ड",
+      "userAlreadyExists": "उपयोगकर्ता पहले से मौजूद है",
+      "cannotUpdateEmailGoogle": "Google अधिकृत उपयोगकर्ताओं के लिए ईमेल अपडेट नहीं किया जा सकता",
+      "emailAlreadyInUse": "ईमेल पहले से उपयोग में है",
+      "reminderBeforeDue": "अनुस्मारक तिथि देय तिथि से पहले होनी चाहिए",
+      "categoryNameAlreadyExists": "श्रेणी नाम पहले से मौजूद है",
+      "upcomingBillNotFound": "आगामी बिल नहीं मिला",
+      "transactionNotFound": "लेन-देन नहीं मिला",
+      "recurringPaymentNotFound": "आवर्ती भुगतान नहीं मिला"
     },
-    "recurringPayment": {
-      "reminderDateBeforeNextDue": "Reminder date must be before next due date",
-      "createdSuccessfully": "Recurring payment created successfully",
-      "notFound": "Recurring payment not found",
-      "updatedSuccessfully": "Recurring payment updated successfully",
-      "deletedSuccessfully": "Recurring payment deleted successfully",
-      "idRequired": "Recurring Payment ID is required",
-      "fetchedSuccessfully": "Fetched successfully"
-    },
-    "upcomingBill": {
-      "reminderDateBeforeDue": "Reminder date must be before due date",
-      "createdSuccessfully": "Upcoming bill created successfully",
-      "notFound": "Upcoming bill not found",
-      "updatedSuccessfully": "Upcoming bill updated successfully",
-      "deletedSuccessfully": "Upcoming bill deleted successfully",
-      "idRequired": "Upcoming Bill ID is required"
-    },
-    "currency": {
-      "errorConvertingCurrency": "मुद्रा परिवर्तन में त्रुटि",
-      "failedToConvertCurrency": "मुद्रा परिवर्तन विफल"
-    },
-    "internal": {
-      "serverError": "आंतरिक सर्वर त्रुटि"
-    }
-  },
-  "home": {
-    "hero": {
-      "titlePart1": "नमस्ते! अपने पैसे पर ",
-      "titleHighlight": "नियंत्रण",
-      "titlePart2": " लेने के लिए तैयार हैं?",
-      "subtitle": "दैनिक खर्च से लेकर मासिक अंतर्दृष्टि तक — सब कुछ एक साफ दृश्य में। सरल। स्मार्ट। तनाव-मुक्त।",
-      "getStarted": "शुरू करें",
-      "readMore": "और पढ़ें"
-    },
-    "features": {
-      "features": "सुविधाएँ",
-      "description": "हमारे शक्तिशाली उपकरणों का पता लगाएं जो आपको अपनी वित्तीय स्थिति को आसानी से प्रबंधित करने में मदद करते हैं।",
-      "powerfulDashboard": "शक्तिशाली डैशबोर्ड",
-      "powerfulDashboardDesc": "साफ चार्ट और डेटा के साथ अपनी वित्तीय स्वास्थ्य का त्वरित अवलोकन प्राप्त करें।",
-      "customCategories": "कस्टम श्रेणियाँ",
-      "customCategoriesDesc": "ऐसी श्रेणियाँ बनाएं और प्रबंधित करें जो आपकी जीवनशैली और आदतों से मेल खाती हों।",
-      "monthlyReports": "मासिक रिपोर्ट",
-      "monthlyReportsDesc": "अपने बजट लक्ष्यों पर नज़र रखने के लिए विस्तृत मासिक सारांश प्राप्त करें।",
-      "smartAlerts": "स्मार्ट अलर्ट",
-      "smartAlertsDesc": "अतिरिक्त खर्च, देय बिल और आगामी भुगतानों के बारे में सूचित रहें।",
-      "multiCurrency": "बहु-मुद्रा",
-      "multiCurrencyDesc": "वास्तविक समय विनिमय दरों के साथ विभिन्न मुद्राओं में अपनी आय और व्यय को ट्रैक करें।",
-      "themeSupport": "थीम समर्थन",
-      "themeSupportDesc": "अपने वातावरण से मेल खाने के लिए निर्बाध प्रकाश और अंधेरे मोड का आनंद लें।"
-    },
-    "footer": {
-      "title": "BudgetBuddy",
-      "subtitle": "अपने खर्च को सरल बनाएं। अपने पैसे को महारत हासिल करें।",
-      "copyright": "© {year} BudgetBuddy. व्यक्तिगत वित्त प्रेमियों के लिए देखभाल के साथ निर्मित।"
-    }
-  },
-  "ui": {
-    "notificationsStartFrom": "सूचनाएँ इस तारीख से शुरू होंगी"
-  },
-  "widgets": {
-    "insights": {
-      "financialInsights": "वित्तीय अंतर्दृष्टि",
-      "recentTransactions": "हाल की लेन-देन",
-      "totalBalance": "कुल शेष"
-    }
-  },
-  "pages": {
-    "upcomingBill": {
-      "addUpcomingBill": "आगामी बिल जोड़ें",
-      "noUpcomingBillsFound": "कोई आगामी बिल नहीं मिला",
-      "noUpcomingBillsMessage": "ऐसा लगता है कि कोई आगामी बिल नहीं हैं। अपना पहला आगामी बिल जोड़कर शुरू करें!",
-      "dueDate": "देय तारीख",
-      "reminderDate": "रिमाइंडर तारीख",
+    "validation": {
+      "name": "नाम",
+      "type": "प्रकार",
+      "budgetLimit": "बजट सीमा",
+      "goal": "लक्ष्य",
+      "nextDueDate": "अगली देय तिथि",
+      "reminderDate": "अनुस्मारक तिथि",
       "title": "शीर्षक",
+      "description": "विवरण",
+      "amount": "राशि",
+      "frequency": "आवृत्ति",
       "status": "स्थिति",
-      "actions": "क्रियाएँ",
-      "deleteConfirmation": "क्या आप वाकई इस आगामी बिल को हटाना चाहते हैं? यह क्रिया वापस नहीं की जा सकती।"
-    },
-    "recurringPayment": {
-      "addRecurringPayment": "आवर्ती भुगतान जोड़ें",
-      "noRecurringPaymentsFound": "कोई आवर्ती भुगतान नहीं मिला",
-      "noRecurringPaymentsMessage": "ऐसा लगता है कि कोई आवर्ती भुगतान नहीं हैं। अपना पहला आवर्ती भुगतान जोड़कर शुरू करें!",
-      "nextDueDate": "अगली देय तारीख",
-      "reminderDate": "रिमाइंडर तारीख",
-      "title": "शीर्षक",
-      "status": "स्थिति",
-      "actions": "क्रियाएँ",
-      "deleteConfirmation": "क्या आप वाकई इस आवर्ती भुगतान को हटाना चाहते हैं? यह क्रिया वापस नहीं की जा सकती।"
+      "date": "तिथि",
+      "category": "श्रेणी",
+      "dueDate": "देय तिथि",
+      "email": "ईमेल",
+      "password": "पासवर्ड",
+      "currency": "मुद्रा",
+      "categories": "श्रेणियाँ",
+      "limit": "सीमा"
     }
   }
 }

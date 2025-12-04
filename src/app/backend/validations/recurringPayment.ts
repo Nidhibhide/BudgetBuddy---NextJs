@@ -1,22 +1,22 @@
 import Joi from "joi";
 import { stringValidator, numberValidator, selectValidator } from "@/app/backend/utils/GlobalValidation";
 
-export const UpdateRecurringPayment = Joi.object({
-  nextDueDate: Joi.date().iso().optional().label("Next Due Date"),
-  reminderDate: Joi.date().iso().optional().label("Reminder Date"),
-  title: stringValidator("Title", 1, 100, false),
-  description: stringValidator("Description", 2, 200, false),
-  amount: numberValidator("Amount", 1, 1000000, false),
-  frequency: selectValidator("Frequency", ["Weekly", "Monthly", "Yearly"], false),
-  status: selectValidator("Status", ["Active", "Inactive"], false),
+export const UpdateRecurringPayment = (t: (key: string) => string) => Joi.object({
+  nextDueDate: Joi.date().iso().optional().label(t("backend.validation.nextDueDate")),
+  reminderDate: Joi.date().iso().optional().label(t("backend.validation.reminderDate")),
+  title: stringValidator("backend.validation.title", 1, 100, false)(t),
+  description: stringValidator("backend.validation.description", 2, 200, false)(t),
+  amount: numberValidator("backend.validation.amount", 1, 1000000, false)(t),
+  frequency: selectValidator("backend.validation.frequency", ["Weekly", "Monthly", "Yearly"], false)(t),
+  status: selectValidator("backend.validation.status", ["Active", "Inactive"], false)(t),
 });
 
-export const CreateRecurringPayment = Joi.object({
-  nextDueDate: Joi.date().iso().required().label("Next Due Date"),
-  reminderDate: Joi.date().iso().required().label("Reminder Date"),
-  title: stringValidator("Title", 1, 100, true),
-  description: stringValidator("Description", 2, 200, true),
-  amount: numberValidator("Amount", 1, 1000000, true),
-  frequency: selectValidator("Frequency", ["Weekly", "Monthly", "Yearly"], true),
-  status: selectValidator("Status", ["Active", "Inactive"], false),
+export const CreateRecurringPayment = (t: (key: string) => string) => Joi.object({
+  nextDueDate: Joi.date().iso().required().label(t("backend.validation.nextDueDate")),
+  reminderDate: Joi.date().iso().required().label(t("backend.validation.reminderDate")),
+  title: stringValidator("backend.validation.title", 1, 100, true)(t),
+  description: stringValidator("backend.validation.description", 2, 200, true)(t),
+  amount: numberValidator("backend.validation.amount", 1, 1000000, true)(t),
+  frequency: selectValidator("backend.validation.frequency", ["Weekly", "Monthly", "Yearly"], true)(t),
+  status: selectValidator("backend.validation.status", ["Active", "Inactive"], false)(t),
 });

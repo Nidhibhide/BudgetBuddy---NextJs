@@ -1,20 +1,20 @@
 import Joi from "joi";
 import { stringValidator, numberValidator, selectValidator } from "@/app/backend/utils/GlobalValidation";
 
-export const CreateUpcomingBill = Joi.object({
-  dueDate: Joi.date().iso().required().label("Due Date"),
-  reminderDate: Joi.date().iso().required().label("Reminder Date"),
-  title: stringValidator("Title", 1, 100, true),
-  description: stringValidator("Description", 2, 200, true),
-  amount: numberValidator("Amount", 1, 1000000, true),
-  status: selectValidator("Status", ["Paid", "Unpaid"], true),
+export const CreateUpcomingBill = (t: (key: string) => string) => Joi.object({
+  dueDate: Joi.date().iso().required().label(t("backend.validation.dueDate")),
+  reminderDate: Joi.date().iso().required().label(t("backend.validation.reminderDate")),
+  title: stringValidator("backend.validation.title", 1, 100, true)(t),
+  description: stringValidator("backend.validation.description", 2, 200, true)(t),
+  amount: numberValidator("backend.validation.amount", 1, 1000000, true)(t),
+  status: selectValidator("backend.validation.status", ["Paid", "Unpaid"], true)(t),
 });
 
-export const UpdateUpcomingBill = Joi.object({
-  dueDate: Joi.date().iso().optional().label("Due Date"),
-  reminderDate: Joi.date().iso().optional().label("Reminder Date"),
-  title: stringValidator("Title", 1, 100, false),
-  description: stringValidator("Description", 2, 200, false),
-  amount: numberValidator("Amount", 1, 1000000, false),
-  status: selectValidator("Status", ["Paid", "Unpaid"], false),
+export const UpdateUpcomingBill = (t: (key: string) => string) => Joi.object({
+  dueDate: Joi.date().iso().optional().label(t("backend.validation.dueDate")),
+  reminderDate: Joi.date().iso().optional().label(t("backend.validation.reminderDate")),
+  title: stringValidator("backend.validation.title", 1, 100, false)(t),
+  description: stringValidator("backend.validation.description", 2, 200, false)(t),
+  amount: numberValidator("backend.validation.amount", 1, 1000000, false)(t),
+  status: selectValidator("backend.validation.status", ["Paid", "Unpaid"], false)(t),
 });

@@ -15,7 +15,7 @@ export async function checkLimitForCreate(
   try {
     const category = await Category.findById(categoryId);
     if (!category) {
-      return { success: false, message: t('backend.category.notFound') };
+      return { success: false, message: "Category not found" };
     }
 
     if (type === "Expense" && category.budgetLimit > 0) {
@@ -31,15 +31,15 @@ export async function checkLimitForCreate(
       });
 
       let totalSpent = 0;
-      for (const t of allTransactions) {
-        if (t.type === "Expense") {
-          totalSpent += t.amount;
+      for (const transaction of allTransactions) {
+        if (transaction.type === "Expense") {
+          totalSpent += transaction.amount;
         }
       }
       if (totalSpent + amountInINR > budgetLimitInINR) {
         return {
           success: false,
-          message: t('backend.transaction.addingExpenseExceedBudget'),
+          message: "Adding this expense would exceed the budget limit",
         };
       }
     } else if (type === "Income" && category.goal > 0) {
@@ -51,15 +51,15 @@ export async function checkLimitForCreate(
       });
 
       let totalIncome = 0;
-      for (const t of allTransactions) {
-        if (t.type === "Income") {
-          totalIncome += t.amount;
+      for (const transaction of allTransactions) {
+        if (transaction.type === "Income") {
+          totalIncome += transaction.amount;
         }
       }
       if (totalIncome + amountInINR > goalInINR) {
         return {
           success: false,
-          message: t('backend.transaction.addingIncomeExceedGoal'),
+          message: "Adding this income would exceed the goal",
         };
       }
     }
@@ -71,8 +71,8 @@ export async function checkLimitForCreate(
       success: false,
       message:
         type === "Expense"
-          ? t('backend.transaction.errorCheckingBudgetLimit')
-          : t('backend.transaction.errorCheckingGoal'),
+          ? "Error checking budget limit"
+          : "Error checking goal",
     };
   }
 }
@@ -89,7 +89,7 @@ export async function checkLimitForEdit(
   try {
     const category = await Category.findById(categoryId);
     if (!category) {
-      return { success: false, message: t('backend.category.notFound') };
+      return { success: false, message: "Category not found" };
     }
 
     if (
@@ -109,15 +109,15 @@ export async function checkLimitForEdit(
       });
 
       let totalSpent = 0;
-      for (const t of allTransactions) {
-        if (t.type === "Expense") {
-          totalSpent += t.amount;
+      for (const transaction of allTransactions) {
+        if (transaction.type === "Expense") {
+          totalSpent += transaction.amount;
         }
       }
       if (totalSpent + balanceAdjustment > budgetLimitInINR) {
         return {
           success: false,
-          message: t('backend.transaction.editingExpenseExceedBudget'),
+          message: "Editing this expense would exceed the budget limit",
         };
       }
     } else if (
@@ -133,15 +133,15 @@ export async function checkLimitForEdit(
       });
 
       let totalIncome = 0;
-      for (const t of allTransactions) {
-        if (t.type === "Income") {
-          totalIncome += t.amount;
+      for (const transaction of allTransactions) {
+        if (transaction.type === "Income") {
+          totalIncome += transaction.amount;
         }
       }
       if (totalIncome + balanceAdjustment > goalInINR) {
         return {
           success: false,
-          message: t('backend.transaction.editingIncomeExceedGoal'),
+          message: "Editing this income would exceed the goal",
         };
       }
     }
@@ -153,8 +153,8 @@ export async function checkLimitForEdit(
       success: false,
       message:
         type === "Expense"
-          ? t('backend.transaction.errorCheckingBudgetLimit')
-          : t('backend.transaction.errorCheckingGoal'),
+          ? "Error checking budget limit"
+          : "Error checking goal",
     };
   }
 }

@@ -4,15 +4,13 @@ import User from "@/app/backend/models/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 import { convertFromINR } from "@/app/backend/utils/currencyConverter";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET() {
-  return await withAuthAndDB(async (session, userId) => {
-    const t = await getT();
+  return await withAuthAndDB(async (session, userId, t) => {
     const userIdObj = new Types.ObjectId(userId);
 
     const user = await User.findById(userIdObj);
-    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
+    if (!user) return JsonOne(404, t("backend.api.userNotFound"), false);
 
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -54,10 +52,10 @@ export async function GET() {
     const result = await Transaction.aggregate(pipeline);
 
     for (const item of result) {
-      item.income = await convertFromINR(item.income, user.currency, t as (key: string) => string);
-      item.expense = await convertFromINR(item.expense, user.currency, t as (key: string) => string);
+      item.income = await convertFromINR(item.income, user.currency, t);
+      item.expense = await convertFromINR(item.expense, user.currency, t);
     }
 
-    return JsonOne(200, t('backend.transaction.totalsFetchedSuccessfully'), true, result);
+    return JsonOne(200, t("backend.api.success"), true, result);
   });
 }

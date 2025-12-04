@@ -5,16 +5,14 @@ import User from "@/app/backend/models/user";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { PipelineStage, Types } from "mongoose";
 import { convertFromINR } from "@/app/backend/utils/currencyConverter";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET() {
-  return await withAuthAndDB(async (session, userId) => {
-    const t = await getT();
+  return await withAuthAndDB(async (session, userId, t) => {
     const userIdObj = new Types.ObjectId(userId);
 
     // Get user's currency
     const user = await User.findById(userIdObj);
-    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
+    if (!user) return JsonOne(404, t("backend.api.userNotFound"), false);
 
     // Calculate current month date range
     const now = new Date();
@@ -89,7 +87,7 @@ export async function GET() {
     const result = await Transaction.aggregate(pipeline);
 
     if (result.length === 0) {
-      return JsonOne(200, t('backend.transaction.totalsFetchedSuccessfully'), true, {
+      return JsonOne(200, t("backend.api.success"), true, {
         totalExpenses: 0,
         categories: [],
       });
@@ -98,11 +96,11 @@ export async function GET() {
     const data = result[0];
 
     // Convert totals from INR to user's currency
-    data.totalExpenses = await convertFromINR(data.totalExpenses, user.currency, t as (key: string) => string);
+    data.totalExpenses = await convertFromINR(data.totalExpenses, user.currency, t);
     for (const cat of data.categories) {
-      cat.total = await convertFromINR(cat.total, user.currency, t as (key: string) => string);
+      cat.total = await convertFromINR(cat.total, user.currency, t);
     }
 
-    return JsonOne(200, t('backend.transaction.totalsFetchedSuccessfully'), true, data);
+    return JsonOne(200, t("backend.api.success"), true, data);
   });
 }

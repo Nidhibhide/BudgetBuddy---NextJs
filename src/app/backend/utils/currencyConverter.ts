@@ -10,9 +10,9 @@ export const convertToINR = async (amount: number, fromCurrency: string, t: (key
     const rate = response.data.rates.INR;
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error(t('backend.currency.errorConvertingCurrency'), error);
-    throw new Error(t('backend.currency.failedToConvertCurrency'));
+    throw new Error(t('backend.api.failedToConvertCurrency'));
   }
 };
 
@@ -26,9 +26,9 @@ export const convertFromINR = async (amount: number, toCurrency: string, t: (key
     const rate = response.data.rates[toCurrency];
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error(t('backend.currency.errorConvertingCurrency'), error);
-    throw new Error(t('backend.currency.failedToConvertCurrency'));
+    throw new Error(t('backend.api.failedToConvertCurrency'));
   }
 };
 

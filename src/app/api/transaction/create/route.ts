@@ -7,13 +7,11 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { updateUserBalance } from "@/app/backend/utils/updateBalance";
 import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import { checkLimitForCreate } from "@/app/backend/utils/transactionChecks";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function POST(request: Request) {
-  const t = await getT();
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (session, userId, t) => {
     const body = await request.json();
-    const { error } = CreateTransaction.validate(body);
+    const { error } = CreateTransaction(t).validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -23,7 +21,7 @@ export async function POST(request: Request) {
     // Get user's currency
     const user = await User.findById(userId);
     if (!user) {
-      return JsonOne(404, t('backend.user.notFound'), false);
+      return JsonOne(404, t("backend.api.userNotFound"), false);
     }
 
     // Convert amount to INR
@@ -38,7 +36,7 @@ export async function POST(request: Request) {
     });
 
     if (!categoryDoc) {
-      return JsonOne(400, t('backend.category.notFound'), false);
+      return JsonOne(400, t("backend.api.categoryNotFound"), false);
     }
 
     // Check budget limit or goal
@@ -51,13 +49,13 @@ export async function POST(request: Request) {
       t
     );
     if (!limitCheck.success) {
-      return JsonOne(400, limitCheck.message || t('backend.transaction.limitCheckFailed'), false);
+      return JsonOne(400, limitCheck.message || t("backend.api.limitCheckFailed"), false);
     }
 
     // Update user balance with converted amount
     const balanceUpdate = await updateUserBalance(userId, amountInINR, type, t);
     if (!balanceUpdate.success) {
-      return JsonOne(400, balanceUpdate.message || t('backend.transaction.balanceUpdateFailed'), false);
+      return JsonOne(400, balanceUpdate.message || t("backend.api.balanceUpdateFailed"), false);
     }
 
     const newTransaction = new Transaction({
@@ -72,7 +70,7 @@ export async function POST(request: Request) {
 
     await newTransaction.save();
 
-    return JsonOne(201, t('backend.transaction.createdSuccessfully'), true, {
+    return JsonOne(201, t("backend.api.success"), true, {
       transaction: newTransaction,
     });
   });

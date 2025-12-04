@@ -9,11 +9,10 @@ import { RecurringPayment as RecurringPaymentForm } from "@/app/features/forms";
 import { useRecurringPayments } from "@/app/hooks";
 import { RecurringPayment as RecurringPaymentType } from "@/app/types/appTypes";
 import { deleteRecurringPayment } from "@/app/lib/recurringPayment";
-import { showSuccess, showError } from "@/app/features/common";
-import { useTranslations } from 'next-intl';
+import { useToast } from "@/app/features/common";
 
 const RecurringPayment: React.FC = () => {
-  const t = useTranslations('pages');
+  const { showSuccess, showError } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("nextDueDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -70,11 +69,12 @@ const RecurringPayment: React.FC = () => {
         refetch();
         setDeleteRecurringPaymentId(null);
       } else {
-        showError(response.message || "Failed to delete recurring payment");
+        showError(response.message || "Error Occurred");
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error deleting recurring payment:", error);
-      showError("An unexpected error occurred while deleting the recurring payment");
+     
+      showError("Error Occurred");
     } finally {
       setDeleting(false);
     }
@@ -107,7 +107,7 @@ const RecurringPayment: React.FC = () => {
               onClick={() => setIsOpen(true)}
             >
               <Plus className="w-4 h-4" />
-              {t('recurringPayment.addRecurringPayment')}
+              Add
             </Button>
           </div>
         </div>
@@ -124,7 +124,7 @@ const RecurringPayment: React.FC = () => {
             columns={[
             {
               key: "nextDueDate",
-              label: t('recurringPayment.nextDueDate'),
+              label: "Next Due Date",
               sortable: true,
               render: (value) =>
                 value
@@ -135,7 +135,7 @@ const RecurringPayment: React.FC = () => {
             },
             {
               key: "reminderDate",
-              label: t('recurringPayment.reminderDate'),
+              label: "Reminder Date",
               sortable: true,
               render: (value) =>
                 value
@@ -144,10 +144,10 @@ const RecurringPayment: React.FC = () => {
                     )
                   : "",
             },
-            { key: "title", label: t('recurringPayment.title') },
+            { key: "title", label: "Title" },
             {
               key: "status",
-              label: t('recurringPayment.status'),
+              label: "Status",
               render: (value) => (
                 <span className={(value as string) === 'Active' ? 'text-green-500' : 'text-red-500'}>
                   {value as string}
@@ -156,7 +156,7 @@ const RecurringPayment: React.FC = () => {
             },
             {
               key: "actions",
-              label: t('recurringPayment.actions'),
+              label: "Actions",
               render: (value, row) => (
                 <div className="flex gap-2">
                   <button
@@ -207,8 +207,8 @@ const RecurringPayment: React.FC = () => {
         </>
       ) : (
         <NotFound
-          title={t('recurringPayment.noRecurringPaymentsFound')}
-          message={t('recurringPayment.noRecurringPaymentsMessage')}
+          title="Recurring payment not found"
+          message="You haven't added any recurring payments yet. Start by adding your first recurring payment."
         />
       )}
       <RecurringPaymentForm open={isOpen} onOpenChange={setIsOpen} onPaymentAdded={handlePaymentAdded} payment={selectedPayment} />
@@ -223,7 +223,7 @@ const RecurringPayment: React.FC = () => {
         onOpenChange={(open) => !open && setDeleteRecurringPaymentId(null)}
         onConfirm={handleConfirmDelete}
         loading={deleting}
-        description={t('recurringPayment.deleteConfirmation')}
+        description="Are you sure you want to delete this recurring payment?"
       />
     </div>
   );

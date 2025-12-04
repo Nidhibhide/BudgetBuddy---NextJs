@@ -6,3 +6,5 @@ export { useBalance } from './useBalance';
 export { useDebounce } from './useDebounce';
 export { usePieChart } from './usePieChart';
 export { useBarGraph } from './useBarGraph';
+export { useBudgetCalendar } from './useBudgetCalendar';
+export { useInsights } from './useInsights';

@@ -11,11 +11,9 @@ import {
   createPaginationPipeline,
   convertAmountsToUserCurrency,
 } from "@/app/backend/utils/PaginationUtils";
-import { getT } from "@/app/backend/utils/getTranslations";
 
 export async function GET(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
-    const t = await getT();
+  return await withAuthAndDB(async (session, userId, t) => {
     const userIdObj = new Types.ObjectId(userId);
     const url = new URL(request.url);
 
@@ -34,7 +32,7 @@ export async function GET(request: Request) {
 
     // Get user's currency
     const user = await User.findById(userIdObj);
-    if (!user) return JsonOne(404, t('backend.user.notFound'), false);
+    if (!user) return JsonOne(404, t("backend.api.userNotFound"), false);
     const matchStage: MatchStage = { user: userIdObj, isDeleted: false };
     if (type) matchStage.type = type;
     if (category && category !== "All") matchStage["category.name"] = category;
@@ -115,7 +113,7 @@ export async function GET(request: Request) {
       t
     );
 
-    return JsonAll(200, t('backend.transaction.fetchedSuccessfully'), true, transactions, {
+    return JsonAll(200, t("backend.api.success"), true, transactions, {
       currentPage: page,
       totalPages,
       totalTransactions,
