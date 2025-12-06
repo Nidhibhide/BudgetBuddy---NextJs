@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getBarGraph } from "@/app/lib/dashboard";
-import { useTranslations } from 'next-intl';
 import { MonthlySummaryResponse, TrendData } from '@/app/types/appTypes';
 
 export const useBarGraph = () => {
-  const t = useTranslations('common');
+  const t = useTranslations();
   const [summary, setSummary] = useState<TrendData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,16 +13,16 @@ export const useBarGraph = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getBarGraph();
+      const response = await getBarGraph(t);
       if (response.success) {
         const data: MonthlySummaryResponse = response.data;
         setSummary(data);
       } else {
-        setError(response.message || t('messages.unexpectedError'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

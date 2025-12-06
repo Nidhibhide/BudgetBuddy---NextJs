@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -19,31 +20,32 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
   const { data: session } = useSession();
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
 
   const validationSchema = Yup.object().shape({
     nextDueDate: Yup.date()
-      .required("Date is required")
-      .min(new Date(), "Date cannot be in the past"),
+      .required(t('forms.validation.dateRequired'))
+      .min(new Date(), t('forms.validation.dateNotPast')),
     reminderDate: Yup.date()
-      .required("Date is required")
-      .min(new Date(), "Date cannot be in the past")
-      .when('nextDueDate', (nextDueDate, schema) => nextDueDate ? schema.max(Yup.ref('nextDueDate'), 'Reminder date must be before next due date') : schema),
+      .required(t('forms.validation.dateRequired'))
+      .min(new Date(), t('forms.validation.dateNotPast'))
+      .when('nextDueDate', (nextDueDate, schema) => nextDueDate ? schema.max(Yup.ref('nextDueDate'), t('forms.validation.reminderBeforeNextDue')) : schema),
     title: Yup.string()
-      .min(1, "Title must be at least 1 character")
-      .max(100, "Title must be at most 100 characters")
-      .required("Title is required"),
+      .min(1, t('forms.validation.titleMin1'))
+      .max(100, t('forms.validation.titleMax100'))
+      .required(t('forms.validation.titleRequired')),
     description: Yup.string()
-      .min(2, "Description must be at least 2 characters")
-      .max(200, "Description must be at most 200 characters")
+      .min(2, t('forms.validation.descriptionMin2'))
+      .max(200, t('forms.validation.descriptionMax200'))
       .optional(),
     amount: Yup.number()
-      .positive("Amount must be positive")
-      .required("Amount is required"),
+      .positive(t('forms.validation.amountPositive'))
+      .required(t('forms.validation.amountRequired')),
     frequency: Yup.string()
-      .oneOf(["Weekly", "Monthly", "Yearly"], "Invalid frequency")
-      .required("Frequency is required"),
+      .oneOf([t('forms.options.weekly'), t('forms.options.monthly'), t('forms.options.yearly')], t('forms.validation.invalidFrequency'))
+      .required(t('forms.validation.frequencyRequired')),
     status: Yup.string()
-      .oneOf(["Active", "Inactive"], "Invalid status")
+      .oneOf([t('forms.options.active'), t('forms.options.inactive')], t('forms.validation.invalidStatus'))
       .optional(),
   });
 
@@ -51,17 +53,17 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
     setLoading(true);
     try {
       const response = payment?._id
-        ? await editRecurringPayment(payment._id, values)
-        : await addRecurringPayment(values);
+        ? await editRecurringPayment(payment._id, values, t)
+        : await addRecurringPayment(values, t);
       if (response.success) {
         showSuccess(response.message);
         onPaymentAdded(values);
         onOpenChange(false);
       } else {
-        showError(response.message || "Error Occurred");
+        showError(response.message || t('forms.messages.errorOccurred'));
       }
     } catch {
-      showError("Error Occurred");
+      showError(t('forms.messages.errorOccurred'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +74,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {payment?._id ? "Edit Form" : "Add Form"}
+            {payment?._id ? t('forms.titles.editForm') : t('forms.titles.addForm')}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -82,25 +84,29 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
             title: payment?.title || "",
             description: payment?.description || "",
             amount: payment?.amount || 1,
-            frequency: payment?.frequency || "",
-            status: payment?.status || "Active",
+            frequency: payment?.frequency ? (
+              payment.frequency === 'Weekly' ? t('forms.options.weekly') :
+              payment.frequency === 'Monthly' ? t('forms.options.monthly') :
+              t('forms.options.yearly')
+            ) : "",
+            status: payment?.status ? (payment.status === 'Active' ? t('forms.options.active') : t('forms.options.inactive')) : t('forms.options.active'),
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="nextDueDate" label="Next Due Date" type="date" />
-              <InputBox name="reminderDate" label="Reminder Date" type="date" />
-              <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
-              <InputBox name="title" label="Title" />
-              <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
-              <SelectBox name="frequency" label="Frequency" options={["Weekly", "Monthly", "Yearly"]} />
+              <InputBox name="nextDueDate" label={t('backend.validation.nextDueDate')} type="date" />
+              <InputBox name="reminderDate" label={t('backend.validation.reminderDate')} type="date" />
+              <p className="text-sm text-gray-600 -mt-2">{t('forms.labels.notificationsStartFromDate')}</p>
+              <InputBox name="title" label={t('backend.validation.title')} />
+              <TextareaBox name="description" label={t('backend.validation.description')} />
+              <InputBox name="amount" label={`${t('backend.validation.amount')} (${session?.user?.currency || 'INR'})`} type="number" />
+              <SelectBox name="frequency" label={t('backend.validation.frequency')} options={[t('forms.options.weekly'), t('forms.options.monthly'), t('forms.options.yearly')]} />
               <SelectBox
                 name="status"
-                label="Status"
-                options={["Active", "Inactive"]}
+                label={t('backend.validation.status')}
+                options={[t('forms.options.active'), t('forms.options.inactive')]}
               />
 
               <div className="flex justify-end space-x-2">
@@ -109,10 +115,10 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  Cancel
+                  {t('forms.buttons.cancel')}
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {payment?._id ? "Update" : "Add"}
+                  {payment?._id ? t('forms.buttons.update') : t('forms.buttons.add')}
                 </Button>
               </div>
             </form>

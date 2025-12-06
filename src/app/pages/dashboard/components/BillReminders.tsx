@@ -1,15 +1,13 @@
 "use client";
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
+import { useTranslations } from "next-intl";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
 import { UpcomingBill, RecurringPayment } from "@/app/features/common";
-import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const BillReminders: React.FC = () => {
-  // Get translation function for the 'dashboard' namespace
-  // This provides access to all dashboard-related translations
-  const t = useTranslations('dashboard');
+  const t = useTranslations();
 
   const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
     children,
@@ -56,16 +54,16 @@ const BillReminders: React.FC = () => {
             onChange={handleChange}
             variant="scrollable"
             scrollButtons="auto"
-            aria-label="bill reminders tabs"
+            aria-label={t("pages.dashboard.billReminders.ariaLabel")}
             className="bg-background"
           >
             <Tab
-              label={t('overview.upcomingBills')}
+              label={t("pages.dashboard.billReminders.tabs.upcomingBills")}
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label={t('overview.recurringPayments')}
+              label={t("pages.dashboard.billReminders.tabs.recurringPayments")}
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getUpcomingBills } from "@/app/lib/upcomingBill";
 import type { UpcomingBill, UseUpcomingBillsProps } from "@/app/types/appTypes";
-import { useTranslations } from 'next-intl'; // Import for internationalization
 
 export const useUpcomingBills = ({
   status = "All",
@@ -10,7 +10,7 @@ export const useUpcomingBills = ({
   sortBy = "dueDate",
   sortOrder = "asc",
 }: UseUpcomingBillsProps) => {
-  const t = useTranslations('common'); // Get translation function for the 'common' namespace
+  const t = useTranslations();
   const [upcomingBills, setUpcomingBills] = useState<UpcomingBill[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +26,7 @@ export const useUpcomingBills = ({
       setLoading(true);
       setError(null);
       const response = await getUpcomingBills(
+        t,
         status,
         page,
         limit,
@@ -36,11 +37,11 @@ export const useUpcomingBills = ({
         setUpcomingBills(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('messages.failedToFetchUpcomingBills'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

@@ -12,8 +12,11 @@ import {
   BudgetCalendar,
 } from "@/app/features/charts";
 import { useBalance, usePieChart, useBarGraph } from "@/app/hooks";
+import { useTranslations } from "next-intl";
 
 const MainPage: React.FC = () => {
+  const t = useTranslations();
+
   const {
     balance,
     // loading: balanceLoading,
@@ -36,7 +39,7 @@ const MainPage: React.FC = () => {
       <div className="relative">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-foreground">
-            Overview
+            {t("pages.dashboard.mainPage.title")}
           </h1>
         </div>
         <div className="absolute top-0 right-0">

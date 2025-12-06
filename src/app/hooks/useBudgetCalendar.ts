@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getBudgetCalendar } from "@/app/lib/dashboard";
-import { useTranslations } from 'next-intl';
 import { DayData, BudgetCalendarResponse} from '@/app/types/appTypes';
 
 export const useBudgetCalendar = (month: number, year: number) => {
-  const t = useTranslations('common');
+  const t = useTranslations();
   const [daysData, setDaysData] = useState<DayData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,16 +13,16 @@ export const useBudgetCalendar = (month: number, year: number) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getBudgetCalendar(month, year);
+      const response = await getBudgetCalendar(month, year,t);
       if (response.success) {
         const data: BudgetCalendarResponse = response.data;
         setDaysData(data.days);
       } else {
-        setError(response.message || t('messages.unexpectedError'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

@@ -1,84 +1,84 @@
 import axios, { AxiosError } from "axios";
 
-export async function getBalance() {
+export async function getBalance(t: (key: string) => string) {
   try {
     const response = await axios.get("/api/dashboard/balance");
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching balance:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching balance",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getBarGraph() {
+export async function getBarGraph(t: (key: string) => string) {
   try {
     const response = await axios.get("/api/dashboard/bar-graph");
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching bar graph data:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching bar graph data",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getPieChart() {
+export async function getPieChart(t: (key: string) => string) {
   try {
     const response = await axios.get("/api/dashboard/pie-chart");
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching pie chart data:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching pie chart data",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getBudgetCalendar(month: number, year: number) {
+export async function getBudgetCalendar(month: number, year: number, t: (key: string) => string) {
   try {
     const response = await axios.get(`/api/dashboard/budgetCalendar?month=${month}&year=${year}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching budget calendar data:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching budget calendar data",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getInsights() {
+export async function getInsights(t: (key: string) => string) {
   try {
     const response = await axios.get("/api/dashboard/insights");
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching insights:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching insights",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };

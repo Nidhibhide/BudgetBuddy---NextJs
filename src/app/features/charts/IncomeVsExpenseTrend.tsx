@@ -5,8 +5,10 @@ import { useSession } from 'next-auth/react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { IncomeVsExpenseTrendProps } from '@/app/types/appTypes';
+import { useTranslations } from 'next-intl';
 
 const IncomeVsExpenseTrend: React.FC<IncomeVsExpenseTrendProps> = ({ data }) => {
+  const t = useTranslations();
   const { data: session } = useSession();
 
   // Generate last 6 months data, merging with actual data if available
@@ -25,7 +27,7 @@ const IncomeVsExpenseTrend: React.FC<IncomeVsExpenseTrendProps> = ({ data }) => 
 
   return (
     <Card className="p-6 text-foreground">
-      <h3 className="text-lg font-semibold mb-4">Income vs Expense Trend</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('charts.incomeVsExpenseTrend.title')}</h3>
       <div className="h-96">
         <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
           <BarChart data={chartData}>
@@ -34,8 +36,8 @@ const IncomeVsExpenseTrend: React.FC<IncomeVsExpenseTrendProps> = ({ data }) => 
             <YAxis />
             <Tooltip formatter={(value: number) => [`${value.toLocaleString()} ${session?.user?.currency || 'INR'}`, '']} />
             <Legend />
-            <Bar dataKey="income" fill="#10B981" name="Income" />
-            <Bar dataKey="expense" fill="#EF4444" name="Expense" />
+            <Bar dataKey="income" fill="#10B981" name={t('common.ui.income')} />
+            <Bar dataKey="expense" fill="#EF4444" name={t('common.ui.expense')} />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getTransactions, getTransactionTotals } from "@/app/lib/transaction";
 import type {
   Transaction,
@@ -19,6 +20,7 @@ export const useTransactions = ({
   minAmount,
   maxAmount,
 }: UseTransactionsProps) => {
+  const t = useTranslations();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [totals, setTotals] = useState<TypeTotal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ export const useTransactions = ({
       setError(null);
       const response = await getTransactions(
         type,
+        t,
         category,
         page,
         limit,
@@ -51,27 +54,27 @@ export const useTransactions = ({
         setTransactions(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || "Failed to fetch transactions");
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);
     }
-  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount]);
+  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount, t]);
 
   const fetchTotals = useCallback(async () => {
     try {
-      const totalsResult = await getTransactionTotals(type);
+      const totalsResult = await getTransactionTotals(type, t);
       if (totalsResult.success && totalsResult.data) {
         setTotals(totalsResult.data);
       }
     } catch (err) {
-      console.error("Error fetching totals", err);
+      console.error(t('backend.api.errorOccurred'), err);
     }
-  }, [type]);
+  }, [type, t]);
 
   useEffect(() => {
     fetchTransactions();
