@@ -5,7 +5,7 @@ import { determineLocale } from '@/app/features/common/helpers/i18nUtils';
 
 import enIndex from '@/messages/en/index.json';
 
-const messages = Object.assign(enCommon, enIndex);
+const messages = enIndex;
 
 export async function getT() {
   const cookieStore = await cookies();

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getInsights } from "@/app/lib/dashboard";
-import { useTranslations } from 'next-intl';
 
 export const useInsights = () => {
-  const t = useTranslations('common');
+  const t = useTranslations();
   const [insights, setInsights] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,22 +12,19 @@ export const useInsights = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getInsights();
+      const response = await getInsights(t);
       if (response.success) {
+        // Use t.raw() to get the array of default insights since t() only supports strings
         setInsights([
-          t('widgets.insights.default1'),
-          t('widgets.insights.default2'),
-          t('widgets.insights.default3'),
-          t('widgets.insights.default4'),
-          t('widgets.insights.default5'),
+          ...t.raw('common.hooks.defaultInsights'),
           ...(response.data?.insights || [])
         ]);
       } else {
-        setError(response.message || t('messages.failedToFetchInsights'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

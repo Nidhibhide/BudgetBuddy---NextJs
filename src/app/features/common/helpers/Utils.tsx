@@ -3,14 +3,17 @@
 import React from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export const useToast = () => {
+  const t = useTranslations();
+
   const showSuccess = (message?: string) => {
-    toast.success(message || "Success");
+    toast.success(message || t('backend.api.success'));
   };
 
   const showError = (message?: string) => {
-    toast.error(message || "Error Occurred");
+    toast.error(message || t('backend.api.errorOccurred'));
   };
 
   return { showSuccess, showError };
@@ -19,6 +22,7 @@ export const useToast = () => {
 export const useHandleResponse = () => {
   const router = useRouter();
   const { showSuccess, showError } = useToast();
+  const t = useTranslations();
 
   const Response = ({
     response,
@@ -28,8 +32,8 @@ export const useHandleResponse = () => {
     successMessage?: string;
   }) => {
     const { message, success } = response;
-    const defaultSuccessMessage = "Success";
-    const defaultErrorMessage = "Error Occurred";
+    const defaultSuccessMessage = t('backend.api.success');
+    const defaultErrorMessage = t('backend.api.errorOccurred');
 
     if (success) {
       showSuccess(successMessage || defaultSuccessMessage);

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -30,7 +31,6 @@ import { TransactionPDF } from "@/app/features/common";
 import { deleteTransaction } from "@/app/lib/transaction";
 import { Transaction as TransactionType } from "@/app/types/appTypes";
 import { useCategories, useTransactions, useDebounce } from "@/app/hooks";
-import { useTranslations } from 'next-intl'; // Import for internationalization
 
 const handlePDFDownload = async (
   transactions: TransactionType[],
@@ -53,20 +53,19 @@ const handlePDFDownload = async (
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "budgetbuddy.pdf";
+    link.download = "transactions.pdf";
     link.click();
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error generating PDF:", error);
+    console.error("Error Occurred:", error);
   }
 };
 
 const Transaction: React.FC = React.memo(() => {
   const { data: session } = useSession();
+  const t = useTranslations();
   const [isExpense, setIsExpense] = useState(true);
 
-  // Get translation function for all namespaces
-  const t = useTranslations();
   const { showSuccess, showError } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -140,20 +139,20 @@ const Transaction: React.FC = React.memo(() => {
       newFilters.dateTo &&
       new Date(newFilters.dateFrom) > new Date(newFilters.dateTo)
     ) {
-      newErrors.dateTo = t('common.messages.toDateAfterFrom');
+      newErrors.dateTo = t("pages.dashboard.transaction.search.errors.toDateAfterFrom");
     }
     if (
       newFilters.minAmount &&
       newFilters.maxAmount &&
       parseFloat(newFilters.minAmount) > parseFloat(newFilters.maxAmount)
     ) {
-      newErrors.maxAmount = t('common.messages.maxGreaterThanMin');
+      newErrors.maxAmount = t("pages.dashboard.transaction.search.errors.maxGreaterThanMin");
     }
     if (newFilters.minAmount && parseFloat(newFilters.minAmount) < 0) {
-      newErrors.minAmount = t('common.messages.minPositive');
+      newErrors.minAmount = t("pages.dashboard.transaction.search.errors.minPositive");
     }
     if (newFilters.maxAmount && parseFloat(newFilters.maxAmount) < 0) {
-      newErrors.maxAmount = t('common.messages.maxPositive');
+      newErrors.maxAmount = t("pages.dashboard.transaction.search.errors.maxPositive");
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -178,18 +177,19 @@ const Transaction: React.FC = React.memo(() => {
 
     setDeleting(true);
     try {
-      const response = await deleteTransaction(deleteTransactionId);
+      const response = await deleteTransaction(deleteTransactionId, () => t("backend.api.errorOccurred"));
       if (response.success) {
         showSuccess(response.message);
         // Refresh transactions
         refetchTransactions();
         setDeleteTransactionId(null);
       } else {
-        showError(response.message || "Failed to delete transaction");
+        showError(response.message || t("backend.api.errorOccurred"));
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      console.error("Error deleting transaction:", error);
-      showError("Unexpected error deleting transaction");
+    
+      showError(t("backend.api.errorOccurred"));
     } finally {
       setDeleting(false);
     }
@@ -222,14 +222,14 @@ const Transaction: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-           Transactions Overview
+           {t("pages.dashboard.transaction.title")}
           </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {t(isExpense ? 'constants.types.expense' : 'constants.types.income')}
+            {isExpense ? t("common.ui.expense") : t("common.ui.income")}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -251,7 +251,7 @@ const Transaction: React.FC = React.memo(() => {
                {() => (
                  <SelectBox
                    name="category"
-                   options={[t('common.ui.all'), ...categories.map((cat) => cat.name)]}
+                   options={["All", ...categories.map((cat) => cat.name)]}
                    value={selectedCategory}
                    onChange={handleCategoryChange}
                  />
@@ -264,7 +264,7 @@ const Transaction: React.FC = React.memo(() => {
              onClick={() => setIsAddTransactionOpen(true)}
            >
              <Plus className="w-4 h-4" />
-             Add Transaction
+             {t("forms.buttons.add")}
            </Button>
          </div>
         <div className="flex justify-end">
@@ -272,7 +272,7 @@ const Transaction: React.FC = React.memo(() => {
             onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
             className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
           >
-            Advanced Search
+            {t("pages.dashboard.transaction.search.advanced")}
             {isAdvancedOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -290,7 +290,7 @@ const Transaction: React.FC = React.memo(() => {
                     name="search"
                     type="text"
                     label=""
-                    placeholder="Search transactions"
+                    placeholder={t("pages.dashboard.transaction.search.placeholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     inputClassName="pl-8 rounded-full"
@@ -302,7 +302,7 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="from"
                      type="date"
-                     label="From"
+                     label={t("pages.dashboard.transaction.search.labels.from")}
                      value={filters.dateFrom}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -319,7 +319,7 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="to"
                      type="date"
-                     label="To"
+                     label={t("pages.dashboard.transaction.search.labels.to")}
                      value={filters.dateTo}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -336,8 +336,8 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="min"
                      type="number"
-                     label="Min"
-                     placeholder="Min amount"
+                     label={t("pages.dashboard.transaction.search.labels.min")}
+                     placeholder={t("pages.dashboard.transaction.search.labels.minAmount")}
                      value={filters.minAmount}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -354,8 +354,8 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="max"
                      type="number"
-                     label="Max"
-                     placeholder="Max amount"
+                     label={t("pages.dashboard.transaction.search.labels.max")}
+                     placeholder={t("pages.dashboard.transaction.search.labels.maxAmount")}
                      value={filters.maxAmount}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -386,7 +386,7 @@ const Transaction: React.FC = React.memo(() => {
             columns={[
               {
                 key: "date",
-                label: "Date",
+                label: t("backend.validation.date"),
                 sortable: true,
                 render: (value) =>
                   value
@@ -395,11 +395,11 @@ const Transaction: React.FC = React.memo(() => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "title", label: "Title" },
-              { key: "category", label: "Category" },
+              { key: "title", label: t("backend.validation.title") },
+              { key: "category", label: t("backend.validation.category") },
               {
                 key: "amount",
-                label: "Amount",
+                label: t("backend.validation.amount"),
                 sortable: true,
                 render: (value) => {
                   const currency = session?.user?.currency || "INR";
@@ -408,27 +408,27 @@ const Transaction: React.FC = React.memo(() => {
               },
               {
                 key: "actions",
-                label: "Actions",
+                label: t("common.ui.actions"),
                 render: (value, row) => (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleViewClick(row as TransactionType)}
                       className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title={t('common.actions.view')}
+                      title={t("forms.buttons.view")}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEditClick(row as TransactionType)}
                       className="p-1 hover:bg-background/10  rounded transition-colors cursor-pointer"
-                      title={t('common.actions.edit')}
+                      title={t("forms.buttons.edit")}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(row._id as string)}
                       className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                      title={t('common.actions.delete')}
+                      title={t("forms.buttons.delete")}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
@@ -436,7 +436,7 @@ const Transaction: React.FC = React.memo(() => {
                 ),
               },
             ]}
-            title="Transaction Records"
+            title={t("pages.dashboard.transaction.table.title")}
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
@@ -468,14 +468,14 @@ const Transaction: React.FC = React.memo(() => {
               }
             >
               <Download className="w-4 h-4" />
-              Download PDF
+              {t("pages.dashboard.transaction.buttons.downloadPdf")}
             </Button>
           </div>
         </>
       ) : (
         <NotFound
-          title="No Transactions Found"
-          message="You haven't added any transactions yet. Start by adding your first transaction."
+          title={t("pages.dashboard.transaction.notFound.title")}
+          message={t("pages.dashboard.transaction.notFound.message")}
         />
       )}
 

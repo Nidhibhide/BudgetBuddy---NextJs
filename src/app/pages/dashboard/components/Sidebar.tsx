@@ -13,13 +13,19 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/app/features/common";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
+  const t = useTranslations();
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
+    const pathname = usePathname(); // Get the current path
 
   useEffect(() => {
-    setSelectedLink("/dashboard/home");
-  }, []);
+    const cleanedPath = pathname.replace(/^\/[^/]+/, "");
+    setSelectedLink(cleanedPath);
+    console.log(pathname);
+  }, [pathname]);
   const handleLinkClick = (link: { href: string }) => {
     setSelectedLink(link.href);
   };
@@ -27,32 +33,32 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const sidebarLinks = [
     {
       href: "/dashboard/home",
-      label: "Dashboard",
+      label: t("pages.dashboard.sidebar.menu.dashboard"),
       icon: MdDashboard,
     },
     {
       href: "/dashboard/category",
-      label: "Category",
+      label: t("pages.dashboard.sidebar.menu.category"),
       icon: MdCategory,
     },
     {
       href: "/dashboard/transaction",
-      label: "Transaction",
+      label: t("pages.dashboard.sidebar.menu.transaction"),
       icon: MdPayment,
     },
     {
       href: "/dashboard/bill-reminders",
-      label: "Set Alerts",
+      label: t("pages.dashboard.sidebar.menu.setAlerts"),
       icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
-      label: "Setting",
+      label: t("pages.dashboard.sidebar.menu.setting"),
       icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
-      label: "Logout",
+      label: t("pages.dashboard.sidebar.menu.logout"),
       icon: MdLogout,
     },
   ];

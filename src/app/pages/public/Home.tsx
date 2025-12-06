@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { GetStartedLink } from "@/app/features/common/index";
+import { useTranslations } from "next-intl";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
 
   const handleGetStartedClick = () => {
     setLoading(true);
@@ -17,19 +19,19 @@ const Home = () => {
       <div className="flex xl:flex-row flex-col gap-12 xl:gap-2 px-4 md:px-20 justify-center">
         <div className="flex flex-col xl:gap-8 gap-6 items-center justify-center">
           <div className="xl:text-6xl md:text-5xl text-4xl font-bold text-center max-w-6xl">
-            Hey there! Ready to take <span className="text-indigo-500">control</span> of your money?
+            {t("pages.public.home.heroTitle")}
           </div>
 
           <div className="text-center xl:text-xl text-lg">
-            From daily spends to monthly insights — all in one clean view. Simple. Smart. Stress-free.
+            {t("pages.public.home.heroSubtitle")}
           </div>
           <div className="flex gap-4 items-center">
-            <GetStartedLink href="/signin" width="w-[150px]" onClick={handleGetStartedClick} loading={loading}>Get Started</GetStartedLink>
+            <GetStartedLink href="/signin" width="w-[150px]" onClick={handleGetStartedClick} loading={loading}>{t("pages.public.home.getStarted")}</GetStartedLink>
             <a
               href="#features"
               className=" bg-btn-background text-white hover:bg-btn-hover py-2.5 px-4 text-center text-base font-medium  rounded-xl   hover:shadow-md transition duration-500 w-[150px]"
             >
-              Read more
+              {t("pages.public.home.readMore")}
             </a>
           </div>
         </div>
@@ -37,10 +39,10 @@ const Home = () => {
       <div className="w-full flex justify-center mt-28 px-4" id="features">
         <div className="flex flex-col justify-center items-center max-w-6xl">
           <h1 className="md:text-5xl text-center font-bold text-4xl">
-            Features
+            {t("pages.public.home.featuresTitle")}
           </h1>
           <p className="text-lg text-center mt-4">
-            Explore our powerful tools designed to help you manage your finances effortlessly.
+            {t("pages.public.home.featuresSubtitle")}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 mt-12 w-full justify-items-center">
@@ -49,10 +51,10 @@ const Home = () => {
                 💡
               </div>
               <h2 className="text-xl font-semibold text-center">
-                Powerful Dashboard
+                {t("pages.public.home.features.powerfulDashboard.title")}
               </h2>
               <p className="text-center">
-                Get an instant overview of your financial health with clean charts and data.
+                {t("pages.public.home.features.powerfulDashboard.description")}
               </p>
             </div>
 
@@ -61,10 +63,10 @@ const Home = () => {
                 ⚙️
               </div>
               <h2 className="text-xl font-semibold text-center">
-                Custom Categories
+                {t("pages.public.home.features.customCategories.title")}
               </h2>
               <p className="text-center">
-                Create and manage categories that match your lifestyle and habits.
+                {t("pages.public.home.features.customCategories.description")}
               </p>
             </div>
 
@@ -73,10 +75,10 @@ const Home = () => {
                 📅
               </div>
               <h2 className="text-xl font-semibold text-center">
-                Monthly Reports
+                {t("pages.public.home.features.monthlyReports.title")}
               </h2>
               <p className="text-center">
-                Get detailed monthly summaries to stay on track with your budget goals.
+                {t("pages.public.home.features.monthlyReports.description")}
               </p>
             </div>
 
@@ -85,10 +87,10 @@ const Home = () => {
                 🔔
               </div>
               <h2 className="text-xl font-semibold text-center">
-                Smart Alerts
+                {t("pages.public.home.features.smartAlerts.title")}
               </h2>
               <p className="text-center">
-                Get notified of overspending, due bills, and upcoming payments.
+                {t("pages.public.home.features.smartAlerts.description")}
               </p>
             </div>
             <div className=" rounded-2xl bg-background shadow-lg p-4 sm:p-6 flex flex-col items-center gap-3 sm:gap-4 hover:shadow-xl transition-shadow duration-300">
@@ -96,10 +98,10 @@ const Home = () => {
                 🌍
               </div>
               <h2 className="text-xl font-semibold text-center">
-                Multi-Currency
+                {t("pages.public.home.features.multiCurrency.title")}
               </h2>
               <p className="text-center">
-                Track your income and expenses in various currencies with real-time exchange rates.
+                {t("pages.public.home.features.multiCurrency.description")}
               </p>
             </div>
 
@@ -108,10 +110,10 @@ const Home = () => {
                 🌓
               </div>
               <h2 className="text-xl font-semibold text-center ">
-                Theme Support
+                {t("pages.public.home.features.themeSupport.title")}
               </h2>
               <p className="text-center ">
-                Enjoy a seamless light and dark mode experience to match your environment.
+                {t("pages.public.home.features.themeSupport.description")}
               </p>
             </div>
           </div>
@@ -121,10 +123,10 @@ const Home = () => {
         <div className="text-center">
           <h2 className="text-2xl font-bold">BudgetBuddy</h2>
           <p className="text-sm mt-2 ">
-            Simplify your spending. Master your money.
+            {t("pages.public.home.footer.tagline")}
           </p>
           <p className="text-xs mt-4">
-            © {new Date().getFullYear()} BudgetBuddy. Built with care for personal finance lovers.
+            {t("pages.public.home.footer.copyright", { year: new Date().getFullYear() })}
           </p>
         </div>
       </footer>

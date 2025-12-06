@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import {
   Dialog,
@@ -29,65 +30,65 @@ const Transaction: React.FC<AddTransactionProps> = ({
   const { data: session } = useSession();
   const { showSuccess, showError } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
-
   const [loading, setLoading] = useState(false);
+  const t = useTranslations();
+  const tCommon = useTranslations('common');
 
-  const translatedTypes = ["Expense", "Income"];
+  const translatedTypes = [tCommon('ui.expense'), tCommon('ui.income')];
 
   const validationSchema = Yup.object().shape({
     date: Yup.date()
-      .required("Date is required")
-      .max(new Date(), "Date cannot be in the future"),
+      .required(t('forms.validation.dateRequired'))
+      .max(new Date(), t('forms.validation.dateNotFuture')),
     title: Yup.string()
-      .min(1, "Title must be at least 1 character")
-      .max(100, "Title must be at most 100 characters")
-      .required("Title is required"),
+      .min(1, t('forms.validation.titleMin1'))
+      .max(100, t('forms.validation.titleMax100'))
+      .required(t('forms.validation.titleRequired')),
     description: Yup.string()
-      .min(2, "Description must be at least 2 characters")
-      .max(200, "Description must be at most 200 characters")
-      .required("Description is required"),
-    category: Yup.string().required("Category is required"),
+      .min(2, t('forms.validation.descriptionMin2'))
+      .max(200, t('forms.validation.descriptionMax200'))
+      .required(t('forms.validation.descriptionRequired')),
+    category: Yup.string().required(t('forms.validation.categoryRequired')),
     amount: Yup.number()
-      .positive("Amount must be positive")
-      .required("Amount is required"),
+      .positive(t('forms.validation.amountPositive'))
+      .required(t('forms.validation.amountRequired')),
     type: Yup.string()
-      .oneOf(translatedTypes, "Invalid type")
-      .required("Type is required"),
+      .oneOf(translatedTypes, t('forms.validation.invalidType'))
+      .required(t('forms.validation.typeRequired')),
   });
 
-  const fetchCategories = async (
+  const fetchCategories = useCallback(async (
     type: string,
     setFieldValue?: (field: string, value: string) => void
   ) => {
-    
+
     try {
-      const response = await getCategoryDetails(type);
-      console.log("response", response);
+      const response = await getCategoryDetails(type, t);
       if (response.success) {
         setCategories(response.data || []);
         if (setFieldValue && response.data && response.data.length > 0) {
           setFieldValue("category", response.data[0].name);
         }
       } else {
-        console.error("Error Occurred:", response.message);
+        console.error(t('forms.messages.errorOccurred') + ":", response.message);
         setCategories([]);
         // TODO: Show user-friendly error message
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      
+
       setCategories([]);
       // TODO: Show user-friendly error message
     } finally {
-      
+
     }
-  };
+  }, [t]);
 
   const handleTypeChange = (
     value: string,
     setFieldValue: (field: string, value: string) => void
   ) => {
-    const englishType = value === "Expense" ? 'Expense' : 'Income';
+    const englishType = value === tCommon('ui.expense') ? 'Expense' : 'Income';
     fetchCategories(englishType, setFieldValue);
   };
 
@@ -96,16 +97,16 @@ const Transaction: React.FC<AddTransactionProps> = ({
       const typeToFetch = transaction?.type || TYPES[0];
       fetchCategories(typeToFetch);
     }
-  }, [open, transaction]);
+  }, [open, transaction, fetchCategories]);
 
   const handleSubmit = async (values: TransactionType) => {
     setLoading(true);
     try {
-      const englishType = values.type === "Expense" ? 'Expense' : 'Income';
+      const englishType = values.type === tCommon('ui.expense') ? 'Expense' : 'Income';
       const data = { ...values, type: englishType };
       const response = transaction?._id
-        ? await editTransaction(transaction._id, data)
-        : await addTransaction(data);
+        ? await editTransaction(transaction._id, data, t)
+        : await addTransaction(data, t);
       if (response.success) {
         showSuccess(response.message);
         onOpenChange(false);
@@ -116,7 +117,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
 
-      showError("An unexpected error occurred");
+      showError(t('forms.messages.unexpectedError'));
     } finally {
       setLoading(false);
     }
@@ -127,7 +128,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {transaction?._id ? "Edit Form" : "Add Form"}
+            {transaction?._id ? t('forms.titles.editForm') : t('forms.titles.addForm')}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -137,7 +138,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
             description: transaction?.description || "",
             category: transaction?.category || "",
             amount: transaction?.amount || 1,
-            type: transaction?.type ? (transaction.type === 'Expense' ? "Expense" : "Income") : "Expense",
+            type: transaction?.type ? (transaction.type === 'Expense' ? tCommon('ui.expense') : tCommon('ui.income')) : tCommon('ui.expense'),
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -145,22 +146,22 @@ const Transaction: React.FC<AddTransactionProps> = ({
         >
           {({ handleSubmit, setFieldValue }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="date" label="Date" type="date" />
+              <InputBox name="date" label={t('backend.validation.date')} type="date" />
               <SelectBox
                 name="type"
-                label="Type"
+                label={t('backend.validation.type')}
                 options={translatedTypes}
                 onChange={(value) => handleTypeChange(value, setFieldValue)}
               />
               <SelectBox
                 name="category"
-                label="Category"
+                label={t('backend.validation.category')}
                 options={categories.map((cat) => cat.name)}
               />
-              <InputBox name="title" label="Title" />
+              <InputBox name="title" label={t('backend.validation.title')} />
 
-              <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
+              <TextareaBox name="description" label={t('backend.validation.description')} />
+              <InputBox name="amount" label={`${t('backend.validation.amount')} (${session?.user?.currency || 'INR'})`} type="number" />
 
               <div className="flex justify-end space-x-2">
                 <Button
@@ -168,10 +169,10 @@ const Transaction: React.FC<AddTransactionProps> = ({
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  Cancel
+                  {t('forms.buttons.cancel')}
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {transaction?._id ? "Update" : "Add"}
+                  {transaction?._id ? t('forms.buttons.update') : t('forms.buttons.add')}
                 </Button>
               </div>
             </form>

@@ -5,25 +5,27 @@ import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, MousePointer, Loader2, Pen, Trash2, AlertTriangle } from "lucide-react";
 import {
-  CustomPagination,
-  NotFound,
-  Table,
-} from "@/app/features/common";
-import { DeleteCategory,Category as CategoryForm } from "@/app/features/forms";
+  Plus,
+  MousePointer,
+  Loader2,
+  Pen,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
+import { CustomPagination, NotFound, Table } from "@/app/features/common";
+import { DeleteCategory, Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
-import { useTranslations, useLocale } from 'next-intl'; // Import for internationalization
+import { useLocale, useTranslations } from "next-intl";
 
 const Category: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
 
-  // Get translation function for all namespaces
-  const t = useTranslations();
   const locale = useLocale();
+  const t = useTranslations();
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -64,7 +66,9 @@ const Category: React.FC = React.memo(() => {
   const getCategoryTotal = useCallback(
     (categoryName: string) => {
       const typeTotals = totals.find((t) => t.type === currentType);
-      const categoryData = typeTotals?.categories.find((c) => c.category === categoryName);
+      const categoryData = typeTotals?.categories.find(
+        (c) => c.category === categoryName
+      );
       const category = data.find((c) => c.name === categoryName);
       const budgetLimit = category?.budgetLimit || 0;
       const goal = category?.goal || 0;
@@ -117,14 +121,14 @@ const Category: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-          {t('dashboard.overview.categoryOverview')}
-        </h2>
+           {t("pages.dashboard.category.title")}
+         </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {t('constants.types.' + currentType.toLowerCase())}
+            {currentType === "Expense" ? t("common.ui.expense") : t("common.ui.income")}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -144,7 +148,9 @@ const Category: React.FC = React.memo(() => {
         ) : (
           <>
             {data?.map((category: Category, index: number) => {
-              const { total, percentage, budgetLimit, goal } = getCategoryTotal(category.name);
+              const { total, percentage, budgetLimit, goal } = getCategoryTotal(
+                category.name
+              );
               return (
                 <Card
                   key={index}
@@ -189,11 +195,13 @@ const Category: React.FC = React.memo(() => {
                               } else {
                                 const result = await getTransactions(
                                   currentType,
+                                  t,
                                   category.name,
                                   1,
                                   1
                                 );
-                                count = result.pagination?.totalTransactions || 0;
+                                count =
+                                  result.pagination?.totalTransactions || 0;
                               }
                               setCategoryTransactionCount(count);
                               setDeletingCategory(category);
@@ -212,15 +220,16 @@ const Category: React.FC = React.memo(() => {
                       </div>
                       {currentType === "Expense" && budgetLimit > 0 && (
                         <div className="text-sm text-foreground/70">
-                          {t('dashboard.budget.budget')}: {budgetLimit.toLocaleString()} {currency}
+                          {t("pages.dashboard.category.labels.budget")}: {budgetLimit.toLocaleString()} {currency}
                         </div>
                       )}
                       {currentType === "Income" && goal > 0 && (
                         <div className="text-sm text-foreground/70">
-                          {t('dashboard.budget.goal')}: {goal.toLocaleString()} {currency}
+                          {t("pages.dashboard.category.labels.goal")}: {goal.toLocaleString()} {currency}
                         </div>
                       )}
-                      {(currentType === "Expense" && budgetLimit > 0) || (currentType === "Income" && goal > 0) ? (
+                      {(currentType === "Expense" && budgetLimit > 0) ||
+                      (currentType === "Income" && goal > 0) ? (
                         <>
                           <div className="text-sm text-foreground">
                             {percentage.toFixed(1)}%
@@ -236,9 +245,14 @@ const Category: React.FC = React.memo(() => {
                         </>
                       ) : (
                         <div className="flex items-center space-x-1">
-                          <AlertTriangle className="w-6 h-6 text-yellow-600" strokeWidth={3} />
+                          <AlertTriangle
+                            className="w-6 h-6 text-yellow-600"
+                            strokeWidth={3}
+                          />
                           <span className="text-base font-semibold text-foreground/60">
-                            {currentType === "Expense" ? t('dashboard.budget.setBudgetToTrack') : t('dashboard.budget.setGoalToTrack')}
+                            {currentType === "Expense"
+                              ? t("pages.dashboard.category.messages.setBudgetToTrack")
+                              : t("pages.dashboard.category.messages.setGoalToTrack")}
                           </span>
                         </div>
                       )}
@@ -257,10 +271,10 @@ const Category: React.FC = React.memo(() => {
                     <Plus className="w-6 h-6 text-foreground" />
                   </div>
                   <div className="text-lg font-semibold text-foreground">
-                    {t('dashboard.category.addCategory')}
+                    {t("forms.buttons.add")}
                   </div>
                   <div className="text-sm text-foreground/70">
-                    {t('dashboard.category.createNewCategory')}
+                    {t("pages.dashboard.category.messages.createNewCategory")}
                   </div>
                 </CardContent>
               </Card>
@@ -282,7 +296,7 @@ const Category: React.FC = React.memo(() => {
               columns={[
                 {
                   key: "date",
-                  label: t('common.fields.date'),
+                  label: t("backend.validation.date"),
                   sortable: true,
                   render: (value) =>
                     value
@@ -291,16 +305,16 @@ const Category: React.FC = React.memo(() => {
                         ).toLocaleDateString(locale)
                       : "",
                 },
-                { key: "description", label: t('common.fields.description') },
+                { key: "description", label: t("backend.validation.description") },
                 {
                   key: "amount",
-                  label: t('common.fields.amount'),
+                  label: t("backend.validation.amount"),
                   sortable: true,
                   render: (value) => `${value} ${currency}`,
                 },
-                { key: "type", label: t('common.fields.type') },
+                { key: "type", label: t("pages.dashboard.category.table.columns.type") },
               ]}
-              title={`${t('dashboard.category.recordsFor')} ${selectedCategory}`}
+              title={t("pages.dashboard.category.table.titles.recordsFor", { category: selectedCategory })}
               onSort={handleSort}
               sortBy={sortBy}
               sortOrder={sortOrder}
@@ -316,14 +330,14 @@ const Category: React.FC = React.memo(() => {
           </>
         ) : (
           <NotFound
-            title={t('dashboard.category.noRecordsFound')}
-            message={t('dashboard.category.noRecordsMessage', { category: selectedCategory })}
+            title={t("pages.dashboard.category.table.titles.noRecordsFound")}
+            message={t("pages.dashboard.category.table.titles.noRecordsMessage", { category: selectedCategory })}
           />
         )
       ) : (
         <NotFound
-          title={t('dashboard.category.selectCategory')}
-          message={t('dashboard.category.selectCategoryMessage')}
+          title={t("pages.dashboard.category.table.titles.selectCategory")}
+          message={t("pages.dashboard.category.table.titles.selectCategoryMessage")}
           icon={MousePointer}
         />
       )}

@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -18,6 +18,8 @@ const ViewUpcomingBill: React.FC<ViewUpcomingBillProps> = ({
   onOpenChange,
   bill,
 }) => {
+  const t = useTranslations();
+
   if (!bill) return null;
 
   return (
@@ -29,23 +31,23 @@ const ViewUpcomingBill: React.FC<ViewUpcomingBillProps> = ({
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label="Due Date"
+            label={t('backend.validation.dueDate')}
             value={formatDate(bill.dueDate)}
           />
           <FieldDisplay
-            label="Reminder Date"
+            label={t('backend.validation.reminderDate')}
             value={formatDate(bill.reminderDate)}
           />
           <FieldDisplay
-            label="Description"
+            label={t('backend.validation.description')}
             value={bill.description}
           />
           <FieldDisplay
-            label="Amount"
+            label={t('backend.validation.amount')}
             value={`${bill.amount} INR`}
           />
           <FieldDisplay
-            label="Status"
+            label={t('backend.validation.status')}
             value={bill.status}
             valueClassName={bill.status === 'Paid' ? 'text-green-500' : 'text-red-500'}
           />

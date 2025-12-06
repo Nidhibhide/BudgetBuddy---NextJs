@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getPieChart } from "@/app/lib/dashboard";
-import { useTranslations } from 'next-intl';
 import { colorPalette } from '@/constants';
 import { MonthlyExpensesResponse, ExpenseData } from '@/app/types/appTypes';
 
 export const usePieChart = () => {
-  const t = useTranslations('common');
+  const t = useTranslations();
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export const usePieChart = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getPieChart();
+      const response = await getPieChart(t);
       if (response.success) {
         const data: MonthlyExpensesResponse = response.data;
         const transformedExpenses: ExpenseData[] = data.categories.map((cat, index) => ({
@@ -24,11 +24,11 @@ export const usePieChart = () => {
         }));
         setExpenses(transformedExpenses);
       } else {
-        setError(response.message || t('messages.unexpectedError'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

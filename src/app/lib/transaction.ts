@@ -1,18 +1,18 @@
 import axios, { AxiosError } from "axios";
 import { Transaction } from "@/app/types/appTypes";
 
-export async function addTransaction(data: Transaction) {
+export async function addTransaction(data: Transaction, t: (key: string) => string) {
   try {
     const response = await axios.post("/api/transaction/create", data);
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error adding transaction:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while adding transaction",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
@@ -21,6 +21,7 @@ export async function addTransaction(data: Transaction) {
 
 export async function getTransactions(
   type: string,
+  t: (key: string) => string,
   category?: string,
   page?: number,
   limit?: number,
@@ -38,63 +39,63 @@ export async function getTransactions(
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching transactions:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching transactions",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getTransactionTotals(type: string) {
+export async function getTransactionTotals(type: string, t: (key: string) => string) {
   try {
     const response = await axios.get(`/api/transaction/total?type=${type}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error fetching transaction totals:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while fetching transaction totals",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function editTransaction(id: string, data: Partial<Transaction>) {
+export async function editTransaction(id: string, data: Partial<Transaction>, t: (key: string) => string) {
   try {
     const response = await axios.put(`/api/transaction/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error editing transaction:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while editing transaction",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function deleteTransaction(id: string) {
+export async function deleteTransaction(id: string, t: (key: string) => string) {
   try {
     const response = await axios.delete(`/api/transaction/delete?id=${id}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error deleting transaction:", error);
+    console.error(t("backend.api.errorOccurred"), error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        "Something went wrong while deleting transaction",
+        t("backend.api.errorOccurred"),
       success: false,
       statusCode: axiosError.response?.status || 500,
     };

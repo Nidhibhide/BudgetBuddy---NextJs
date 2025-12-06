@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const t = await getTranslations();
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing email or password");
+          throw new Error(t('backend.api.missingEmailOrPassword'));
         }
 
         const { error } = Login(t).validate({ email: credentials.email, password: credentials.password });
@@ -30,15 +30,15 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
-          throw new Error("No user found");
+          throw new Error(t('backend.api.userNotFound'));
         }
 
         if (user.authProvider !== "local") {
-          throw new Error("This account uses a different login method");
+          throw new Error(t('backend.api.differentLoginMethod'));
         }
 
         if (!user.password) {
-          throw new Error("No user found");
+          throw new Error(t('backend.api.userNotFound'));
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error("Incorrect password");
+          throw new Error(t('backend.api.incorrectPassword'));
         }
 
         return {
@@ -94,6 +94,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
+      const t = await getTranslations();
       if (account?.provider === "google") {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
@@ -139,7 +140,7 @@ export const authOptions: NextAuthOptions = {
           const refreshedTokens = await response.json();
 
           if (!response.ok) {
-            throw new Error("Failed to refresh token");
+            throw new Error(t('backend.api.failedToRefreshToken'));
           }
 
           token.accessToken = refreshedTokens.access_token;
@@ -148,7 +149,7 @@ export const authOptions: NextAuthOptions = {
             token.refreshToken = refreshedTokens.refresh_token;
           }
         } catch (error) {
-          throw new Error(`Failed to refresh token: ${error instanceof Error ? error.message : String(error)}`);
+          throw new Error(`${t('backend.api.failedToRefreshToken')}: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 

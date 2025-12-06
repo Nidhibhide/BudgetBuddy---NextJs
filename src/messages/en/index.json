@@ -11,7 +11,6 @@
       "brokenEven": "You have broken even"
     },
     "api": {
-      "success": "Success",
       "userNotFound": "User not found",
       "categoryNotFound": "Category not found",
       "categoryAlreadyExists": "Category already exists",
@@ -30,9 +29,7 @@
       "emailAlreadyInUse": "Email already in use",
       "reminderBeforeDue": "Reminder date must be before due date",
       "categoryNameAlreadyExists": "Category name already exists",
-      "upcomingBillNotFound": "Upcoming bill not found",
-      "transactionNotFound": "Transaction not found",
-      "recurringPaymentNotFound": "Recurring payment not found"
+      "success": "Success"
     },
     "validation": {
       "name": "Name",
@@ -43,10 +40,10 @@
       "reminderDate": "Reminder Date",
       "title": "Title",
       "description": "Description",
+      "date": "Date",
       "amount": "Amount",
       "frequency": "Frequency",
       "status": "Status",
-      "date": "Date",
       "category": "Category",
       "dueDate": "Due Date",
       "email": "Email",
@@ -54,6 +51,350 @@
       "currency": "Currency",
       "categories": "Categories",
       "limit": "Limit"
+    }
+  },
+  "forms": {
+    "buttons": {
+      "cancel": "Cancel",
+      "update": "Update",
+      "add": "Add",
+      "save": "Save",
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "titles": {
+      "editForm": "Edit Form",
+      "addForm": "Add Form",
+      "changePassword": "Change Password",
+      "deleteCategory": "Delete Category",
+      "updateProfile": "Update Profile"
+    },
+    "labels": {
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "enterName": "Enter Name",
+      "enterEmail": "Enter Email",
+      "selectCurrency": "Select Currency",
+      "chooseAction": "Choose an action",
+      "selectCategory": "Select category",
+      "notificationsStartFromDate": "Notifications will start from this date"
+    },
+    "options": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "active": "Active",
+      "inactive": "Inactive",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "messages": {
+      "confirmDeleteCategory": "Are you sure you want to delete \"{categoryName}\"?",
+      "categoryHasTransactions": "This category has {count} associated transaction(s).",
+      "deleteAllTransactions": "Delete all transactions",
+      "reassignToCategory": "Reassign to category",
+      "noAssociatedTransactions": "No associated transactions for \"{categoryName}\" ({categoryType}).",
+      "noChangesDetected": "No changes detected",
+      "newPasswordDifferent": "New password must be different from old password",
+      "unexpectedError": "An unexpected error occurred"
+    },
+    "validation": {
+      "nameMin2": "Name must be at least 2 characters",
+      "nameMax50": "Name must be at most 50 characters",
+      "nameRequired": "Name is required",
+      "nameAlphabetsOnly": "Name must contain only alphabets and spaces",
+      "nameMin3": "Name must be at least 3 characters",
+      "budgetLimitPositive": "Budget limit must be positive",
+      "budgetLimitTooHigh": "Budget limit is too high",
+      "goalPositive": "Goal must be positive",
+      "goalTooHigh": "Goal is too high",
+      "invalidType": "Invalid type",
+      "typeRequired": "Type is required",
+      "passwordDigitsOnly": "Password must contain only digits",
+      "passwordMin5": "Password must be at least 5 characters",
+      "passwordMax10": "Password must be at most 10 characters",
+      "newPasswordRequired": "New password is required",
+      "passwordsMustMatch": "Passwords must match",
+      "confirmPasswordRequired": "Confirm password is required",
+      "dateRequired": "Date is required",
+      "dateNotPast": "Date cannot be in the past",
+      "dateNotFuture": "Date cannot be in the future",
+      "reminderBeforeNextDue": "Reminder date must be before next due date",
+      "titleMin1": "Title must be at least 1 character",
+      "titleMax100": "Title must be at most 100 characters",
+      "titleRequired": "Title is required",
+      "descriptionMin2": "Description must be at least 2 characters",
+      "descriptionMax200": "Description must be at most 200 characters",
+      "descriptionRequired": "Description is required",
+      "categoryRequired": "Category is required",
+      "amountPositive": "Amount must be positive",
+      "amountRequired": "Amount is required",
+      "invalidFrequency": "Invalid frequency",
+      "frequencyRequired": "Frequency is required",
+      "invalidStatus": "Invalid status",
+      "invalidEmail": "Invalid email",
+      "emailRequired": "Email is required",
+      "invalidCurrency": "Invalid currency",
+      "currencyRequired": "Currency is required"
+    }
+  },
+  "dialogs": {
+    "confirmation": {
+      "title": "Confirm Action",
+      "description": "Are you sure you want to proceed with this action?"
+    },
+    "viewTransaction": {}
+  },
+  "charts": {
+    "budgetCalendar": {
+      "title": "Budget Calendar",
+      "tooltip": {
+        "notFound": "No data"
+      }
+    },
+    "incomeVsExpenseTrend": {
+      "title": "Income vs Expense Trend"
+    },
+    "monthlyExpensePieChart": {
+      "title": "Monthly Expenses"
+    }
+  },
+  "common": {
+    "appName": "BudgetBuddy",
+    "notFound": {
+      "defaultTitle": "No Data Found",
+      "defaultMessage": "We couldn't find any data matching your criteria. Try adjusting your filters or add some new items."
+    },
+    "widgets": {
+      "insights": {
+        "title": "Financial Insights"
+      },
+      "recentTransactions": {
+        "title": "Recent Transactions"
+      },
+      "totalBalance": {
+        "title": "Total Balance"
+      }
+    },
+    "pages": {
+      "upcomingBill": {
+        "columns": {},
+        "notFound": {
+          "message": "You haven't added any upcoming bills yet. Start by adding your first upcoming bill."
+        },
+        "delete": {
+          "confirm": "Are you sure you want to delete this upcoming bill?"
+        }
+      },
+      "recurringPayment": {
+        "columns": {},
+
+        "notFound": {
+          "message": "You haven't added any recurring payments yet. Start by adding your first recurring payment."
+        },
+        "delete": {
+          "confirm": "Are you sure you want to delete this recurring payment?"
+        }
+      }
+    },
+    "pdf": {
+      "title": "Transaction Report",
+      "categoriesAll": "Categories: All",
+      "noTransactions": "No transactions found",
+      "footer": {
+        "generatedBy": "Generated by BudgetBuddy App - Your Personal Finance Companion",
+        "generatedOn": "Generated on"
+      }
+    },
+    "ui": {
+      "toggleTheme": "Toggle theme",
+      "actions": "Actions",
+      "all": "All",
+      "expense": "Expense",
+      "income": "Income"
+    },
+    "hooks": {
+      "defaultInsights": [
+        "Track your spending patterns to identify areas for savings.",
+        "Set realistic budget goals based on your income.",
+        "Review your transactions regularly to stay on track.",
+        "Categorize your expenses for better financial insight.",
+        "Save a portion of your income for emergencies."
+      ]
+    }
+  },
+  "pages": {
+    "public": {
+      "header": {},
+      "home": {
+        "heroTitle": "Hey there! Ready to take control of your money?",
+        "heroSubtitle": "From daily spends to monthly insights — all in one clean view. Simple. Smart. Stress-free.",
+        "getStarted": "Get Started",
+        "readMore": "Read more",
+        "featuresTitle": "Features",
+        "featuresSubtitle": "Explore our powerful tools designed to help you manage your finances effortlessly.",
+        "features": {
+          "powerfulDashboard": {
+            "title": "Powerful Dashboard",
+            "description": "Get an instant overview of your financial health with clean charts and data."
+          },
+          "customCategories": {
+            "title": "Custom Categories",
+            "description": "Create and manage categories that match your lifestyle and habits."
+          },
+          "monthlyReports": {
+            "title": "Monthly Reports",
+            "description": "Get detailed monthly summaries to stay on track with your budget goals."
+          },
+          "smartAlerts": {
+            "title": "Smart Alerts",
+            "description": "Get notified of overspending, due bills, and upcoming payments."
+          },
+          "multiCurrency": {
+            "title": "Multi-Currency",
+            "description": "Track your income and expenses in various currencies with real-time exchange rates."
+          },
+          "themeSupport": {
+            "title": "Theme Support",
+            "description": "Enjoy a seamless light and dark mode experience to match your environment."
+          }
+        },
+        "footer": {
+          "tagline": "Simplify your spending. Master your money.",
+          "copyright": "© {year} BudgetBuddy. Built with care for personal finance lovers."
+        }
+      },
+      "signin": {
+        "title": "Sign In",
+        "googleSignIn": "Sign in with Google",
+        "or": "OR",
+        "placeholders": {
+          "email": "Enter your email",
+          "password": "Enter your password"
+        },
+        "buttons": {
+          "signin": "Sign In"
+        },
+        "links": {
+          "newUser": "New User?"
+        },
+        "messages": {
+          "loginFailed": "Login Failed"
+        }
+      },
+      "signup": {
+        "title": "Sign Up",
+        "placeholders": {
+          "name": "Enter your name",
+          "email": "Enter your email",
+          "password": "Enter your password"
+        },
+        "buttons": {
+          "signup": "Sign Up"
+        },
+        "links": {
+          "alreadyHaveAccount": "Already have an account?"
+        }
+      }
+    },
+    "dashboard": {
+      "mainPage": {
+        "title": "Overview"
+      },
+      "sidebar": {
+        "menu": {
+          "dashboard": "Dashboard",
+          "category": "Category",
+          "transaction": "Transaction",
+          "setAlerts": "Set Alerts",
+          "setting": "Setting",
+          "logout": "Logout"
+        },
+        "close": "Close sidebar"
+      },
+      "category": {
+        "title": "Category Overview",
+        "types": {},
+        "labels": {
+          "budget": "Budget",
+          "goal": "Goal",
+          "percentage": "%"
+        },
+        "messages": {
+          "setBudgetToTrack": "Set Budget to Track",
+          "setGoalToTrack": "Set Goal to Track",
+          "addCategory": "Add Category",
+          "createNewCategory": "Create New Category"
+        },
+        "table": {
+          "columns": {
+            "type": "Type"
+          },
+          "titles": {
+            "recordsFor": "Records for {category}",
+            "noRecordsFound": "No Records Found",
+            "noRecordsMessage": "No records found for {category}",
+            "selectCategory": "Select Category",
+            "selectCategoryMessage": "Select a category to view its transactions"
+          }
+        }
+      },
+      "transaction": {
+        "title": "Transactions Overview",
+        "types": {
+          "expense": "Expense",
+          "income": "Income"
+        },
+        "buttons": {
+          "add": "Add",
+          "downloadPdf": "Download PDF"
+        },
+        "search": {
+          "advanced": "Advanced Search",
+          "placeholder": "Search transactions",
+          "labels": {
+            "from": "From",
+            "to": "To",
+            "min": "Min",
+            "max": "Max",
+            "minAmount": "Min amount",
+            "maxAmount": "Max amount"
+          },
+          "errors": {
+            "toDateAfterFrom": "To date must be after from date",
+            "maxGreaterThanMin": "Max must be greater than min",
+            "minPositive": "Min must be positive",
+            "maxPositive": "Max must be positive"
+          }
+        },
+        "table": {
+          "columns": {},
+          "title": "Transaction Records"
+        },
+        "notFound": {
+          "title": "No Transactions Found",
+          "message": "You haven't added any transactions yet. Start by adding your first transaction."
+        }
+      },
+      "setting": {
+        "tabs": {
+          "editProfile": "Edit Profile",
+          "changePassword": "Change Password"
+        },
+        "ariaLabel": "settings tabs"
+      },
+      "billReminders": {
+        "tabs": {
+          "upcomingBills": "Upcoming Bills",
+          "recurringPayments": "Recurring Payments"
+        },
+        "ariaLabel": "bill reminders tabs"
+      },
+      "logout": {
+        "loggingOut": "Logging out..."
+      }
     }
   }
 }

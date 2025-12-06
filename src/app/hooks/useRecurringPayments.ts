@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { getRecurringPayments } from "@/app/lib/recurringPayment";
 import type { RecurringPayment, UseUpcomingBillsProps } from "@/app/types/appTypes";
-import { useTranslations } from 'next-intl'; // Import for internationalization
 
 export const useRecurringPayments = ({
   status = "All",
@@ -10,7 +10,7 @@ export const useRecurringPayments = ({
   sortBy = "nextDueDate",
   sortOrder = "asc",
 }: UseUpcomingBillsProps) => {
-  const t = useTranslations('common'); // Get translation function for the 'common' namespace
+  const t = useTranslations();
   const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +26,7 @@ export const useRecurringPayments = ({
       setLoading(true);
       setError(null);
       const response = await getRecurringPayments(
+        t,
         status,
         page,
         limit,
@@ -36,11 +37,11 @@ export const useRecurringPayments = ({
         setRecurringPayments(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('messages.failedToFetchRecurringPayments'));
+        setError(response.message || t('backend.api.errorOccurred'));
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('messages.unexpectedError')
+        err instanceof Error ? err.message : t('backend.api.errorOccurred')
       );
     } finally {
       setLoading(false);

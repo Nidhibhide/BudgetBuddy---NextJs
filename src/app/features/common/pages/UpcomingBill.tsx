@@ -16,9 +16,12 @@ import { useUpcomingBills } from "@/app/hooks";
 import { UpcomingBill as UpcomingBillType } from "@/app/types/appTypes";
 import { deleteUpcomingBill } from "@/app/lib/upcomingBill";
 import { useToast } from "@/app/features/common";
+import { useTranslations } from "next-intl";
 
 const UpcomingBill: React.FC = () => {
   const { showSuccess, showError } = useToast();
+  const t = useTranslations();
+  const tCommon = useTranslations('common');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("dueDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -73,19 +76,19 @@ const UpcomingBill: React.FC = () => {
 
     setDeleting(true);
     try {
-      const response = await deleteUpcomingBill(deleteUpcomingBillId);
+      const response = await deleteUpcomingBill(deleteUpcomingBillId, t);
       if (response.success) {
         showSuccess(response.message);
         // Refresh upcoming bills
         refetch();
         setDeleteUpcomingBillId(null);
       } else {
-        showError(response.message || "Error Occurred");
+        showError(response.message || t('backend.api.errorOccurred'));
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-   
-      showError("Error Occurred");
+
+      showError(t('backend.api.errorOccurred'));
     } finally {
       setDeleting(false);
     }
@@ -105,7 +108,7 @@ const UpcomingBill: React.FC = () => {
                 <div className="w-full sm:w-[180px]">
                   <SelectBox
                     name="status"
-                    options={["All", "Paid", "Unpaid"]}
+                    options={[tCommon('ui.all'), t('forms.options.paid'), t('forms.options.unpaid')]}
                     value={selectedStatus}
                     onChange={handleStatusChange}
                   />
@@ -118,7 +121,7 @@ const UpcomingBill: React.FC = () => {
               onClick={() => setIsOpen(true)}
             >
               <Plus className="w-4 h-4" />
-              Add
+              {t('forms.buttons.add')}
             </Button>
           </div>
         </div>
@@ -135,7 +138,7 @@ const UpcomingBill: React.FC = () => {
             columns={[
               {
                 key: "dueDate",
-                label: "Due Date",
+                label: t('backend.validation.dueDate'),
                 sortable: true,
                 render: (value) =>
                   value
@@ -146,7 +149,7 @@ const UpcomingBill: React.FC = () => {
               },
               {
                 key: "reminderDate",
-                label: "Reminder Date",
+                label: t('backend.validation.reminderDate'),
                 sortable: true,
                 render: (value) =>
                   value
@@ -155,10 +158,10 @@ const UpcomingBill: React.FC = () => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "title", label: "Title" },
+              { key: "title", label: t('backend.validation.title') },
               {
                 key: "status",
-                label: "Status",
+                label: t('backend.validation.status'),
                 render: (value) => (
                   <span
                     className={
@@ -173,12 +176,12 @@ const UpcomingBill: React.FC = () => {
               },
               {
                 key: "actions",
-                label: "Actions",
+                label: tCommon('ui.actions'),
                 render: (value, row) => (
                   <div className="flex gap-2">
                     <button
                       className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title="View"
+                      title={t('forms.buttons.view')}
                       onClick={() => {
                         setSelectedBill(row as unknown as UpcomingBillType);
                         setViewOpen(true);
@@ -188,7 +191,7 @@ const UpcomingBill: React.FC = () => {
                     </button>
                     <button
                       className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title="Edit"
+                      title={t('forms.buttons.edit')}
                       onClick={() => {
                         setSelectedBill(row as unknown as UpcomingBillType);
                         setIsOpen(true);
@@ -199,7 +202,7 @@ const UpcomingBill: React.FC = () => {
                     <button
                       onClick={() => handleDeleteClick(row._id as string)}
                       className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                      title="Delete"
+                      title={t('forms.buttons.delete')}
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
@@ -224,8 +227,8 @@ const UpcomingBill: React.FC = () => {
         </>
       ) : (
         <NotFound
-          title="Upcoming bill not found"
-          message="You haven't added any upcoming bills yet. Start by adding your first upcoming bill."
+          title={tCommon('notFound.defaultTitle')}
+          message={tCommon('notFound.defaultMessage')}
         />
       )}
       <UpcomingBillForm
@@ -245,7 +248,7 @@ const UpcomingBill: React.FC = () => {
         onOpenChange={(open) => !open && setDeleteUpcomingBillId(null)}
         onConfirm={handleConfirmDelete}
         loading={deleting}
-        description="Are you sure you want to delete this upcoming bill?"
+        description={tCommon('pages.upcomingBill.delete.confirm')}
       />
     </div>
   );
