@@ -3,16 +3,14 @@
 import React from "react";
 import { SearchX } from "lucide-react";
 import { NotFoundProps } from "@/app/types/appTypes";
-import { useTranslations } from "next-intl";
 
 const NotFound: React.FC<NotFoundProps> = ({
   title,
   message,
   icon: Icon = SearchX,
 }) => {
-  const t = useTranslations('common');
-  const defaultTitle = t('notFound.defaultTitle');
-  const defaultMessage = t('notFound.defaultMessage');
+  const defaultTitle = "No Data Found";
+  const defaultMessage = "No data available to display.";
 
   const displayTitle = title || defaultTitle;
   const displayMessage = message || defaultMessage;

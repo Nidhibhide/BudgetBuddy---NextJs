@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getRecurringPayments } from "@/app/lib/recurringPayment";
 import type { RecurringPayment, UseUpcomingBillsProps } from "@/app/types/appTypes";
 
@@ -10,7 +9,6 @@ export const useRecurringPayments = ({
   sortBy = "nextDueDate",
   sortOrder = "asc",
 }: UseUpcomingBillsProps) => {
-  const t = useTranslations();
   const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +24,6 @@ export const useRecurringPayments = ({
       setLoading(true);
       setError(null);
       const response = await getRecurringPayments(
-        t,
         status,
         page,
         limit,
@@ -37,16 +34,16 @@ export const useRecurringPayments = ({
         setRecurringPayments(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('backend.api.errorOccurred')
+        err instanceof Error ? err.message : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [status, page, limit, sortBy, sortOrder, t]);
+  }, [status, page, limit, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchRecurringPayments();

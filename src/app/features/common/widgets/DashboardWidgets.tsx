@@ -6,18 +6,16 @@ import { Lightbulb, X } from "lucide-react";
 import { TotalBalanceProps } from "@/app/types/appTypes";
 import { useTransactions } from "@/app/hooks/useTransactions";
 import { useInsights } from "@/app/hooks/useInsights";
-import { useTranslations } from "next-intl";
 
 export const Insights: React.FC = () => {
   const { insights } = useInsights();
-  const t = useTranslations('common');
 
   return (
     <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
       <div className="flex items-center mb-4">
         <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
         <h3 className="text-lg font-semibold">
-          {t('widgets.insights.title')}
+          Insights
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto">
@@ -46,19 +44,18 @@ export const RecentTransactions: React.FC = () => {
     sortBy: "date",
     sortOrder: "desc",
   });
-  const t = useTranslations('common');
 
   return (
     <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
       <h3 className="text-lg font-semibold mb-4">
-        {t('widgets.recentTransactions.title')}
+        Recent Transactions
       </h3>
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-3">
           {transactions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-2">
               <X className="w-12 h-12" />
-              <p>{t('notFound.defaultTitle')}</p>
+              <p>No Data Found</p>
             </div>
           ) : (
             transactions.map((transaction) => (
@@ -97,14 +94,13 @@ export const RecentTransactions: React.FC = () => {
 export const TotalBalance: React.FC<TotalBalanceProps> = ({ balance }) => {
   const { data: session } = useSession();
   const currency = session?.user?.currency || "INR";
-  const t = useTranslations('common');
 
   return (
     <Card className="p-6 bg-linear-to-r from-[#6366f1] to-[#4f46e5] text-white shadow-lg">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold mb-2">
-            {t('widgets.totalBalance.title')}
+            Total Balance
           </h3>
           <p className="text-3xl font-bold">
             {balance.toLocaleString()} {currency}

@@ -3,7 +3,6 @@
 import React, { useState} from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -24,20 +23,18 @@ const Category: React.FC<AddCategoryProps> = ({
   const { showSuccess, showError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!category;
-  const t = useTranslations();
-  const tCommon = useTranslations('common');
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
-      .min(2, t('forms.validation.nameMin2'))
-      .max(50, t('forms.validation.nameMax50'))
-      .required(t('forms.validation.nameRequired')),
-    budgetLimit: Yup.number().min(0, t('forms.validation.budgetLimitPositive')).max(1000000, t('forms.validation.budgetLimitTooHigh')),
-    goal: Yup.number().min(0, t('forms.validation.goalPositive')).max(1000000, t('forms.validation.goalTooHigh')),
+      .min(2, "Name must be at least 2 characters")
+      .max(50, "Name must be at most 50 characters")
+      .required("Name is required"),
+    budgetLimit: Yup.number().min(0, "Budget limit must be positive").max(1000000, "Budget limit is too high"),
+    goal: Yup.number().min(0, "Goal must be positive").max(1000000, "Goal is too high"),
     ...(isEdit ? {} : {
         type: Yup.string()
-          .oneOf([tCommon('ui.expense'), tCommon('ui.income')], t('forms.validation.invalidType'))
-          .required(t('forms.validation.typeRequired')),
+          .oneOf(["Expense", "Income"], "Invalid type")
+          .required("Type is required"),
       }),
   });
 
@@ -48,12 +45,11 @@ const Category: React.FC<AddCategoryProps> = ({
   ) => {
     setIsLoading(true);
     try {
-      // Map translated type back to English for API
-      const englishType = (values as CategoryType).type === tCommon('ui.expense') ? 'Expense' : 'Income';
+      const englishType = (values as CategoryType).type === "Expense" ? 'Expense' : 'Income';
       const data = { ...values, type: englishType };
       const response = isEdit
-        ? await editCategory(category._id!, data as CategoryType, t)
-        : await createCategory(data as CategoryType, t);
+        ? await editCategory(category._id!, data as CategoryType)
+        : await createCategory(data as CategoryType);
       if (response.success) {
         showSuccess(response.message);
         resetForm();
@@ -67,7 +63,7 @@ const Category: React.FC<AddCategoryProps> = ({
         showError(response.message);
       }
     } catch {
-      showError(t('forms.messages.errorOccurred'));
+      showError("Error Occurred");
     } finally {
       setIsLoading(false);
     }
@@ -82,12 +78,12 @@ const Category: React.FC<AddCategoryProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {isEdit ? t('forms.titles.editForm') : t('forms.titles.addForm')}
+            {isEdit ? "Edit Form" : "Add Form"}
           </DialogTitle>
         </DialogHeader>
         <Formik
           initialValues={
-            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: category.type.toLowerCase() === 'expense' ? tCommon('ui.expense') : tCommon('ui.income') } : { name: "", type: tCommon('ui.expense'), budgetLimit: 0, goal: 0 }
+            isEdit ? { name: category.name, budgetLimit: category.budgetLimit || 0, goal: category.goal || 0, type: category.type } : { name: "", type: "Expense", budgetLimit: 0, goal: 0 }
           }
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -95,17 +91,17 @@ const Category: React.FC<AddCategoryProps> = ({
         >
           {({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="name" label={t('backend.validation.name')} onChange={handleNameChange} />
+              <InputBox name="name" label="Name" onChange={handleNameChange} />
               {!isEdit && (
                 <>
-                  <SelectBox name="type" label={t('backend.validation.type')} options={[tCommon('ui.expense'), tCommon('ui.income')]} />
+                  <SelectBox name="type" label="Type" options={["Expense", "Income"]} />
                 </>
               )}
-              {(isEdit ? category.type === "Expense" : values.type === tCommon('ui.expense')) && (
-                <InputBox name="budgetLimit" label={t('backend.validation.budgetLimit')} type="number" />
+              {(isEdit ? category.type === "Expense" : values.type === "Expense") && (
+                <InputBox name="budgetLimit" label="Budget Limit" type="number" />
               )}
-              {(isEdit ? category.type === "Income" : values.type === tCommon('ui.income')) && (
-                <InputBox name="goal" label={t('backend.validation.goal')} type="number" />
+              {(isEdit ? category.type === "Income" : values.type === "Income") && (
+                <InputBox name="goal" label="Goal" type="number" />
               )}
               <div className="flex justify-end space-x-2">
                 <Button
@@ -113,10 +109,10 @@ const Category: React.FC<AddCategoryProps> = ({
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  {t('forms.buttons.cancel')}
+                  Cancel
                 </Button>
                 <Button type="submit" loading={isLoading}>
-                  {isEdit ? t('forms.buttons.update') : t('forms.buttons.add')}
+                  {isEdit ? "Update" : "Add"}
                 </Button>
               </div>
             </form>

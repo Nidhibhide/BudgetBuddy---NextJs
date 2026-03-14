@@ -18,14 +18,11 @@ import { DeleteCategory, Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
-import { useLocale, useTranslations } from "next-intl";
 
 const Category: React.FC = React.memo(() => {
   const { data: session } = useSession();
   const [isExpense, setIsExpense] = useState(true);
 
-  const locale = useLocale();
-  const t = useTranslations();
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -121,14 +118,14 @@ const Category: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-           {t("pages.dashboard.category.title")}
+           Categories
          </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {currentType === "Expense" ? t("common.ui.expense") : t("common.ui.income")}
+            {currentType === "Expense" ? "Expense" : "Income"}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -195,7 +192,6 @@ const Category: React.FC = React.memo(() => {
                               } else {
                                 const result = await getTransactions(
                                   currentType,
-                                  t,
                                   category.name,
                                   1,
                                   1
@@ -220,12 +216,12 @@ const Category: React.FC = React.memo(() => {
                       </div>
                       {currentType === "Expense" && budgetLimit > 0 && (
                         <div className="text-sm text-foreground/70">
-                          {t("pages.dashboard.category.labels.budget")}: {budgetLimit.toLocaleString()} {currency}
+                          Budget:  {budgetLimit.toLocaleString()} {currency}
                         </div>
                       )}
                       {currentType === "Income" && goal > 0 && (
                         <div className="text-sm text-foreground/70">
-                          {t("pages.dashboard.category.labels.goal")}: {goal.toLocaleString()} {currency}
+                          Goal:  {goal.toLocaleString()} {currency}
                         </div>
                       )}
                       {(currentType === "Expense" && budgetLimit > 0) ||
@@ -251,8 +247,8 @@ const Category: React.FC = React.memo(() => {
                           />
                           <span className="text-base font-semibold text-foreground/60">
                             {currentType === "Expense"
-                              ? t("pages.dashboard.category.messages.setBudgetToTrack")
-                              : t("pages.dashboard.category.messages.setGoalToTrack")}
+                              ? "Set a budget to track expenses"
+                              : "Set a goal to track income"}
                           </span>
                         </div>
                       )}
@@ -271,10 +267,10 @@ const Category: React.FC = React.memo(() => {
                     <Plus className="w-6 h-6 text-foreground" />
                   </div>
                   <div className="text-lg font-semibold text-foreground">
-                    {t("forms.buttons.add")}
+                    Add Category
                   </div>
                   <div className="text-sm text-foreground/70">
-                    {t("pages.dashboard.category.messages.createNewCategory")}
+                    Create a new category
                   </div>
                 </CardContent>
               </Card>
@@ -296,25 +292,25 @@ const Category: React.FC = React.memo(() => {
               columns={[
                 {
                   key: "date",
-                  label: t("backend.validation.date"),
+                  label: "Date",
                   sortable: true,
                   render: (value) =>
                     value
                       ? new Date(
                           value as string | number | Date
-                        ).toLocaleDateString(locale)
+                        ).toLocaleDateString("en-GB")
                       : "",
                 },
-                { key: "description", label: t("backend.validation.description") },
+                { key: "description", label: "Description" },
                 {
                   key: "amount",
-                  label: t("backend.validation.amount"),
+                  label: "Amount",
                   sortable: true,
                   render: (value) => `${value} ${currency}`,
                 },
-                { key: "type", label: t("pages.dashboard.category.table.columns.type") },
+                { key: "type", label: "Type" },
               ]}
-              title={t("pages.dashboard.category.table.titles.recordsFor", { category: selectedCategory })}
+              title={`Records for ${selectedCategory}`}
               onSort={handleSort}
               sortBy={sortBy}
               sortOrder={sortOrder}
@@ -330,14 +326,14 @@ const Category: React.FC = React.memo(() => {
           </>
         ) : (
           <NotFound
-            title={t("pages.dashboard.category.table.titles.noRecordsFound")}
-            message={t("pages.dashboard.category.table.titles.noRecordsMessage", { category: selectedCategory })}
+            title="No Records Found"
+            message={`No transactions found for ${selectedCategory}`}
           />
         )
       ) : (
         <NotFound
-          title={t("pages.dashboard.category.table.titles.selectCategory")}
-          message={t("pages.dashboard.category.table.titles.selectCategoryMessage")}
+          title="Select a Category"
+          message="Click on a category card to view its transactions"
           icon={MousePointer}
         />
       )}

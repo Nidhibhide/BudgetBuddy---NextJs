@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getTransactions, getTransactionTotals } from "@/app/lib/transaction";
 import type {
   Transaction,
@@ -20,7 +19,6 @@ export const useTransactions = ({
   minAmount,
   maxAmount,
 }: UseTransactionsProps) => {
-  const t = useTranslations();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [totals, setTotals] = useState<TypeTotal[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,6 @@ export const useTransactions = ({
       setError(null);
       const response = await getTransactions(
         type,
-        t,
         category,
         page,
         limit,
@@ -54,27 +51,27 @@ export const useTransactions = ({
         setTransactions(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('backend.api.errorOccurred')
+        err instanceof Error ? err.message : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount, t]);
+  }, [type, category, page, limit, sortBy, sortOrder, search, dateFrom, dateTo, minAmount, maxAmount]);
 
   const fetchTotals = useCallback(async () => {
     try {
-      const totalsResult = await getTransactionTotals(type, t);
+      const totalsResult = await getTransactionTotals(type);
       if (totalsResult.success && totalsResult.data) {
         setTotals(totalsResult.data);
       }
     } catch (err) {
-      console.error(t('backend.api.errorOccurred'), err);
+      console.error("An error occurred", err);
     }
-  }, [type, t]);
+  }, [type]);
 
   useEffect(() => {
     fetchTransactions();

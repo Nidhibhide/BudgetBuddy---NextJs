@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getBalance } from "@/app/lib/dashboard";
 
 export const useBalance = () => {
-  const t = useTranslations();
   const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -12,20 +10,20 @@ export const useBalance = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getBalance(t);
+      const response = await getBalance();
       if (response.success) {
         setBalance(response.data.balance || 0);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('backend.api.errorOccurred')
+        err instanceof Error ? err.message : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchBalance();

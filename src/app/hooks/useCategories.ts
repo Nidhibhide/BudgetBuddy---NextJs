@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getCategoryDetails } from "@/app/lib/category";
 import type { Category } from "@/app/types/appTypes";
 
 export const useCategories = (type: string) => {
-  const t = useTranslations();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,18 +11,18 @@ export const useCategories = (type: string) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getCategoryDetails(type, t);
+      const response = await getCategoryDetails(type);
       if (response.success && response.data) {
         setCategories(response.data);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('backend.api.errorOccurred'));
+      setError(err instanceof Error ? err.message : "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [type, t]);
+  }, [type]);
 
   useEffect(() => {
     fetchCategories();

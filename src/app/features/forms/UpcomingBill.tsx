@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -17,29 +16,28 @@ import { AddUpcomingBillProps, UpcomingBill } from "@/app/types/appTypes";
 const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, onBillAdded, bill }) => {
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
-  const t = useTranslations();
 
   const validationSchema = Yup.object().shape({
     dueDate: Yup.date()
-      .required(t('forms.validation.dateRequired'))
-      .min(new Date(), t('forms.validation.dateNotPast')),
+      .required("Date is required")
+      .min(new Date(), "Date cannot be in the past"),
     reminderDate: Yup.date()
-      .required(t('forms.validation.dateRequired'))
-      .min(new Date(), t('forms.validation.dateNotPast'))
-      .when('dueDate', (dueDate, schema) => dueDate ? schema.max(Yup.ref('dueDate'), t('forms.validation.reminderBeforeDue')) : schema),
+      .required("Date is required")
+      .min(new Date(), "Date cannot be in the past")
+      .when('dueDate', (dueDate, schema) => dueDate ? schema.max(Yup.ref('dueDate'), "Reminder date must be before due date") : schema),
     title: Yup.string()
-      .min(1, t('forms.validation.titleMin1'))
-      .max(100, t('forms.validation.titleMax100'))
-      .required(t('forms.validation.titleRequired')),
+      .min(1, "Title must be at least 1 character")
+      .max(100, "Title must be at most 100 characters")
+      .required("Title is required"),
     description: Yup.string()
-      .min(2, t('forms.validation.descriptionMin2'))
-      .max(200, t('forms.validation.descriptionMax200'))
-      .required(t('forms.validation.descriptionRequired')),
+      .min(2, "Description must be at least 2 characters")
+      .max(200, "Description must be at most 200 characters")
+      .optional(),
     amount: Yup.number()
-      .positive(t('forms.validation.amountPositive'))
-      .required(t('forms.validation.amountRequired')),
+      .positive("Amount must be positive")
+      .required("Amount is required"),
     status: Yup.string()
-      .oneOf([t('forms.options.paid'), t('forms.options.unpaid')], t('forms.validation.invalidStatus'))
+      .oneOf(["Paid", "Unpaid"], "Invalid status")
       .optional(),
   });
 
@@ -47,17 +45,17 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
     setLoading(true);
     try {
       const response = bill?._id
-        ? await editUpcomingBill(bill._id, values, t)
-        : await addUpcomingBill(values, t);
+        ? await editUpcomingBill(bill._id, values)
+        : await addUpcomingBill(values);
       if (response.success) {
         showSuccess(response.message);
         onBillAdded(values);
         onOpenChange(false);
       } else {
-        showError(response.message || t('forms.messages.errorOccurred'));
+        showError(response.message || "Error Occurred");
       }
     } catch {
-      showError(t('forms.messages.errorOccurred'));
+      showError("Error Occurred");
     } finally {
       setLoading(false);
     }
@@ -68,7 +66,7 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {bill?._id ? t('forms.titles.editForm') : t('forms.titles.addForm')}
+            {bill?._id ? "Edit Form" : "Add Form"}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -78,23 +76,23 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
             title: bill?.title || "",
             description: bill?.description || "",
             amount: bill?.amount || 1,
-            status: bill?.status ? (bill.status === 'Unpaid' ? t('forms.options.unpaid') : t('forms.options.paid')) : t('forms.options.unpaid'),
+            status: bill?.status || "Unpaid",
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ handleSubmit }) => (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <InputBox name="dueDate" label={t('backend.validation.dueDate')} type="date" />
-              <InputBox name="reminderDate" label={t('backend.validation.reminderDate')} type="date" />
-              <p className="text-sm text-gray-600 -mt-2">{t('forms.labels.notificationsStartFromDate')}</p>
-              <InputBox name="title" label={t('backend.validation.title')} />
-              <TextareaBox name="description" label={t('backend.validation.description')} />
-              <InputBox name="amount" label={t('backend.validation.amount')} type="number" />
+              <InputBox name="dueDate" label="Due Date" type="date" />
+              <InputBox name="reminderDate" label="Reminder Date" type="date" />
+              <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
+              <InputBox name="title" label="Title" />
+              <TextareaBox name="description" label="Description" />
+              <InputBox name="amount" label="Amount" type="number" />
               <SelectBox
                 name="status"
-                label={t('backend.validation.status')}
-                options={[t('forms.options.unpaid'), t('forms.options.paid')]}
+                label="Status"
+                options={["Unpaid", "Paid"]}
               />
 
               <div className="flex justify-end space-x-2">
@@ -103,10 +101,10 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({ open, onOpenChange, 
                   onClick={() => onOpenChange(false)}
                   className="bg-gray-500 hover:bg-gray-600"
                 >
-                  {t('forms.buttons.cancel')}
+                  Cancel
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {bill?._id ? t('forms.buttons.update') : t('forms.buttons.add')}
+                  {bill?._id ? "Update" : "Add"}
                 </Button>
               </div>
             </form>

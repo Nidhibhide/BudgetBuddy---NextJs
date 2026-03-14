@@ -4,7 +4,6 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { ThemeToggleProps } from "@/app/types/appTypes";
-import { useTranslations } from 'next-intl';
 
 export function ThemeProvider({
   children,
@@ -15,7 +14,6 @@ export function ThemeProvider({
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ size = "icon" }) => {
   const { setTheme, theme } = useTheme();
-  const t = useTranslations('common');
   return (
     <Button
       size={size}
@@ -27,7 +25,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ size = "icon" }) => {
       ) : (
         <Sun className="size-5" />
       )}
-      <span className="sr-only">{t('ui.toggleTheme')}</span>
+      <span className="sr-only">Toggle theme</span>
     </Button>
   );
 };

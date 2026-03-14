@@ -13,11 +13,9 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/app/features/common";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 
 const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-  const t = useTranslations();
   const [selectedLink, setSelectedLink] = useState<string | null>(null);
     const pathname = usePathname(); // Get the current path
 
@@ -33,32 +31,32 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   const sidebarLinks = [
     {
       href: "/dashboard/home",
-      label: t("pages.dashboard.sidebar.menu.dashboard"),
+      label: "Dashboard",
       icon: MdDashboard,
     },
     {
       href: "/dashboard/category",
-      label: t("pages.dashboard.sidebar.menu.category"),
+      label: "Category",
       icon: MdCategory,
     },
     {
       href: "/dashboard/transaction",
-      label: t("pages.dashboard.sidebar.menu.transaction"),
+      label: "Transaction",
       icon: MdPayment,
     },
     {
       href: "/dashboard/bill-reminders",
-      label: t("pages.dashboard.sidebar.menu.setAlerts"),
+      label: "Set Alerts",
       icon: MdNotifications,
     },
     {
       href: "/dashboard/setting",
-      label: t("pages.dashboard.sidebar.menu.setting"),
+      label: "Setting",
       icon: IoMdSettings,
     },
     {
       href: "/dashboard/logout",
-      label: t("pages.dashboard.sidebar.menu.logout"),
+      label: "Logout",
       icon: MdLogout,
     },
   ];

@@ -1,14 +1,11 @@
 "use client";
 import React from "react";
 import { Tabs, Tab, Box } from "@mui/material";
-import { useTranslations } from "next-intl";
 
 import { CustomTabPanelProps } from "@/app/types/appTypes";
 import { UpcomingBill, RecurringPayment } from "@/app/features/common";
 
 const BillReminders: React.FC = () => {
-  const t = useTranslations();
-
   const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
     children,
     value,
@@ -54,16 +51,16 @@ const BillReminders: React.FC = () => {
             onChange={handleChange}
             variant="scrollable"
             scrollButtons="auto"
-            aria-label={t("pages.dashboard.billReminders.ariaLabel")}
+            aria-label="Bill Reminders tabs"
             className="bg-background"
           >
             <Tab
-              label={t("pages.dashboard.billReminders.tabs.upcomingBills")}
+              label="Upcoming Bills"
               {...a11yProps(0)}
               sx={{ color: "var(--foreground)" }}
             />
             <Tab
-              label={t("pages.dashboard.billReminders.tabs.recurringPayments")}
+              label="Recurring Payments"
               {...a11yProps(1)}
               sx={{ color: "var(--foreground)" }}
             />

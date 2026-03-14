@@ -46,13 +46,12 @@ export const DEFAULT_INSIGHTS = [
   "Use categories to organize your transactions.",
 ];
 
-export const LANGUAGES = ["en", "hi"] as const;
+export const LANGUAGES = ["en"] as const;
 export const DEFAULT_LANGUAGE = "en";
-export type Language = "en" | "hi";
+export type Language = "en";
 
 export const LANGUAGE_OPTIONS = [
   { code: "en", display: "English" },
-  { code: "hi", display: "हिन्दी" },
 ] as const;
 
 export const colorPalette = [

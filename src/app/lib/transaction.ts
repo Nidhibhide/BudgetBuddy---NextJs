@@ -1,18 +1,18 @@
 import axios, { AxiosError } from "axios";
 import { Transaction } from "@/app/types/appTypes";
 
-export async function addTransaction(data: Transaction, t: (key: string) => string) {
+export async function addTransaction(data: Transaction) {
   try {
     const response = await axios.post("/api/transaction/create", data);
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error(t("backend.api.errorOccurred"), error);
+    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        t("backend.api.errorOccurred"),
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
@@ -21,7 +21,6 @@ export async function addTransaction(data: Transaction, t: (key: string) => stri
 
 export async function getTransactions(
   type: string,
-  t: (key: string) => string,
   category?: string,
   page?: number,
   limit?: number,
@@ -39,66 +38,65 @@ export async function getTransactions(
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error(t("backend.api.errorOccurred"), error);
+    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        t("backend.api.errorOccurred"),
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function getTransactionTotals(type: string, t: (key: string) => string) {
+export async function getTransactionTotals(type: string) {
   try {
     const response = await axios.get(`/api/transaction/total?type=${type}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error(t("backend.api.errorOccurred"), error);
+    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        t("backend.api.errorOccurred"),
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function editTransaction(id: string, data: Partial<Transaction>, t: (key: string) => string) {
+export async function editTransaction(id: string, data: Partial<Transaction>) {
   try {
     const response = await axios.put(`/api/transaction/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error(t("backend.api.errorOccurred"), error);
+    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        t("backend.api.errorOccurred"),
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
 
-export async function deleteTransaction(id: string, t: (key: string) => string) {
+export async function deleteTransaction(id: string) {
   try {
     const response = await axios.delete(`/api/transaction/delete?id=${id}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error(t("backend.api.errorOccurred"), error);
+    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
         (axiosError.response?.data as { message?: string })?.message ||
-        t("backend.api.errorOccurred"),
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
   }
 }
-

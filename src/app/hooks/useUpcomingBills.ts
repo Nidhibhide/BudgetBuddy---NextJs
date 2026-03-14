@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getUpcomingBills } from "@/app/lib/upcomingBill";
 import type { UpcomingBill, UseUpcomingBillsProps } from "@/app/types/appTypes";
 
@@ -10,7 +9,6 @@ export const useUpcomingBills = ({
   sortBy = "dueDate",
   sortOrder = "asc",
 }: UseUpcomingBillsProps) => {
-  const t = useTranslations();
   const [upcomingBills, setUpcomingBills] = useState<UpcomingBill[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +24,6 @@ export const useUpcomingBills = ({
       setLoading(true);
       setError(null);
       const response = await getUpcomingBills(
-        t,
         status,
         page,
         limit,
@@ -37,16 +34,16 @@ export const useUpcomingBills = ({
         setUpcomingBills(response.data || []);
         setPagination((prev) => response.pagination || prev);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('backend.api.errorOccurred')
+        err instanceof Error ? err.message : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [status, page, limit, sortBy, sortOrder, t]);
+  }, [status, page, limit, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchUpcomingBills();

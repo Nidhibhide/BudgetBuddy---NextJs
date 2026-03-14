@@ -4,27 +4,25 @@ import React, { useState } from "react";
 import { Formik, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { InputBox, Button, useToast } from "@/app/features/common/index";
-import { signIn } from "next-auth/react"; // ✅ Import from NextAuth
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { User } from "@/app/types/appTypes";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const t = useTranslations();
 
   const { showSuccess, showError } = useToast();
 
   // validation schema with error messages
   const validationSchema = Yup.object({
-    email: Yup.string().email(t("forms.validation.invalidEmail")).required(t("forms.validation.emailRequired")),
+    email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string()
-      .matches(/^\d+$/, t("forms.validation.passwordDigitsOnly"))
-      .min(5, t("forms.validation.passwordMin5"))
-      .max(10, t("forms.validation.passwordMax10"))
-      .required(t("forms.validation.newPasswordRequired")),
+      .matches(/^\d+$/, "Password must contain only digits")
+      .min(5, "Password must be at least 5 characters")
+      .max(10, "Password must be at most 10 characters")
+      .required("Password is required"),
   });
 
   // handle sign in
@@ -44,16 +42,16 @@ const SignIn = () => {
 
       if (res?.error) {
         showError(
-          res.error === "CredentialsSignin" ? t("pages.public.signin.messages.loginFailed") : res.error
+          res.error === "CredentialsSignin" ? "Login Failed" : res.error
         );
       } else {
-        showSuccess(t("backend.api.success")); // Using save as success message, or find a better one
-        router.replace(res?.url || "/dashboard/home"); // redirect manually
+        showSuccess("Success");
+        router.replace(res?.url || "/dashboard/home");
       }
       actions.resetForm();
     } catch (err) {
       showError(
-        err instanceof Error ? err.message : t("backend.api.errorOccurred")
+        err instanceof Error ? err.message : "Error Occurred"
       );
     } finally {
       setLoading(false);
@@ -63,13 +61,13 @@ const SignIn = () => {
     try {
       await signIn("google", { callbackUrl: "/dashboard/home" });
     } catch (err) {
-      showError(err instanceof Error ? err.message : t("backend.api.errorOccurred"));
+      showError(err instanceof Error ? err.message : "Error Occurred");
     }
   };
   return (
     <div className="min-h-screen w-full flex justify-center items-center p-4 text-foreground">
       <div className="w-full max-w-md bg-background rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6">{t("pages.public.signin.title")}</h1>
+        <h1 className="text-2xl font-bold mb-6">Sign In</h1>
 
         <div className="mb-4 flex justify-center">
           <Button
@@ -78,13 +76,13 @@ const SignIn = () => {
             hoverColor="hover:bg-[#3367D6]"
             className="border px-4 w-full sm:w-[270px] flex items-center justify-center gap-2"
           >
-            {t("pages.public.signin.googleSignIn")}
+            Sign in with Google
           </Button>
         </div>
 
         <div className="flex items-center w-full my-4">
           <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="mx-4 text-muted font-semibold">{t("pages.public.signin.or")}</span>
+          <span className="mx-4 text-muted font-semibold">OR</span>
           <div className="flex-1 h-px bg-gray-300"></div>
         </div>
         <Formik<User>
@@ -96,16 +94,16 @@ const SignIn = () => {
             <>
               <div className="flex flex-col mb-6 gap-4 w-full">
                 <InputBox
-                  label={t("forms.labels.enterEmail")}
+                  label="Enter Email"
                   name="email"
                   type="email"
-                  placeholder={t("pages.public.signin.placeholders.email")}
+                  placeholder="Enter your email"
                 />
                 <InputBox
-                  label={t("forms.labels.currentPassword")}
+                  label="Current Password"
                   name="password"
                   type="password"
-                  placeholder={t("pages.public.signin.placeholders.password")}
+                  placeholder="Enter your password"
                 />
               </div>
 
@@ -115,15 +113,15 @@ const SignIn = () => {
                 className="mt-4"
                 loading={loading}
               >
-                {t("pages.public.signin.buttons.signin")}
+                Sign In
               </Button>
               <p className="md:text-base text-sm mt-2 text-center">
-                {t("pages.public.signin.links.newUser")}{" "}
+                New User?{" "}
                 <Link
                   href="/signup"
                   className="font-semibold text-primary hover:underline"
                 >
-                  {t("pages.public.signup.buttons.signup")}
+                  Sign Up
                 </Link>
               </p>
             </>

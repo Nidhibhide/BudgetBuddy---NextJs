@@ -10,12 +10,9 @@ import { useRecurringPayments } from "@/app/hooks";
 import { RecurringPayment as RecurringPaymentType } from "@/app/types/appTypes";
 import { deleteRecurringPayment } from "@/app/lib/recurringPayment";
 import { useToast } from "@/app/features/common";
-import { useTranslations } from "next-intl";
 
 const RecurringPayment: React.FC = () => {
   const { showSuccess, showError } = useToast();
-  const t = useTranslations();
-  const tCommon = useTranslations('common');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("nextDueDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -65,19 +62,19 @@ const RecurringPayment: React.FC = () => {
 
     setDeleting(true);
     try {
-      const response = await deleteRecurringPayment(deleteRecurringPaymentId, t);
+      const response = await deleteRecurringPayment(deleteRecurringPaymentId);
       if (response.success) {
         showSuccess(response.message);
         // Refresh recurring payments
         refetch();
         setDeleteRecurringPaymentId(null);
       } else {
-        showError(response.message || t('backend.api.errorOccurred'));
+        showError(response.message || "An error occurred. Please try again.");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
 
-      showError(t('backend.api.errorOccurred'));
+      showError("An error occurred. Please try again.");
     } finally {
       setDeleting(false);
     }
@@ -97,7 +94,7 @@ const RecurringPayment: React.FC = () => {
                 <div className="w-full sm:w-[180px]">
                   <SelectBox
                     name="status"
-                    options={[tCommon('ui.all'), t('forms.options.active'), t('forms.options.inactive')]}
+                    options={["All", "Active", "Inactive"]}
                     value={selectedStatus}
                     onChange={handleStatusChange}
                   />
@@ -110,7 +107,7 @@ const RecurringPayment: React.FC = () => {
               onClick={() => setIsOpen(true)}
             >
               <Plus className="w-4 h-4" />
-              {t('forms.buttons.add')}
+              Add Recurring Payment
             </Button>
           </div>
         </div>
@@ -127,7 +124,7 @@ const RecurringPayment: React.FC = () => {
             columns={[
             {
               key: "nextDueDate",
-              label: t('backend.validation.nextDueDate'),
+              label: "Next Due Date",
               sortable: true,
               render: (value) =>
                 value
@@ -138,7 +135,7 @@ const RecurringPayment: React.FC = () => {
             },
             {
               key: "reminderDate",
-              label: t('backend.validation.reminderDate'),
+              label: "Reminder Date",
               sortable: true,
               render: (value) =>
                 value
@@ -147,10 +144,10 @@ const RecurringPayment: React.FC = () => {
                     )
                   : "",
             },
-            { key: "title", label: t('backend.validation.title') },
+            { key: "title", label: "Title" },
             {
               key: "status",
-              label: t('backend.validation.status'),
+              label: "Status",
               render: (value) => (
                 <span className={(value as string) === 'Active' ? 'text-green-500' : 'text-red-500'}>
                   {value as string}
@@ -159,12 +156,12 @@ const RecurringPayment: React.FC = () => {
             },
             {
               key: "actions",
-              label: tCommon('ui.actions'),
+              label: "Actions",
               render: (value, row) => (
                 <div className="flex gap-2">
                   <button
                     className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                    title={t('forms.buttons.view')}
+                    title="View"
                     onClick={() => {
                       setSelectedPayment(row as unknown as RecurringPaymentType);
                       setViewOpen(true);
@@ -174,7 +171,7 @@ const RecurringPayment: React.FC = () => {
                   </button>
                   <button
                     className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                    title={t('forms.buttons.edit')}
+                    title="Edit"
                     onClick={() => {
                       setSelectedPayment(row as unknown as RecurringPaymentType);
                       setIsOpen(true);
@@ -185,7 +182,7 @@ const RecurringPayment: React.FC = () => {
                   <button
                     onClick={() => handleDeleteClick(row._id as string)}
                     className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                    title={t('forms.buttons.delete')}
+                    title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </button>
@@ -210,8 +207,8 @@ const RecurringPayment: React.FC = () => {
         </>
       ) : (
         <NotFound
-         title={tCommon('notFound.defaultTitle')}
-          message={tCommon('notFound.defaultMessage')}
+          title="No Recurring Payments Found"
+          message="You haven't added any recurring payments yet."
         />
       )}
       <RecurringPaymentForm open={isOpen} onOpenChange={setIsOpen} onPaymentAdded={handlePaymentAdded} payment={selectedPayment} />
@@ -226,7 +223,7 @@ const RecurringPayment: React.FC = () => {
         onOpenChange={(open) => !open && setDeleteRecurringPaymentId(null)}
         onConfirm={handleConfirmDelete}
         loading={deleting}
-        description={tCommon('pages.recurringPayment.delete.confirm')}
+        description="Are you sure you want to delete this recurring payment? This action cannot be undone."
       />
     </div>
   );

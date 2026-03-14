@@ -6,13 +6,11 @@ import { FaWallet } from "react-icons/fa";
 import { HeaderProps } from "../../types/appTypes";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { useLocale } from 'next-intl'; // Import for internationalization
-import { ThemeToggle, LanguageSelector } from '@/app/features/common';
+import { ThemeToggle } from '@/app/features/common';
 
 const Header: React.FC<HeaderProps> = ({}) => {
   const pathname = usePathname();
   const showBackButton = pathname.includes("/signin") || pathname.includes("/signup");
-  const locale = useLocale();
 
   // Get translation function for the root namespace
   // This provides access to all translations
@@ -24,10 +22,9 @@ const Header: React.FC<HeaderProps> = ({}) => {
           <span className="font-semibold text-2xl">BudgetBuddy</span>
         </div>
         <div className="flex items-center gap-4">
-          <LanguageSelector className="border-0" />
           <ThemeToggle />
           {showBackButton && (
-            <Link href={`/${locale}`}>
+            <Link href="/">
               <ArrowLeft className="size-6" />
             </Link>
           )}

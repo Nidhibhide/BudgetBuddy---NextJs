@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +18,6 @@ const ViewTransaction: React.FC<ViewTransactionProps> = ({
   transaction,
 }) => {
   const { data: session } = useSession();
-  const t = useTranslations();
 
   if (!transaction) return null;
 
@@ -33,28 +31,28 @@ const ViewTransaction: React.FC<ViewTransactionProps> = ({
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label={t('backend.validation.date')}
+            label="Date"
             value={transaction.date ? formatDate(transaction.date) : ""}
           />
           <FieldDisplay
-            label={t('backend.validation.title')}
+            label="Title"
             value={transaction.title || ""}
           />
           <FieldDisplay
-            label={t('backend.validation.description')}
+            label="Description"
             value={transaction.description || ""}
           />
           <FieldDisplay
-            label={t('backend.validation.category')}
+            label="Category"
             value={String(transaction.category || "")}
           />
           <FieldDisplay
-            label={t('backend.validation.amount')}
+            label="Amount"
             value={`${transaction.amount} ${currency}`}
           />
           <FieldDisplay
-            label={t('backend.validation.type')}
-            value={transaction.type === "Expense" ? t('common.ui.expense') : t('common.ui.income')}
+            label="Type"
+            value={transaction.type === "Expense" ? "Expense" : "Income"}
           />
         </div>
       </DialogContent>

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
 import { Formik } from "formik";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -63,7 +62,6 @@ const handlePDFDownload = async (
 
 const Transaction: React.FC = React.memo(() => {
   const { data: session } = useSession();
-  const t = useTranslations();
   const [isExpense, setIsExpense] = useState(true);
 
   const { showSuccess, showError } = useToast();
@@ -139,24 +137,24 @@ const Transaction: React.FC = React.memo(() => {
       newFilters.dateTo &&
       new Date(newFilters.dateFrom) > new Date(newFilters.dateTo)
     ) {
-      newErrors.dateTo = t("pages.dashboard.transaction.search.errors.toDateAfterFrom");
+      newErrors.dateTo = "To date must be after from date";
     }
     if (
       newFilters.minAmount &&
       newFilters.maxAmount &&
       parseFloat(newFilters.minAmount) > parseFloat(newFilters.maxAmount)
     ) {
-      newErrors.maxAmount = t("pages.dashboard.transaction.search.errors.maxGreaterThanMin");
+      newErrors.maxAmount = "Max amount must be greater than min amount";
     }
     if (newFilters.minAmount && parseFloat(newFilters.minAmount) < 0) {
-      newErrors.minAmount = t("pages.dashboard.transaction.search.errors.minPositive");
+      newErrors.minAmount = "Min amount must be positive";
     }
     if (newFilters.maxAmount && parseFloat(newFilters.maxAmount) < 0) {
-      newErrors.maxAmount = t("pages.dashboard.transaction.search.errors.maxPositive");
+      newErrors.maxAmount = "Max amount must be positive";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [t]);
+  }, []);
 
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
@@ -177,19 +175,19 @@ const Transaction: React.FC = React.memo(() => {
 
     setDeleting(true);
     try {
-      const response = await deleteTransaction(deleteTransactionId, () => t("backend.api.errorOccurred"));
+      const response = await deleteTransaction(deleteTransactionId);
       if (response.success) {
         showSuccess(response.message);
         // Refresh transactions
         refetchTransactions();
         setDeleteTransactionId(null);
       } else {
-        showError(response.message || t("backend.api.errorOccurred"));
+        showError(response.message || "An error occurred. Please try again.");
       }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
     
-      showError(t("backend.api.errorOccurred"));
+      showError("An error occurred. Please try again.");
     } finally {
       setDeleting(false);
     }
@@ -222,14 +220,14 @@ const Transaction: React.FC = React.memo(() => {
       {/* Header with Switch */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">
-           {t("pages.dashboard.transaction.title")}
+           Transactions
           </h2>
         <div className="flex items-center space-x-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {isExpense ? t("common.ui.expense") : t("common.ui.income")}
+            {isExpense ? "Expense" : "Income"}
           </Label>
           <Switch
             id="expense-income-switch"
@@ -264,7 +262,7 @@ const Transaction: React.FC = React.memo(() => {
              onClick={() => setIsAddTransactionOpen(true)}
            >
              <Plus className="w-4 h-4" />
-             {t("forms.buttons.add")}
+             Add Transaction
            </Button>
          </div>
         <div className="flex justify-end">
@@ -272,7 +270,7 @@ const Transaction: React.FC = React.memo(() => {
             onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
             className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
           >
-            {t("pages.dashboard.transaction.search.advanced")}
+            Advanced Search
             {isAdvancedOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -290,7 +288,7 @@ const Transaction: React.FC = React.memo(() => {
                     name="search"
                     type="text"
                     label=""
-                    placeholder={t("pages.dashboard.transaction.search.placeholder")}
+                    placeholder="Search transactions..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     inputClassName="pl-8 rounded-full"
@@ -302,7 +300,7 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="from"
                      type="date"
-                     label={t("pages.dashboard.transaction.search.labels.from")}
+                     label="From"
                      value={filters.dateFrom}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -319,7 +317,7 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="to"
                      type="date"
-                     label={t("pages.dashboard.transaction.search.labels.to")}
+                     label="To"
                      value={filters.dateTo}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -336,8 +334,8 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="min"
                      type="number"
-                     label={t("pages.dashboard.transaction.search.labels.min")}
-                     placeholder={t("pages.dashboard.transaction.search.labels.minAmount")}
+                     label="Min Amount"
+                     placeholder="Enter min amount"
                      value={filters.minAmount}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -354,8 +352,8 @@ const Transaction: React.FC = React.memo(() => {
                    <InputBox
                      name="max"
                      type="number"
-                     label={t("pages.dashboard.transaction.search.labels.max")}
-                     placeholder={t("pages.dashboard.transaction.search.labels.maxAmount")}
+                     label="Max Amount"
+                     placeholder="Enter max amount"
                      value={filters.maxAmount}
                      onChange={(e) =>
                        setFilters((prev) => ({
@@ -386,7 +384,7 @@ const Transaction: React.FC = React.memo(() => {
             columns={[
               {
                 key: "date",
-                label: t("backend.validation.date"),
+                label: "Date",
                 sortable: true,
                 render: (value) =>
                   value
@@ -395,11 +393,11 @@ const Transaction: React.FC = React.memo(() => {
                       ).toLocaleDateString("en-GB")
                     : "",
               },
-              { key: "title", label: t("backend.validation.title") },
-              { key: "category", label: t("backend.validation.category") },
+              { key: "title", label: "Title" },
+              { key: "category", label: "Category" },
               {
                 key: "amount",
-                label: t("backend.validation.amount"),
+                label: "Amount",
                 sortable: true,
                 render: (value) => {
                   const currency = session?.user?.currency || "INR";
@@ -408,27 +406,27 @@ const Transaction: React.FC = React.memo(() => {
               },
               {
                 key: "actions",
-                label: t("common.ui.actions"),
+                label: "Actions",
                 render: (value, row) => (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleViewClick(row as TransactionType)}
                       className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title={t("forms.buttons.view")}
+                      title="View"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEditClick(row as TransactionType)}
                       className="p-1 hover:bg-background/10  rounded transition-colors cursor-pointer"
-                      title={t("forms.buttons.edit")}
+                      title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(row._id as string)}
                       className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
-                      title={t("forms.buttons.delete")}
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
                     </button>
@@ -436,7 +434,7 @@ const Transaction: React.FC = React.memo(() => {
                 ),
               },
             ]}
-            title={t("pages.dashboard.transaction.table.title")}
+            title="Transactions"
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
@@ -468,14 +466,14 @@ const Transaction: React.FC = React.memo(() => {
               }
             >
               <Download className="w-4 h-4" />
-              {t("pages.dashboard.transaction.buttons.downloadPdf")}
+              Download PDF
             </Button>
           </div>
         </>
       ) : (
         <NotFound
-          title={t("pages.dashboard.transaction.notFound.title")}
-          message={t("pages.dashboard.transaction.notFound.message")}
+          title="No Transactions Found"
+          message="You haven't added any transactions yet."
         />
       )}
 

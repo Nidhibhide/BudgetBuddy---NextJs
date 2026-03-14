@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
 import { getPieChart } from "@/app/lib/dashboard";
 import { colorPalette } from '@/constants';
 import { MonthlyExpensesResponse, ExpenseData } from '@/app/types/appTypes';
 
 export const usePieChart = () => {
-  const t = useTranslations();
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +12,7 @@ export const usePieChart = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getPieChart(t);
+      const response = await getPieChart();
       if (response.success) {
         const data: MonthlyExpensesResponse = response.data;
         const transformedExpenses: ExpenseData[] = data.categories.map((cat, index) => ({
@@ -24,16 +22,16 @@ export const usePieChart = () => {
         }));
         setExpenses(transformedExpenses);
       } else {
-        setError(response.message || t('backend.api.errorOccurred'));
+        setError(response.message || "An error occurred. Please try again.");
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t('backend.api.errorOccurred')
+        err instanceof Error ? err.message : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchMonthlyExpenses();

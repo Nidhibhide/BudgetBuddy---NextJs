@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +17,6 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
   onOpenChange,
   payment,
 }) => {
-  const t = useTranslations();
-
   if (!payment) return null;
 
   return (
@@ -30,32 +27,32 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
         </DialogHeader>
         <div className="space-y-1">
           <FieldDisplay
-            label={t('backend.validation.nextDueDate')}
+            label="Next Due Date"
             value={formatDate(payment.nextDueDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('backend.validation.reminderDate')}
+            label="Reminder Date"
             value={formatDate(payment.reminderDate)}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('backend.validation.description')}
+            label="Description"
             value={payment.description}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('backend.validation.amount')}
+            label="Amount"
             value={`${payment.amount} INR`}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('backend.validation.frequency')}
+            label="Frequency"
             value={payment.frequency}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
-            label={t('backend.validation.status')}
+            label="Status"
             value={payment.status}
             valueClassName={
               payment.status === "Active" ? "text-green-500" : "text-red-500"

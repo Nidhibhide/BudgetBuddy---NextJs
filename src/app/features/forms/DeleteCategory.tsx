@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
-import { useTranslations } from "next-intl";
 import { SelectBox } from "@/app/features/common/index";
 import { deleteCategory } from "@/app/lib/category";
 import { Confirmation } from "../dialogs";
@@ -21,7 +20,6 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
     "delete"
   );
   const [loading, setLoading] = useState(false);
-  const t = useTranslations();
 
   useEffect(() => {
     if (!open) {
@@ -41,14 +39,13 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
       try {
         const result = await deleteCategory(
           category._id,
-          t,
           deleteAction === "reassign" ? reassignCategoryId : undefined
         );
         if (result.success) {
           onCategoryDeleted();
           onOpenChange(false);
         } else {
-          console.error(t('forms.messages.errorOccurred'), result.message);
+          console.error("Error Occurred", result.message);
         }
       } finally {
         setLoading(false);
@@ -61,8 +58,8 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
       initialValues={{
         deleteAction:
           deleteAction === "delete"
-            ? t('forms.messages.deleteAllTransactions')
-            : t('forms.messages.reassignToCategory'),
+            ? "Delete all transactions"
+            : "Reassign to category",
         reassignCategoryId: selectedCategoryName,
       }}
       onSubmit={() => {}}
@@ -72,23 +69,20 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
         open={open}
         onOpenChange={onOpenChange}
         onConfirm={handleConfirm}
-        title={t('forms.titles.deleteCategory')}
+        title="Delete Category"
         loading={loading}
         description={
           transactionCount > 0 ? (
             <div className="space-y-4">
-              {/* <p>
-                Are you sure you want to delete &quot;{category?.name}&quot;?
-              </p> */}
               <p>
-                {t('forms.messages.confirmDeleteCategory', { categoryName: category?.name || '' })}
+                Are you sure you want to delete {category?.name}?
               </p>
               <p>
-                {t('forms.messages.categoryHasTransactions', { count: transactionCount })}
+                This category has {transactionCount} associated transaction(s).
               </p>
               <div>
                 <label className="text-sm font-medium">
-                  {t('forms.labels.chooseAction')}
+                  Choose an action
                 </label>
                 <SelectBox
                   name="deleteAction"
@@ -96,19 +90,19 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
                   options={
                     categories.length > 1
                       ? [
-                          t('forms.messages.deleteAllTransactions'),
-                          t('forms.messages.reassignToCategory'),
+                          "Delete all transactions",
+                          "Reassign to category",
                         ]
-                      : [t('forms.messages.deleteAllTransactions')]
+                      : ["Delete all transactions"]
                   }
                   value={
                     deleteAction === "delete"
-                      ? t('forms.messages.deleteAllTransactions')
-                      : t('forms.messages.reassignToCategory')
+                      ? "Delete all transactions"
+                      : "Reassign to category"
                   }
                   onChange={(value) => {
                     const newAction =
-                      value === t('forms.messages.deleteAllTransactions')
+                      value === "Delete all transactions"
                         ? "delete"
                         : "reassign";
                     setDeleteAction(newAction);
@@ -120,7 +114,7 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
                 {deleteAction === "reassign" && (
                   <SelectBox
                     name="reassignCategoryId"
-                    label={t('forms.labels.selectCategory')}
+                    label="Select category"
                     options={categories
                       .filter(
                         (cat) =>
@@ -137,7 +131,7 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
               </div>
             </div>
           ) : (
-            t('forms.messages.noAssociatedTransactions', { categoryName: category?.name || '', categoryType: category?.type || '' })
+            `No associated transactions for "${category?.name}" (${category?.type}).`
           )
         }
       />

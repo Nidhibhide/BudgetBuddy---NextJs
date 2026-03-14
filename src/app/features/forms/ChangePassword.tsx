@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useTranslations } from "next-intl";
 import { InputBox, Button, useToast, useHandleResponse } from "@/app/features/common/index";
 import { changePassword } from "@/app/lib/auth";
 import { User } from "@/app/types/appTypes";
@@ -12,27 +11,26 @@ const ChangePassword: React.FC = () => {
   const [passwordLoading, setPasswordLoading] = useState<boolean>(false);
   const { showError } = useToast();
   const Response = useHandleResponse();
-  const t = useTranslations();
 
   const passwordBaseSchema = Yup.string()
-    .matches(/^\d+$/, t('forms.validation.passwordDigitsOnly'))
-    .min(5, t('forms.validation.passwordMin5'))
-    .max(10, t('forms.validation.passwordMax10'));
+    .matches(/^\d+$/, "Password must contain only digits")
+    .min(5, "Password must be at least 5 characters")
+    .max(10, "Password must be at most 10 characters");
 
   const passwordValidationSchema = Yup.object().shape({
     OldPassword: passwordBaseSchema.notRequired(),
 
     NewPassword: Yup.string().when("OldPassword", {
       is: (val: string | undefined) => val && val.length > 0,
-      then: () => passwordBaseSchema.required(t('forms.validation.newPasswordRequired')),
+      then: () => passwordBaseSchema.required("New password is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
 
     ConfirmPassword: Yup.string()
-      .oneOf([Yup.ref("NewPassword"), undefined], t('forms.validation.passwordsMustMatch'))
+      .oneOf([Yup.ref("NewPassword"), undefined], "Passwords must match")
       .when("OldPassword", {
         is: (val: string | undefined) => val && val.length > 0,
-        then: () => passwordBaseSchema.required(t('forms.validation.confirmPasswordRequired')),
+        then: () => passwordBaseSchema.required("Confirm password is required"),
         otherwise: (schema) => schema.notRequired(),
       }),
   }) as Yup.ObjectSchema<
@@ -52,19 +50,19 @@ const ChangePassword: React.FC = () => {
       const { OldPassword, NewPassword } = values;
       if (OldPassword && NewPassword) {
         if (OldPassword === NewPassword) {
-          showError(t('forms.messages.newPasswordDifferent'));
+          showError("New password must be different from old password");
           setPasswordLoading(false);
           return;
         }
         const response = await changePassword({
           oldPassword: OldPassword,
           newPassword: NewPassword,
-        }, t);
-        Response({ response, successMessage: t('forms.messages.success') });
+        });
+        Response({ response, successMessage: "Success" });
       }
     } catch (error: unknown) {
       const err = error as Error;
-      showError(err.message || t('forms.messages.errorOccurred'));
+      showError(err.message || "An unexpected error occurred");
     } finally {
       setPasswordLoading(false);
     }
@@ -84,28 +82,28 @@ const ChangePassword: React.FC = () => {
         <div className="w-full max-w-[600px] mx-auto bg-background p-6 rounded-lg shadow-sm border">
           <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
             <Lock className="w-6 h-6 text-foreground" />
-            {t('forms.titles.changePassword')}
+            Change Password
           </h2>
           <div className="flex flex-col gap-6">
             <InputBox
               name="OldPassword"
-              label={t('forms.labels.currentPassword')}
+              label="Current Password"
               type="password"
             />
             <InputBox
               name="NewPassword"
-              label={t('forms.labels.newPassword')}
+              label="New Password"
               type="password"
             />
             <InputBox
               name="ConfirmPassword"
-              label={t('forms.labels.confirmPassword')}
+              label="Confirm Password"
               type="password"
             />
           </div>
           <div className="mt-4">
             <Button onClick={handleSubmit} width="w-full" loading={passwordLoading}>
-          {t('forms.buttons.save')}
+          Save
             </Button>
           </div>
         </div>

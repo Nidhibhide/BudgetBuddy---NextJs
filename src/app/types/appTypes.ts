@@ -310,10 +310,6 @@ export interface ThemeToggleProps {
   size?: "icon" | "icon-lg";
 }
 
-export interface LanguageSelectorProps {
-  className?: string;
-}
-
 export interface Session {
   user: {
     id: string;
