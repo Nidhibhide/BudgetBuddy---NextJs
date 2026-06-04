@@ -82,6 +82,7 @@ export interface ButtonProps {
   bgColor?: string;
   hoverColor?: string;
   loading?: boolean;
+  text?: string;
 }
 
 export interface TooltipProps {
@@ -95,6 +96,7 @@ export interface GetStartedLinkProps {
   width?: string;
   onClick?: () => void;
   loading?: boolean;
+  text?: string;
 }
 
 export interface AppState {

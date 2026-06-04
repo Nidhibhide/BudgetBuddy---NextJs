@@ -4,9 +4,9 @@ import { CreateRecurringPayment } from "@/app/backend/validations/recurringPayme
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function POST(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
-    const { error } = CreateRecurringPayment(t).validate(body);
+    const { error } = CreateRecurringPayment().validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     // Validate that reminderDate is before nextDueDate
     if (new Date(reminderDate) >= new Date(nextDueDate)) {
-      return JsonOne(400, t("backend.api.reminderBeforeDue"), false);
+      return JsonOne(400, "Reminder date must be before due date", false);
     }
 
     const newRecurringPayment = new RecurringPayment({
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     await newRecurringPayment.save();
 
-    return JsonOne(201, t("backend.api.success"), true, {
+    return JsonOne(201, "Success", true, {
       recurringPayment: newRecurringPayment,
     });
   });

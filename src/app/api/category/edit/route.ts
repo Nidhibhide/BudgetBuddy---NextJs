@@ -4,14 +4,14 @@ import { EditCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function PUT(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
 
 
 
     const body = await request.json();
-    const { error } = EditCategory(t).validate(body);
+    const { error } = EditCategory().validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -26,7 +26,7 @@ export async function PUT(request: Request) {
     });
 
     if (!existingCategory) {
-      return JsonOne(404, t("backend.api.categoryNotFound"), false);
+      return JsonOne(404, "Category not found", false);
     }
 
     // Check if new name already exists for this user and type
@@ -39,7 +39,7 @@ export async function PUT(request: Request) {
     });
 
     if (duplicateCategory) {
-      return JsonOne(400, t("backend.api.categoryNameAlreadyExists"), false);
+      return JsonOne(400, "Category name already exists", false);
     }
 
     existingCategory.name = name;
@@ -54,7 +54,7 @@ export async function PUT(request: Request) {
     }
     await existingCategory.save();
 
-    return JsonOne(200, t("backend.api.success"), true, {
+    return JsonOne(200, "Success", true, {
       category: existingCategory
     });
   });

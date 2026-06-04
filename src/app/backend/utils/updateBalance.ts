@@ -3,16 +3,15 @@ import UserModel from "../models/user";
 export async function updateUserBalance(
   userId: string,
   amount: number,
-  type: string,
-  t: (key: string) => string
+  type: string
 ): Promise<{ success: boolean; message?: string }> {
   const user = await UserModel.findById(userId);
   if (!user) {
-    return { success: false, message: t('backend.api.userNotFound') };
+    return { success: false, message: "User not found" };
   }
 
   if (type === "Expense" && user.totalBalance < amount) {
-    return { success: false, message: t('backend.api.insufficientBalance') };
+    return { success: false, message: "Insufficient balance" };
   }
 
   if (type === "Income") {

@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/app/backend/config/MongoDB";
 import User from "@/app/backend/models/user";
 import { Login } from "@/app/backend/validations/user";
-import { getTranslations } from "next-intl/server";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,12 +16,11 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const t = await getTranslations();
         if (!credentials?.email || !credentials?.password) {
-          throw new Error(t('backend.api.missingEmailOrPassword'));
+          throw new Error("Email and password are required");
         }
 
-        const { error } = Login(t).validate({ email: credentials.email, password: credentials.password });
+        const { error } = Login().validate({ email: credentials.email, password: credentials.password });
         if (error) {
           throw new Error(error.details[0].message);
         }
@@ -30,15 +28,15 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
-          throw new Error(t('backend.api.userNotFound'));
+          throw new Error("User not found");
         }
 
         if (user.authProvider !== "local") {
-          throw new Error(t('backend.api.differentLoginMethod'));
+          throw new Error("Please sign in with your original login method");
         }
 
         if (!user.password) {
-          throw new Error(t('backend.api.userNotFound'));
+          throw new Error("User not found");
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -47,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordCorrect) {
-          throw new Error(t('backend.api.incorrectPassword'));
+          throw new Error("Incorrect password");
         }
 
         return {
@@ -94,7 +92,6 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
-      const t = await getTranslations();
       if (account?.provider === "google") {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
@@ -140,7 +137,7 @@ export const authOptions: NextAuthOptions = {
           const refreshedTokens = await response.json();
 
           if (!response.ok) {
-            throw new Error(t('backend.api.failedToRefreshToken'));
+            throw new Error("Failed to refresh access token");
           }
 
           token.accessToken = refreshedTokens.access_token;
@@ -149,7 +146,7 @@ export const authOptions: NextAuthOptions = {
             token.refreshToken = refreshedTokens.refresh_token;
           }
         } catch (error) {
-          throw new Error(`${t('backend.api.failedToRefreshToken')}: ${error instanceof Error ? error.message : String(error)}`);
+          throw new Error(`Failed to refresh token: ${error instanceof Error ? error.message : String(error)}`);
         }
       }
 

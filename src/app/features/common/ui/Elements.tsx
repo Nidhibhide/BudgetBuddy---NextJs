@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Loader2} from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useField } from "formik";
 import {
   Select,
@@ -39,7 +39,7 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
     meta = null;
   }
 
-  const selectValue = value !== undefined ? value : field?.value || '';
+  const selectValue = value !== undefined ? value : field?.value || "";
 
   const handleValueChange = (selectedValue: string) => {
     if (field) {
@@ -55,11 +55,10 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
           {label}
         </Label>
       )}
-      <Select
-        value={selectValue}
-        onValueChange={handleValueChange}
-      >
-        <SelectTrigger className={`h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`}>
+      <Select value={selectValue} onValueChange={handleValueChange}>
+        <SelectTrigger
+          className={`h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`}
+        >
           {icon}
           <SelectValue placeholder={label} />
         </SelectTrigger>
@@ -100,7 +99,7 @@ export const InputBox: React.FC<InputBoxProps> = ({
   }
   const [showPassword, setShowPassword] = useState(false);
 
-  const inputValue = value !== undefined ? value : field?.value || '';
+  const inputValue = value !== undefined ? value : field?.value || "";
   const inputType = type === "password" && showPassword ? "text" : type;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,6 +174,7 @@ export const Button: React.FC<ButtonProps> = ({
   bgColor = "bg-btn-background",
   hoverColor = "hover:bg-btn-hover",
   loading = false,
+  text,
 }) => {
   return (
     <button
@@ -187,6 +187,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
+          <span>{text || children}</span>
           <Loader2 className="animate-spin text-foreground" size={20} />
         </div>
       ) : (
@@ -212,6 +213,7 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
   width = "w-full sm:w-[150px]",
   onClick,
   loading = false,
+  text,
 }) => {
   return (
     <Link
@@ -223,6 +225,7 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
+          <span>{text || children}</span>
           <Loader2 className="animate-spin text-foreground" size={20} />
         </div>
       ) : (
@@ -231,5 +234,3 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
     </Link>
   );
 };
-
-

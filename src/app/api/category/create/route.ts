@@ -5,9 +5,9 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 
 export async function POST(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
-    const { error, value } = validateBody<{ name: string; type: string; budgetLimit?: number; goal?: number }>(body, CreateCategory(t));
+    const { error, value } = validateBody<{ name: string; type: string; budgetLimit?: number; goal?: number }>(body, CreateCategory());
 
     if (error) {
       return JsonOne(400, error.details[0].message, false);
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     });
 
     if (existingCategory) {
-      return JsonOne(400, t("backend.api.categoryAlreadyExists"), false);
+      return JsonOne(400, "Category already exists", false);
     }
 
     const newCategory = new Category({
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     await newCategory.save();
 
-    return JsonOne(201, t("backend.api.success"), true, {
+    return JsonOne(201, "Success", true, {
       category: newCategory
     });
   });

@@ -4,12 +4,12 @@ import { UpdateRecurringPayment } from "@/app/backend/validations/recurringPayme
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 
 export async function PUT(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const recurringPaymentId = url.searchParams.get("id");
 
     const body = await request.json();
-    const { error } = UpdateRecurringPayment(t).validate(body);
+    const { error } = UpdateRecurringPayment().validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -18,7 +18,7 @@ export async function PUT(request: Request) {
 
     // Validate that reminderDate is before nextDueDate
     if (new Date(reminderDate) >= new Date(nextDueDate)) {
-      return JsonOne(400, t("backend.api.reminderBeforeDue"), false);
+      return JsonOne(400, "Reminder date must be before due date", false);
     }
 
     const existingRecurringPayment = await RecurringPayment.findOne({
@@ -28,7 +28,7 @@ export async function PUT(request: Request) {
     });
 
     if (!existingRecurringPayment) {
-      return JsonOne(404, t("backend.api.recurringPaymentNotFound"), false);
+      return JsonOne(404, "Recurring payment not found", false);
     }
 
     const updateData = {
@@ -47,7 +47,7 @@ export async function PUT(request: Request) {
       { new: true }
     );
 
-    return JsonOne(200, t("backend.api.success"), true, {
+    return JsonOne(200, "Success", true, {
       recurringPayment: updatedRecurringPayment,
     });
   });

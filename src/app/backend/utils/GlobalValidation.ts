@@ -16,93 +16,81 @@ export const stringArrayValidator = (
 };
 
 export const stringValidator = (
-  labelKey: string,
+  label: string,
   min: number,
   max: number,
   required: boolean,
   regex?: RegExp
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.string().min(min).max(max).label(t(labelKey));
-    if (regex) {
-      schema = schema.pattern(regex);
-    }
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.string().min(min).max(max).label(label);
+  if (regex) {
+    schema = schema.pattern(regex);
+  }
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };
 
 export const numberValidator = (
-  labelKey: string,
+  label: string,
   min: number,
   max: number,
   required: boolean
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.number().min(min).max(max).label(t(labelKey));
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.number().min(min).max(max).label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };
 
 export const selectValidator = (
-  labelKey: string,
+  label: string,
   options: string[],
   required: boolean
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.string().valid(...options).label(t(labelKey));
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.string().valid(...options).label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };
 
 export const emailValidator = (
-  labelKey: string = "backend.validation.email",
+  label: string = "Email",
   required: boolean = true
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.string().email().label(t(labelKey));
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.string().email().label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };
 
 export const passwordValidator = (
-  labelKey: string = "backend.validation.password",
+  label: string = "Password",
   required: boolean = true
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.string().min(5).max(100).label(t(labelKey));
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.string().min(5).max(100).label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };
 
 export const arraySelectValidator = (
-  labelKey: string,
+  label: string,
   options: string[],
   required: boolean,
   maxLength: number
 ) => {
-  return (t: (key: string) => string) => {
-    let schema = Joi.array()
-      .items(Joi.string().valid(...options))
-      .max(maxLength)
-      .label(t(labelKey));
-    if (required) {
-      schema = schema.required();
-    }
-    return schema;
-  };
+  let schema = Joi.array()
+    .items(Joi.string().valid(...options))
+    .max(maxLength)
+    .label(label);
+  if (required) {
+    schema = schema.required();
+  }
+  return schema;
 };

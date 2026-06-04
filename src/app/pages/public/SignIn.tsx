@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 
 const SignIn = () => {
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const router = useRouter();
 
   const { showSuccess, showError } = useToast();
@@ -59,9 +60,12 @@ const SignIn = () => {
   };
   const handleGoogleLogin = async () => {
     try {
+      setGoogleLoading(true);
       await signIn("google", { callbackUrl: "/dashboard/home" });
     } catch (err) {
       showError(err instanceof Error ? err.message : "Error Occurred");
+    } finally {
+      setGoogleLoading(false);
     }
   };
   return (
@@ -75,6 +79,7 @@ const SignIn = () => {
             bgColor="bg-[#4285F4]"
             hoverColor="hover:bg-[#3367D6]"
             className="border px-4 w-full sm:w-[270px] flex items-center justify-center gap-2"
+            loading={googleLoading}
           >
             Sign in with Google
           </Button>

@@ -9,9 +9,9 @@ import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import { checkLimitForCreate } from "@/app/backend/utils/transactionChecks";
 
 export async function POST(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const body = await request.json();
-    const { error } = CreateTransaction(t).validate(body);
+    const { error } = CreateTransaction().validate(body);
     if (error) {
       return JsonOne(400, error.details[0].message, false);
     }
@@ -21,11 +21,11 @@ export async function POST(request: Request) {
     // Get user's currency
     const user = await User.findById(userId);
     if (!user) {
-      return JsonOne(404, t("backend.api.userNotFound"), false);
+      return JsonOne(404, "User not found", false);
     }
 
     // Convert amount to INR
-    const amountInINR = await convertToINR(amount, user.currency, t);
+    const amountInINR = await convertToINR(amount, user.currency);
 
     // Find the category by name and user
     const categoryDoc = await Category.findOne({
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     });
 
     if (!categoryDoc) {
-      return JsonOne(400, t("backend.api.categoryNotFound"), false);
+      return JsonOne(400, "Category not found", false);
     }
 
     // Check budget limit or goal
@@ -45,17 +45,16 @@ export async function POST(request: Request) {
       userId,
       type,
       amountInINR,
-      user.currency,
-      t
+      user.currency
     );
     if (!limitCheck.success) {
-      return JsonOne(400, limitCheck.message || t("backend.api.limitCheckFailed"), false);
+      return JsonOne(400, limitCheck.message || "Limit check failed", false);
     }
 
     // Update user balance with converted amount
-    const balanceUpdate = await updateUserBalance(userId, amountInINR, type, t);
+    const balanceUpdate = await updateUserBalance(userId, amountInINR, type);
     if (!balanceUpdate.success) {
-      return JsonOne(400, balanceUpdate.message || t("backend.api.balanceUpdateFailed"), false);
+      return JsonOne(400, balanceUpdate.message || "Balance update failed", false);
     }
 
     const newTransaction = new Transaction({
@@ -70,7 +69,7 @@ export async function POST(request: Request) {
 
     await newTransaction.save();
 
-    return JsonOne(201, t("backend.api.success"), true, {
+    return JsonOne(201, "Success", true, {
       transaction: newTransaction,
     });
   });

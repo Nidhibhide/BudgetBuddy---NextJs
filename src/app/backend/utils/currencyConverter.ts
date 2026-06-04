@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const convertToINR = async (amount: number, fromCurrency: string, t: (key: string) => string): Promise<number> => {
+export const convertToINR = async (amount: number, fromCurrency: string): Promise<number> => {
   if (fromCurrency === 'INR') {
     return amount;
   }
@@ -10,13 +10,12 @@ export const convertToINR = async (amount: number, fromCurrency: string, t: (key
     const rate = response.data.rates.INR;
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new Error(t('backend.api.failedToConvertCurrency'));
+    throw new Error('Failed to convert currency');
   }
 };
 
-export const convertFromINR = async (amount: number, toCurrency: string, t: (key: string) => string): Promise<number> => {
+export const convertFromINR = async (amount: number, toCurrency: string): Promise<number> => {
   if (toCurrency === 'INR') {
     return amount;
   }
@@ -26,9 +25,7 @@ export const convertFromINR = async (amount: number, toCurrency: string, t: (key
     const rate = response.data.rates[toCurrency];
     const convertedAmount = amount * rate;
     return Math.round(convertedAmount * 100) / 100; // Round to 2 decimal places
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    throw new Error(t('backend.api.failedToConvertCurrency'));
+    throw new Error('Failed to convert currency');
   }
 };
-

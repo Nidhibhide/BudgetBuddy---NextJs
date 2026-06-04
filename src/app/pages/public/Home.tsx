@@ -24,7 +24,7 @@ const Home = () => {
             From daily spends to monthly insights — all in one clean view. Simple. Smart. Stress-free.
           </div>
           <div className="flex gap-4 items-center">
-            <GetStartedLink href="/signin" width="w-[150px]" onClick={handleGetStartedClick} loading={loading}>Get Started</GetStartedLink>
+            <GetStartedLink href="/signin" width="w-[150px]" onClick={handleGetStartedClick} loading={loading} text="Get Started">Get Started</GetStartedLink>
             <a
               href="#features"
               className=" bg-btn-background text-white hover:bg-btn-hover py-2.5 px-4 text-center text-base font-medium  rounded-xl   hover:shadow-md transition duration-500 w-[150px]"

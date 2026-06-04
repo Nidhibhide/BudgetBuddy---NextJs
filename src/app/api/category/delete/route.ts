@@ -7,7 +7,7 @@ import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import User from "@/app/backend/models/user";
 
 export async function DELETE(request: Request) {
-  return await withAuthAndDB(async (session, userId, t) => {
+  return await withAuthAndDB(async (session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
     const reassignCategoryId = url.searchParams.get("reassignCategoryId");
@@ -21,13 +21,13 @@ export async function DELETE(request: Request) {
     });
 
     if (!category) {
-      return JsonOne(404, t("backend.api.categoryNotFound"), false);
+      return JsonOne(404, "Category not found", false);
     }
 
     // Get user's currency for balance updates
     const user = await User.findById(userId);
     if (!user) {
-      return JsonOne(404, t("backend.api.userNotFound"), false);
+      return JsonOne(404, "User not found", false);
     }
 
     // Find all associated transactions
@@ -46,11 +46,11 @@ export async function DELETE(request: Request) {
       });
 
       if (!reassignCategory) {
-        return JsonOne(400, t("backend.api.reassignCategoryNotFound"), false);
+        return JsonOne(400, "Reassign category not found", false);
       }
 
       if (reassignCategory.type !== category.type) {
-        return JsonOne(400, t("backend.api.cannotReassignDifferentType"), false);
+        return JsonOne(400, "Cannot reassign to a different type", false);
       }
 
       // Reassign transactions to the new category
@@ -64,8 +64,7 @@ export async function DELETE(request: Request) {
         // Convert amount back to INR for balance reversal
         const amountInINR = await convertToINR(
           transaction.amount,
-          user.currency,
-          t
+          user.currency
         );
 
         // Reverse the balance update
@@ -74,13 +73,12 @@ export async function DELETE(request: Request) {
         const balanceUpdate = await updateUserBalance(
           userId,
           amountInINR,
-          reverseType,
-          t
+          reverseType
         );
         if (!balanceUpdate.success) {
           return JsonOne(
             400,
-            balanceUpdate.message || t("backend.api.balanceUpdateFailed"),
+            balanceUpdate.message || "Balance update failed",
             false
           );
         }
@@ -94,6 +92,6 @@ export async function DELETE(request: Request) {
     // Soft delete the category by archiving it
     await Category.updateOne({ _id: categoryId }, { isArchived: true });
 
-    return JsonOne(200, t("backend.api.success"), true);
+    return JsonOne(200, "Success", true);
   });
 }

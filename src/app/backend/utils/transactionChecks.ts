@@ -9,8 +9,7 @@ export async function checkLimitForCreate(
   userId: string,
   type: "Expense" | "Income",
   amountInINR: number,
-  userCurrency: string,
-  t: (key: string) => string
+  userCurrency: string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
@@ -21,8 +20,7 @@ export async function checkLimitForCreate(
     if (type === "Expense" && category.budgetLimit > 0) {
       const budgetLimitInINR = await convertToINR(
         category.budgetLimit,
-        userCurrency,
-        t
+        userCurrency
       );
       const allTransactions = await Transaction.find({
         category: categoryId,
@@ -43,7 +41,7 @@ export async function checkLimitForCreate(
         };
       }
     } else if (type === "Income" && category.goal > 0) {
-      const goalInINR = await convertToINR(category.goal, userCurrency, t);
+      const goalInINR = await convertToINR(category.goal, userCurrency);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -65,7 +63,6 @@ export async function checkLimitForCreate(
     }
 
     return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return {
       success: false,
@@ -83,8 +80,7 @@ export async function checkLimitForEdit(
   userId: string,
   type: "Expense" | "Income",
   balanceAdjustment: number,
-  userCurrency: string,
-  t: (key: string) => string
+  userCurrency: string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
@@ -99,8 +95,7 @@ export async function checkLimitForEdit(
     ) {
       const budgetLimitInINR = await convertToINR(
         category.budgetLimit,
-        userCurrency,
-        t
+        userCurrency
       );
       const allTransactions = await Transaction.find({
         category: categoryId,
@@ -125,7 +120,7 @@ export async function checkLimitForEdit(
       category.goal > 0 &&
       balanceAdjustment > 0
     ) {
-      const goalInINR = await convertToINR(category.goal, userCurrency, t);
+      const goalInINR = await convertToINR(category.goal, userCurrency);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -147,7 +142,6 @@ export async function checkLimitForEdit(
     }
 
     return { success: true };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return {
       success: false,

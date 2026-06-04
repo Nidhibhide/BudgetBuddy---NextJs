@@ -7,6 +7,9 @@ import { ThemeProvider } from "./features/common";
 export const metadata: Metadata = {
   title: "BudgetBuddy",
   description: "Your budget management app",
+  icons: {
+    icon: "/wallet.png",
+  },
 };
 
 export default async function RootLayout({
