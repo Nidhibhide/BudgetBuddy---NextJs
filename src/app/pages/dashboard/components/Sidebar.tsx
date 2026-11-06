@@ -12,21 +12,24 @@ import { IoMdSettings } from "react-icons/io";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/app/features/common";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-const Sidebar = ({ onClose }: { onClose?: () => void }) => {
-  const [selectedLink, setSelectedLink] = useState<string | null>(null);
-    const pathname = usePathname(); // Get the current path
+const Sidebar = ({
+  onClose,
+  onLogout,
+}: {
+  onClose?: () => void;
+  onLogout?: () => void;
+}) => {
+  const pathname = usePathname();
 
-  useEffect(() => {
-    const cleanedPath = pathname.replace(/^\/[^/]+/, "");
-    setSelectedLink(cleanedPath);
-    console.log(pathname);
-  }, [pathname]);
-  const handleLinkClick = (link: { href: string }) => {
-    setSelectedLink(link.href);
+  const handleLinkClick = () => {
     onClose?.();
+  };
+
+  const handleLogoutClick = () => {
+    onClose?.();
+    onLogout?.();
   };
 
   const sidebarLinks = [
@@ -54,11 +57,6 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       href: "/dashboard/setting",
       label: "Setting",
       icon: IoMdSettings,
-    },
-    {
-      href: "/dashboard/logout",
-      label: "Logout",
-      icon: MdLogout,
     },
   ];
 
@@ -89,8 +87,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
       <div className="flex-1">
         <ul className="flex flex-col text-xl font-medium">
           {sidebarLinks.map((link) => {
-            // const isActive = pathname === link.href;
-            const isActive = selectedLink === link.href;
+            const isActive = pathname === link.href;
             return (
               <li
                 key={link.href}
@@ -99,7 +96,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
                     ? "bg-foreground text-background"
                     : "hover:bg-sidebar-hover text-foreground"
                 }`}
-                onClick={() => handleLinkClick(link)}
+                onClick={handleLinkClick}
               >
                 <Link
                   href={link.href}
@@ -114,6 +111,18 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
               </li>
             );
           })}
+          <li
+            className="group flex items-center gap-2 cursor-pointer md:py-3 py-2 justify-center hover:bg-sidebar-hover text-foreground"
+            onClick={handleLogoutClick}
+          >
+            <button
+              type="button"
+              className="flex items-center gap-2 text-base md:text-lg"
+            >
+              <MdLogout size={28} className="text-foreground" />
+              Logout
+            </button>
+          </li>
         </ul>
       </div>
     </div>

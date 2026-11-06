@@ -21,6 +21,7 @@ const Confirmation: React.FC<ConfirmationProps> = ({
   title,
   description,
   loading = false,
+  confirmLabel = "Delete",
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -37,7 +38,7 @@ const Confirmation: React.FC<ConfirmationProps> = ({
                 <Loader2 className="mr-2 h-4 w-4 animate-spin text-background" />
               </>
             ) : (
-              "Delete"
+              confirmLabel
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

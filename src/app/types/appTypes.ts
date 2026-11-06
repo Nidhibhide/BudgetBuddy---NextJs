@@ -217,6 +217,7 @@ export interface ConfirmationProps {
   title?: string;
   description?: string | React.ReactNode;
   loading?: boolean;
+  confirmLabel?: string;
 }
 
 
