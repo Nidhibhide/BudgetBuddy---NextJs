@@ -109,6 +109,14 @@ const SignIn = () => {
                   type="password"
                   placeholder="Enter your password"
                 />
+                <p className="text-sm text-right -mt-2">
+                  <Link
+                    href="/forgot-password"
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    Forgot Password?
+                  </Link>
+                </p>
               </div>
 
               <Button

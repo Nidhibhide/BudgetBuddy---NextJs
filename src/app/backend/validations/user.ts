@@ -31,10 +31,29 @@ const ChangePassword = () => Joi.object({
   oldPassword: Joi.string().required().label("Old Password"),
 });
 
+const ForgotPassword = () =>
+  Joi.object({
+    email: emailValidator("Email"),
+  });
+
+const ResetPassword = () =>
+  Joi.object({
+    token: Joi.string().required().label("Token"),
+    newPassword: passwordValidator("New Password"),
+  });
+
 const FinancialSettings = () => Joi.object({
   names: arraySelectValidator("Categories", CATEGORY_LIST, true, 4),
   currency: selectValidator("Currency", CURRENCIES, true),
   limit: numberValidator("Budget Limit", 0, Number.MAX_SAFE_INTEGER, true),
 });
 
-export { Register, Login, Update, ChangePassword, FinancialSettings };
+export {
+  Register,
+  Login,
+  Update,
+  ChangePassword,
+  ForgotPassword,
+  ResetPassword,
+  FinancialSettings,
+};

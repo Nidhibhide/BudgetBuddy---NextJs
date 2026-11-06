@@ -61,3 +61,62 @@ export async function updateProfile(data: User) {
     };
   }
 }
+
+export async function forgotPassword(data: { email: string }) {
+  try {
+    const response = await axios.post("/api/auth/forgotPassword", data);
+
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error Occurred", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Error Occurred",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}
+
+export async function verifyResetToken(token: string) {
+  try {
+    const response = await axios.get("/api/auth/resetPassword", {
+      params: { token },
+    });
+
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error Occurred", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Error Occurred",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}
+
+export async function resetPassword(data: {
+  token: string;
+  newPassword: string;
+}) {
+  try {
+    const response = await axios.post("/api/auth/resetPassword", data);
+
+    return { ...response.data, statusCode: response.status };
+  } catch (error: unknown) {
+    console.error("Error Occurred", error);
+    const axiosError = error as AxiosError;
+    return {
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Error Occurred",
+      success: false,
+      statusCode: axiosError.response?.status || 500,
+    };
+  }
+}

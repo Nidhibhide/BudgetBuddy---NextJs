@@ -37,6 +37,12 @@ const UserSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Balance cannot be negative"],
     },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpire: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
