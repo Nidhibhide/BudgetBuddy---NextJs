@@ -72,7 +72,16 @@ export const passwordValidator = (
   label: string = "Password",
   required: boolean = true
 ) => {
-  let schema = Joi.string().min(5).max(100).label(label);
+  let schema = Joi.string()
+    .min(8)
+    .max(100)
+    .pattern(/^(?=.*[A-Za-z])(?=.*\d)/)
+    .messages({
+      "string.pattern.base": `${label} must contain at least one letter and one number`,
+      "string.min": `${label} must be at least 8 characters`,
+      "string.max": `${label} must be at most 100 characters`,
+    })
+    .label(label);
   if (required) {
     schema = schema.required();
   }

@@ -19,11 +19,8 @@ const SignIn = () => {
   // validation schema with error messages
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string()
-      .matches(/^\d+$/, "Password must contain only digits")
-      .min(5, "Password must be at least 5 characters")
-      .max(10, "Password must be at most 10 characters")
-      .required("Password is required"),
+    // Login only checks that a password is entered; complexity is enforced on signup/change
+    password: Yup.string().required("Password is required"),
   });
 
   // handle sign in
@@ -43,10 +40,12 @@ const SignIn = () => {
 
       if (res?.error) {
         showError(
-          res.error === "CredentialsSignin" ? "Login Failed" : res.error
+          res.error === "CredentialsSignin"
+            ? "Invalid email or password"
+            : res.error
         );
       } else {
-        showSuccess("Success");
+        showSuccess("Signed in successfully");
         router.replace(res?.url || "/dashboard/home");
       }
       actions.resetForm();
@@ -70,7 +69,7 @@ const SignIn = () => {
   };
   return (
     <div className="min-h-[calc(100vh-5rem)] w-full flex justify-center items-center p-4 text-foreground">
-      <div className="w-full max-w-md bg-background rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign In</h1>
 
         <div className="mb-4 flex justify-center">

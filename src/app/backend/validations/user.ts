@@ -28,7 +28,7 @@ const Update = () => Joi.object({
 
 const ChangePassword = () => Joi.object({
   newPassword: passwordValidator("New Password"),
-  oldPassword: passwordValidator("Old Password"),
+  oldPassword: Joi.string().required().label("Old Password"),
 });
 
 const FinancialSettings = () => Joi.object({

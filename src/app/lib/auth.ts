@@ -3,7 +3,11 @@ import {User } from "@/app/types/appTypes";
 
 export async function registerUser(data: User) {
   try {
-    const response = await axios.post("/api/auth/register", data);
+    const response = await axios.post("/api/auth/register", {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {

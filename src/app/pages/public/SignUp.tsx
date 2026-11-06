@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { registerUser } from "@/app/lib/auth";
 import { User } from "@/app/types/appTypes";
 
+type SignUpFormValues = User & { confirmPassword: string };
+
 const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -26,29 +28,42 @@ const SignUp = () => {
     email: Yup.string().email("Invalid email").required("Email is required"),
 
     password: Yup.string()
-      .matches(/^(?=.*\d)/, "Password must contain only digits")
-      .min(5, "Password must be at least 5 characters")
-      .max(10, "Password must be at most 10 characters")
+      .min(8, "Password must be at least 8 characters")
+      .max(100, "Password must be at most 100 characters")
+      .matches(/[A-Za-z]/, "Password must contain at least one letter")
+      .matches(/\d/, "Password must contain at least one number")
       .required("Password is required"),
+
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Confirm password is required"),
   });
 
   // handle sign up
   const handleSignUp = async (
-    values: User,
+    values: SignUpFormValues,
     { resetForm }: { resetForm: () => void }
   ) => {
     try {
       if (loading) return;
       setLoading(true);
-      const response = await registerUser(values);
+      const response = await registerUser({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      } as User);
 
       const { message, statusCode } = response;
 
       if (statusCode === 201) {
-        showSuccess(message);
+        showSuccess("Account created successfully");
         setTimeout(() => router.push("/signin"), 3000);
       } else if (message) {
-        showError(message);
+        showError(
+          message === "User already exists"
+            ? "An account with this email already exists"
+            : message
+        );
       }
       resetForm();
     } catch (err: unknown) {
@@ -60,10 +75,16 @@ const SignUp = () => {
 
   return (
     <div className="min-h-[calc(100vh-5rem)] w-full text-foreground flex justify-center items-center p-4">
-      <div className="w-full max-w-md bg-background  rounded-2xl shadow-xl p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
-        <Formik<User>
-          initialValues={{ name: "", email: "", password: "", currency: "INR" }}
+        <Formik<SignUpFormValues>
+          initialValues={{
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            currency: "INR",
+          }}
           validationSchema={validationSchema}
           onSubmit={handleSignUp}
         >
@@ -81,11 +102,22 @@ const SignUp = () => {
                   type="email"
                   placeholder="Enter your email"
                 />
+                <div className="w-full flex flex-col gap-1">
+                  <InputBox
+                    label="New Password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                  />
+                  <p className="text-sm text-red-500 px-0.5">
+                    At least 8 characters, with a letter and a number
+                  </p>
+                </div>
                 <InputBox
-                  label="New Password"
-                  name="password"
+                  label="Confirm Password"
+                  name="confirmPassword"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="Confirm your password"
                 />
               </div>
 

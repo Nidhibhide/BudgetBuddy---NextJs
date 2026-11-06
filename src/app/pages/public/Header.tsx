@@ -15,8 +15,8 @@ const Header: React.FC<HeaderProps> = ({}) => {
   // Get translation function for the root namespace
   // This provides access to all translations
   return (
-    <div className="sticky top-0 z-10  w-full flex flex-col text-foreground">
-      <div className="flex items-center gap-2 md:px-12 px-4 justify-between w-full h-20 bg-background">
+    <div className="sticky top-0 z-10 w-full flex flex-col text-foreground">
+      <div className="flex items-center gap-2 md:px-12 px-4 justify-between w-full h-20 bg-slate-200 dark:bg-slate-800 border-b border-foreground/10">
         <div className="flex gap-2">
           <FaWallet size={20} className="mt-1.5" />
           <span className="font-semibold text-2xl">BudgetBuddy</span>

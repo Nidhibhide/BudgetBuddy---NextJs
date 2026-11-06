@@ -13,12 +13,13 @@ const ChangePassword: React.FC = () => {
   const Response = useHandleResponse();
 
   const passwordBaseSchema = Yup.string()
-    .matches(/^\d+$/, "Password must contain only digits")
-    .min(5, "Password must be at least 5 characters")
-    .max(10, "Password must be at most 10 characters");
+    .min(8, "Password must be at least 8 characters")
+    .max(100, "Password must be at most 100 characters")
+    .matches(/[A-Za-z]/, "Password must contain at least one letter")
+    .matches(/\d/, "Password must contain at least one number");
 
   const passwordValidationSchema = Yup.object().shape({
-    OldPassword: passwordBaseSchema.notRequired(),
+    OldPassword: Yup.string().notRequired(),
 
     NewPassword: Yup.string().when("OldPassword", {
       is: (val: string | undefined) => val && val.length > 0,
@@ -30,7 +31,8 @@ const ChangePassword: React.FC = () => {
       .oneOf([Yup.ref("NewPassword"), undefined], "Passwords must match")
       .when("OldPassword", {
         is: (val: string | undefined) => val && val.length > 0,
-        then: () => passwordBaseSchema.required("Confirm password is required"),
+        then: () =>
+          Yup.string().required("Confirm password is required"),
         otherwise: (schema) => schema.notRequired(),
       }),
   }) as Yup.ObjectSchema<
@@ -90,11 +92,16 @@ const ChangePassword: React.FC = () => {
               label="Current Password"
               type="password"
             />
-            <InputBox
-              name="NewPassword"
-              label="New Password"
-              type="password"
-            />
+            <div className="w-full flex flex-col gap-1">
+              <InputBox
+                name="NewPassword"
+                label="New Password"
+                type="password"
+              />
+              <p className="text-sm text-red-500 px-0.5">
+                At least 8 characters, with a letter and a number
+              </p>
+            </div>
             <InputBox
               name="ConfirmPassword"
               label="Confirm Password"
