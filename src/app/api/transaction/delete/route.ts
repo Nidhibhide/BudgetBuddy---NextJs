@@ -34,7 +34,7 @@ export async function DELETE(request: Request) {
 
     // Reverse the balance update
     const reverseType = transaction.type === "Income" ? "Expense" : "Income";
-    const balanceUpdate = await updateUserBalance(userId, amountInINR, reverseType, t);
+    const balanceUpdate = await updateUserBalance(userId, amountInINR, reverseType);
     if (!balanceUpdate.success) {
       return JsonOne(400, balanceUpdate.message || t("backend.api.balanceUpdateFailed"), false);
     }
