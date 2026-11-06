@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useField } from "formik";
@@ -31,6 +31,7 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   className,
   icon,
 }) => {
+  const [mounted, setMounted] = useState(false);
   let field, meta;
   try {
     [field, meta] = useField(name);
@@ -39,7 +40,12 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
     meta = null;
   }
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const selectValue = value !== undefined ? value : field?.value || "";
+  const triggerClassName = `h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`;
 
   const handleValueChange = (selectedValue: string) => {
     if (field) {
@@ -55,25 +61,33 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
           {label}
         </Label>
       )}
-      <Select value={selectValue} onValueChange={handleValueChange}>
-        <SelectTrigger
-          className={`h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`}
+      {!mounted ? (
+        <div
+          className={`rounded-md border px-3 py-2 text-sm shadow-sm ${triggerClassName}`}
+          aria-hidden="true"
         >
           {icon}
-          <SelectValue placeholder={label} />
-        </SelectTrigger>
-        <SelectContent className="bg-background text-foreground border-foreground">
-          {options.map((option: string) => (
-            <SelectItem
-              key={option}
-              value={option}
-              className="hover:bg-foreground/10"
-            >
-              {option}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+          <span className="text-muted-foreground">{selectValue || label || ""}</span>
+        </div>
+      ) : (
+        <Select value={selectValue} onValueChange={handleValueChange}>
+          <SelectTrigger className={triggerClassName}>
+            {icon}
+            <SelectValue placeholder={label} />
+          </SelectTrigger>
+          <SelectContent className="bg-background text-foreground border-foreground">
+            {options.map((option: string) => (
+              <SelectItem
+                key={option}
+                value={option}
+                className="hover:bg-foreground/10"
+              >
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       {meta?.touched && meta?.error && (
         <p className="text-red-500 text-sm">{meta.error}</p>
       )}
@@ -201,7 +215,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
   return (
     <div className="relative group inline-block cursor-pointer">
       {children}
-      <span className="absolute hidden group-hover:block top-full mt-1 left-1/2 -translate-x-1/2 bg-black text-white text-sm rounded px-2 py-1 whitespace-nowrap z-50">
+      <span className="absolute hidden group-hover:block top-full mt-3 left-1/2 -translate-x-1/2 bg-black text-white text-sm rounded px-2 py-1 whitespace-nowrap z-50 pointer-events-none">
         {label}
       </span>
     </div>

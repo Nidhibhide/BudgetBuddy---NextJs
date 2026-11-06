@@ -9,12 +9,18 @@
   --color-btn-hover: var(--btn-hover);
   --color-sidebar-hover: var(--sidebar-hover);
   --color-selected-background: var(--selected-background);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
 :root {
   /* header and form section */
   --foreground: #171717;
   --background: #f1f5f9;
+
+  /* input borders / focus */
+  --input: #cbd5e1;
+  --ring: #6366f1;
 
   /* button section */
   --btn-background: #6366f1;
@@ -30,6 +36,10 @@
   /* header section */
   --foreground: #ffffff;
   --background: #1e293b;
+
+  /* input borders / focus */
+  --input: #475569;
+  --ring: #818cf8;
 
   /* button section */
   --btn-background: #818cf8;

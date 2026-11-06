@@ -31,7 +31,7 @@ const MainPage: React.FC = () => {
   } = useBarGraph();
 
   return (
-    <div className="w-full px-6 py-4 mx-auto space-y-6 overflow-y-auto">
+    <div className="w-full px-4 sm:px-6 py-4 mx-auto space-y-6">
       {/* Header */}
       <div className="relative">
         <div className="flex justify-between items-center">
@@ -51,7 +51,7 @@ const MainPage: React.FC = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
         <RecentTransactions />
         <BudgetCalendar/>
         <Insights />

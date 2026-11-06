@@ -218,7 +218,7 @@ const Transaction: React.FC = React.memo(() => {
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold text-foreground">
            Transactions
           </h2>
@@ -411,21 +411,21 @@ const Transaction: React.FC = React.memo(() => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleViewClick(row as TransactionType)}
-                      className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
                       title="View"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEditClick(row as TransactionType)}
-                      className="p-1 hover:bg-background/10  rounded transition-colors cursor-pointer"
+                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(row._id as string)}
-                      className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />

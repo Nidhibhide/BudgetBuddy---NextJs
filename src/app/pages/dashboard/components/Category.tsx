@@ -116,7 +116,7 @@ const Category: React.FC = React.memo(() => {
   return (
     <div className="w-full p-4 space-y-3">
       {/* Header with Switch */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold text-foreground">
            Categories
          </h2>
@@ -151,7 +151,7 @@ const Category: React.FC = React.memo(() => {
               return (
                 <Card
                   key={index}
-                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 ${
+                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg sm:hover:scale-105 ${
                     selectedCategory === category.name
                       ? "bg-selected-background"
                       : "bg-background"
@@ -259,7 +259,7 @@ const Category: React.FC = React.memo(() => {
             })}
             {data.length < 4 && (
               <Card
-                className="relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 bg-background border-dashed border-2 border-foreground/50 cursor-pointer"
+                className="relative overflow-hidden transition-all duration-300 hover:shadow-lg sm:hover:scale-105 bg-background border-dashed border-2 border-foreground/50 cursor-pointer"
                 onClick={() => setIsAddCategoryOpen(true)}
               >
                 <CardContent className="flex flex-col items-center justify-center h-full py-8">

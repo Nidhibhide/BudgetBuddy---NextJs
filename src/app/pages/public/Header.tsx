@@ -6,7 +6,7 @@ import { FaWallet } from "react-icons/fa";
 import { HeaderProps } from "../../types/appTypes";
 import { usePathname } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { ThemeToggle } from '@/app/features/common';
+import { ThemeToggle, Tooltip } from '@/app/features/common';
 
 const Header: React.FC<HeaderProps> = ({}) => {
   const pathname = usePathname();
@@ -24,9 +24,11 @@ const Header: React.FC<HeaderProps> = ({}) => {
         <div className="flex items-center gap-4">
           <ThemeToggle />
           {showBackButton && (
-            <Link href="/">
-              <ArrowLeft className="size-6" />
-            </Link>
+            <Tooltip label="Back to Home">
+              <Link href="/" aria-label="Back to Home">
+                <ArrowLeft className="size-6" />
+              </Link>
+            </Tooltip>
           )}
         </div>
       </div>

@@ -13,7 +13,7 @@ const Home = () => {
   };
 
   return (
-    <div className=" min-h-screen w-full py-28 text-foreground">
+    <div className=" min-h-screen w-full py-16 md:py-28 text-foreground">
       <div className="flex xl:flex-row flex-col gap-12 xl:gap-2 px-4 md:px-20 justify-center">
         <div className="flex flex-col xl:gap-8 gap-6 items-center justify-center">
           <div className="xl:text-6xl md:text-5xl text-4xl font-bold text-center max-w-6xl">
@@ -34,7 +34,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="w-full flex justify-center mt-28 px-4" id="features">
+      <div className="w-full flex justify-center mt-16 md:mt-28 px-4" id="features">
         <div className="flex flex-col justify-center items-center max-w-6xl">
           <h1 className="md:text-5xl text-center font-bold text-4xl">
             Features

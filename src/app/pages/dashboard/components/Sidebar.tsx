@@ -26,6 +26,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   }, [pathname]);
   const handleLinkClick = (link: { href: string }) => {
     setSelectedLink(link.href);
+    onClose?.();
   };
 
   const sidebarLinks = [
@@ -62,7 +63,7 @@ const Sidebar = ({ onClose }: { onClose?: () => void }) => {
   ];
 
   return (
-    <div className="w-96 h-full flex flex-col bg-background text-foreground">
+    <div className="w-full max-w-96 h-full flex flex-col bg-background text-foreground overflow-x-hidden">
       {/* App Header */}
       <div className="flex items-center py-6 px-4 mb-4 border-b border-foreground">
         <div className="flex-1 flex items-center justify-center gap-1">

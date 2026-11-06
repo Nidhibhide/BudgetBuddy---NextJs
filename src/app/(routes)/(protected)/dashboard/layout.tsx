@@ -12,32 +12,37 @@ export default function DashboardLayout({
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <div className="h-screen w-full flex flex-col xl:flex-row overflow-hidden">
+    <div className="h-screen w-full flex flex-col lg:flex-row overflow-hidden">
       {/* Header for small screens */}
-      <div className="xl:hidden h-16 flex items-center px-4 sticky top-0 z-10 bg-background">
-        <button onClick={() => setShowSidebar(true)}>
+      <div className="lg:hidden h-16 flex items-center px-4 sticky top-0 z-10 bg-background">
+        <button
+          type="button"
+          aria-label="Open menu"
+          className="min-h-11 min-w-11 flex items-center justify-center"
+          onClick={() => setShowSidebar(true)}
+        >
           <IoMenu size={24} className="text-foreground" />
         </button>
       </div>
       {/* Sidebar for large screens */}
-      <div className="hidden xl:block fixed top-0 left-0 z-10 h-screen">
+      <div className="hidden lg:block fixed top-0 left-0 z-10 h-screen w-96">
         <Sidebar />
       </div>
       {showSidebar && (
-        <div className="fixed inset-0 z-50 flex">
+        <div className="fixed inset-0 z-50 flex overflow-x-hidden">
           {/* Sidebar slides in from the left */}
-          <div className="w-96 h-full">
+          <div className="w-full max-w-96 h-full shrink-0">
             <Sidebar onClose={() => setShowSidebar(false)} />
           </div>
 
           {/* Transparent overlay to close sidebar when clicked outside */}
           <div
-            className="flex-1 bg-opacity-40"
+            className="flex-1 min-w-0 bg-black/40"
             onClick={() => setShowSidebar(false)}
           />
         </div>
       )}
-      <div className="flex-1 overflow-y-auto xl:ml-96">{children}</div>
+      <div className="flex-1 overflow-y-auto overflow-x-hidden lg:ml-96">{children}</div>
     </div>
   );
 }

@@ -7,12 +7,13 @@ export async function addTransaction(data: Transaction) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
+    const message =
+      (axiosError.response?.data as { message?: string })?.message ||
+      "Error Occurred";
+    console.error("Error Occurred:", message);
     return {
-      message:
-        (axiosError.response?.data as { message?: string })?.message ||
-        "Error Occurred",
+      message,
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
@@ -72,12 +73,13 @@ export async function editTransaction(id: string, data: Partial<Transaction>) {
     const response = await axios.put(`/api/transaction/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
+    const message =
+      (axiosError.response?.data as { message?: string })?.message ||
+      "Error Occurred";
+    console.error("Error Occurred:", message);
     return {
-      message:
-        (axiosError.response?.data as { message?: string })?.message ||
-        "Error Occurred",
+      message,
       success: false,
       statusCode: axiosError.response?.status || 500,
     };

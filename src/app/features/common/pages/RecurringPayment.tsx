@@ -81,11 +81,11 @@ const RecurringPayment: React.FC = () => {
   };
 
   return (
-    <div className="w-full p-4 space-y-3">
+    <div className="w-full p-2 sm:p-4 space-y-3">
       {/* Controls */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-end">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Formik
               initialValues={{ status: selectedStatus }}
               onSubmit={() => {}}
@@ -160,7 +160,7 @@ const RecurringPayment: React.FC = () => {
               render: (value, row) => (
                 <div className="flex gap-2">
                   <button
-                    className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                    className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
                     title="View"
                     onClick={() => {
                       setSelectedPayment(row as unknown as RecurringPaymentType);
@@ -170,7 +170,7 @@ const RecurringPayment: React.FC = () => {
                     <Eye className="w-4 h-4" />
                   </button>
                   <button
-                    className="p-1 hover:bg-background/10 rounded transition-colors cursor-pointer"
+                    className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
                     title="Edit"
                     onClick={() => {
                       setSelectedPayment(row as unknown as RecurringPaymentType);
@@ -181,7 +181,7 @@ const RecurringPayment: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleDeleteClick(row._id as string)}
-                    className="p-1 hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                    className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-red-500/10 rounded transition-colors cursor-pointer"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />

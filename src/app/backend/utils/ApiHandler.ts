@@ -5,8 +5,17 @@ import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { Session } from "@/app/types/appTypes";
 import Joi from "joi";
 
+const apiMessages: Record<string, string> = {
+  "backend.api.success": "Success",
+  "backend.api.userNotFound": "User not found",
+  "backend.api.transactionNotFound": "Transaction not found",
+  "backend.api.balanceUpdateFailed": "Failed to update balance",
+};
+
+const t = (key: string) => apiMessages[key] || key;
+
 export async function withAuthAndDB<T>(
-  handler: (session: Session, userId: string, t?: (key: string) => string) => Promise<T>
+  handler: (session: Session, userId: string, t: (key: string) => string) => Promise<T>
 ): Promise<T | Response> {
   try {
     await dbConnect();
@@ -14,7 +23,7 @@ export async function withAuthAndDB<T>(
     if (!session?.user) {
       return JsonOne(401, "Unauthorized", false);
     }
-    return await handler(session as Session, session.user.id);
+    return await handler(session as Session, session.user.id, t);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return JsonOne(500, "An error occurred", false);

@@ -11,7 +11,7 @@ export const Insights: React.FC = () => {
   const { insights } = useInsights();
 
   return (
-    <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
+    <Card className="p-6 text-foreground flex flex-col h-full min-h-96">
       <div className="flex items-center mb-4">
         <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
         <h3 className="text-lg font-semibold">
@@ -26,7 +26,7 @@ export const Insights: React.FC = () => {
               className="flex items-start p-3 bg-selected-background rounded-lg"
             >
               <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 shrink-0"></div>
-              <p className="text-base text-foreground">{insight}</p>
+              <p className="text-lg font-medium text-foreground">{insight}</p>
             </div>
           ))}
         </div>
@@ -46,7 +46,7 @@ export const RecentTransactions: React.FC = () => {
   });
 
   return (
-    <Card className="p-6 text-foreground flex flex-col h-96 md:h-[710px]">
+    <Card className="p-6 text-foreground flex flex-col h-full min-h-96">
       <h3 className="text-lg font-semibold mb-4">
         Recent Transactions
       </h3>
@@ -61,19 +61,19 @@ export const RecentTransactions: React.FC = () => {
             transactions.map((transaction) => (
               <div
                 key={transaction._id}
-                className="flex items-center justify-between p-3 bg-selected-background rounded-lg"
+                className="flex items-center justify-between gap-2 p-3 bg-selected-background rounded-lg"
               >
-                <div className="flex-1">
-                  <p className="font-medium text-base">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-base truncate">
                     {transaction.title || transaction.description}
                   </p>
-                  <p className="text-sm text-foreground">
+                  <p className="text-sm text-foreground truncate">
                     {new Date(transaction.date || "").toLocaleDateString()} •{" "}
                     {String(transaction.category)}
                   </p>
                 </div>
                 <div
-                  className={`font-semibold ${
+                  className={`font-semibold shrink-0 ${
                     transaction.type === "income"
                       ? "text-green-600"
                       : "text-red-600"

@@ -28,10 +28,10 @@ const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({ expense
                 data={data}
                 cx="50%"
                 cy="50%"
-                outerRadius={140}
+                outerRadius="70%"
                 fill="#8884d8"
                 dataKey="value"
-                label
+                label={false}
               >
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />

@@ -30,7 +30,17 @@ const IncomeVsExpenseTrend: React.FC<IncomeVsExpenseTrendProps> = ({ data }) => 
         <ResponsiveContainer width="100%" height="100%" minWidth={300} minHeight={300}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
+            <XAxis
+              dataKey="month"
+              tickFormatter={(value: string) => {
+                const [year, month] = value.split("-");
+                return new Date(Number(year), Number(month) - 1).toLocaleString(
+                  "default",
+                  { month: "short" }
+                );
+              }}
+              interval={0}
+            />
             <YAxis />
             <Tooltip formatter={(value: number) => [`${value.toLocaleString()} ${session?.user?.currency || 'INR'}`, '']} />
             <Legend />

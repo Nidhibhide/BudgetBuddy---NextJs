@@ -52,10 +52,10 @@ export const FieldDisplay: React.FC<FieldDisplayProps> = ({
   labelWidth = "w-[110px]",
   valueClassName = "",
 }) => (
-  <div className="flex items-center gap-1">
-    <span className={`text-base font-bold px-2 py-1 rounded ${labelWidth} text-left`}>
+  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+    <span className={`text-base font-bold px-2 py-1 rounded shrink-0 ${labelWidth} text-left`}>
       {label}:
     </span>
-    <span className={valueClassName}>{value}</span>
+    <span className={`break-words min-w-0 ${valueClassName}`}>{value}</span>
   </div>
 );
