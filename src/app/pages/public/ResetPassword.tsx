@@ -89,9 +89,9 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-[calc(100vh-5rem)] w-full flex justify-center items-center p-4 text-foreground">
-      <div className="w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md bg-card border-2 border-border rounded-2xl shadow-[0_12px_40px_rgba(99,102,241,0.18)] p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-2">Reset Password</h1>
-        <p className="text-sm text-muted text-center mb-6">{message}</p>
+        <p className="text-sm text-muted-foreground text-center mb-6">{message}</p>
 
         {verifying ? (
           <p className="text-sm">Verifying reset link...</p>
@@ -105,7 +105,7 @@ const ResetPassword = () => {
             </Button>
             <Link
               href="/signin"
-              className="font-semibold text-primary hover:underline text-sm"
+              className="font-semibold text-btn-background hover:underline text-sm"
             >
               Back to Sign In
             </Link>

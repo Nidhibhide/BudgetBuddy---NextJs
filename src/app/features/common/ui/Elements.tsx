@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/app/features/common/helpers/tailwind";
 
 export const SelectBox: React.FC<SelectBoxProps> = ({
   label,
@@ -45,7 +46,7 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   }, []);
 
   const selectValue = value !== undefined ? value : field?.value || "";
-  const triggerClassName = `h-11 bg-background text-foreground border-foreground cursor-pointer flex items-center gap-2 ${className || ""}`;
+  const triggerClassName = `h-11 bg-card text-foreground border-border cursor-pointer flex items-center gap-2 ${className || ""}`;
 
   const handleValueChange = (selectedValue: string) => {
     if (field) {
@@ -75,12 +76,12 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
             {icon}
             <SelectValue placeholder={label} />
           </SelectTrigger>
-          <SelectContent className="bg-background text-foreground border-foreground">
+          <SelectContent className="bg-card text-foreground border-border">
             {options.map((option: string) => (
               <SelectItem
                 key={option}
                 value={option}
-                className="hover:bg-foreground/10"
+                className="hover:bg-muted"
               >
                 {option}
               </SelectItem>
@@ -133,9 +134,11 @@ export const InputBox: React.FC<InputBoxProps> = ({
           type={inputType}
           placeholder={placeholder || label}
           onChange={handleChange}
-          className={`h-11 placeholder:text-base text-lg text-foreground ${
-            type === "password" ? "pr-10" : ""
-          } ${inputClassName || ""}`}
+          className={cn(
+            "h-11 bg-card border-border placeholder:text-base text-base text-foreground dark:bg-card",
+            type === "password" && "pr-10",
+            inputClassName
+          )}
         />
         {type === "password" && (
           <button
@@ -170,7 +173,7 @@ export const TextareaBox: React.FC<TextareaBoxProps> = ({
         {...field}
         id={name}
         placeholder={placeholder || label}
-        className="placeholder:text-base text-lg text-foreground resize-none min-h-20"
+        className="bg-card border-border placeholder:text-base text-base text-foreground resize-none min-h-20"
       />
       {meta.touched && meta.error && (
         <p className="text-red-500 text-sm">{meta.error}</p>
@@ -195,14 +198,19 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`h-11 flex items-center justify-center ${bgColor} text-white py-2 text-base cursor-pointer font-medium rounded-xl ${hoverColor} hover:shadow-md transition duration-500 ${width} ${className} ${
-        loading ? "cursor-not-allowed opacity-50" : ""
-      }`}
+      className={cn(
+        "h-11 inline-flex items-center justify-center gap-2 px-4 py-2 text-base cursor-pointer font-medium rounded-xl hover:shadow-md transition duration-500 text-white",
+        bgColor,
+        hoverColor,
+        width,
+        loading && "cursor-not-allowed opacity-50",
+        className
+      )}
     >
       {loading ? (
         <div className="flex items-center justify-center gap-2">
           <span>{text || children}</span>
-          <Loader2 className="animate-spin text-foreground" size={20} />
+          <Loader2 className="animate-spin text-white" size={20} />
         </div>
       ) : (
         children
@@ -215,7 +223,7 @@ export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
   return (
     <div className="relative group inline-block cursor-pointer">
       {children}
-      <span className="absolute hidden group-hover:block top-full mt-3 left-1/2 -translate-x-1/2 bg-black text-white text-sm rounded px-2 py-1 whitespace-nowrap z-50 pointer-events-none">
+      <span className="absolute hidden group-hover:block top-full mt-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-sm rounded px-2 py-1 whitespace-nowrap z-50 pointer-events-none">
         {label}
       </span>
     </div>
@@ -240,7 +248,7 @@ export const GetStartedLink: React.FC<GetStartedLinkProps> = ({
       {loading ? (
         <div className="flex items-center justify-center gap-2">
           <span>{text || children}</span>
-          <Loader2 className="animate-spin text-foreground" size={20} />
+          <Loader2 className="animate-spin text-white" size={20} />
         </div>
       ) : (
         children

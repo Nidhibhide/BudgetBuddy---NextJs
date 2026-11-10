@@ -5,53 +5,88 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
   --color-btn-background: var(--btn-background);
   --color-btn-hover: var(--btn-hover);
+  --color-primary: var(--btn-background);
+  --color-primary-foreground: #ffffff;
   --color-sidebar-hover: var(--sidebar-hover);
   --color-selected-background: var(--selected-background);
+  --color-shell: var(--shell);
+  --color-shell-foreground: var(--shell-foreground);
+  --color-shell-hover: var(--shell-hover);
+  --color-shell-selected: var(--shell-selected);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --font-sans: var(--font-sans);
 }
 
 :root {
-  /* header and form section */
-  --foreground: #171717;
-  --background: #f1f5f9;
+  --foreground: #0f172a;
+  --background: #eef2ff;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #e0e7ff;
+  --muted-foreground: #64748b;
+  --border: #c7d2fe;
 
-  /* input borders / focus */
-  --input: #cbd5e1;
+  --shell: #6366f1;
+  --shell-foreground: #ffffff;
+  --shell-hover: rgba(255, 255, 255, 0.12);
+  --shell-selected: rgba(255, 255, 255, 0.22);
+
+  --input: #c7d2fe;
   --ring: #6366f1;
 
-  /* button section */
-  --btn-background: #6366f1;
-  --btn-hover: #4f46e5;
+  --btn-background: #4f46e5;
+  --btn-hover: #4338ca;
 
-  /* sidebar hover */
-  --sidebar-hover: #e2e8f0;
+  --sidebar-hover: #eef2ff;
+  --selected-background: #e0e7ff;
 
-  /* selected category background */
-  --selected-background: #dbeafe;
+  --destructive: #dc2626;
+  --success: #16a34a;
+
+  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
-.dark {
-  /* header section */
-  --foreground: #ffffff;
-  --background: #1e293b;
 
-  /* input borders / focus */
-  --input: #475569;
+.dark {
+  --foreground: #f8fafc;
+  --background: #0b1224;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --muted: #243b55;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+
+  --shell: #4338ca;
+  --shell-foreground: #f8fafc;
+  --shell-hover: rgba(255, 255, 255, 0.1);
+  --shell-selected: rgba(255, 255, 255, 0.18);
+
+  --input: #334155;
   --ring: #818cf8;
 
-  /* button section */
   --btn-background: #818cf8;
-  --btn-hover: #4f46e5;
+  --btn-hover: #6366f1;
 
-  /* sidebar hover */
-  --sidebar-hover: #334155;
+  --sidebar-hover: #243b55;
+  --selected-background: #312e81;
 
-  /* selected category background */
-  --selected-background: #334155;
+  --destructive: #f87171;
+  --success: #4ade80;
+
+  --font-sans: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
 }

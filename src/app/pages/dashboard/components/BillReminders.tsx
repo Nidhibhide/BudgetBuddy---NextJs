@@ -1,82 +1,35 @@
 "use client";
 import React from "react";
-import { Tabs, Tab, Box } from "@mui/material";
-
-import { CustomTabPanelProps } from "@/app/types/appTypes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UpcomingBill, RecurringPayment } from "@/app/features/common";
 
 const BillReminders: React.FC = () => {
-  const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
-    children,
-    value,
-    index,
-    ...other
-  }) => {
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ p: { xs: 1, sm: 2 } }}>{children}</Box>
-        )}
-      </div>
-    );
-  };
-
-  const a11yProps = (index: number) => {
-    return {
-      id: `simple-tab-${index}`,
-      "aria-controls": `simple-tabpanel-${index}`,
-    };
-  };
-
-  const [value, setValue] = React.useState<number>(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
   return (
-    <div className="px-4 pt-4 md:pt-16 text-foreground">
-      <Box sx={{ width: "100%" }}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
-        >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            aria-label="Bill Reminders tabs"
-            className="bg-background"
+    <div className="px-4 pt-4 md:pt-8 text-foreground">
+      <Tabs defaultValue="upcoming" className="w-full">
+        <TabsList className="w-full sm:w-auto h-auto flex flex-wrap justify-start bg-muted border border-border p-1 gap-1">
+          <TabsTrigger
+            value="upcoming"
+            className="data-[state=active]:bg-card data-[state=active]:text-foreground px-4 py-2"
           >
-            <Tab
-              label="Upcoming Bills"
-              {...a11yProps(0)}
-              sx={{ color: "var(--foreground)" }}
-            />
-            <Tab
-              label="Recurring Payments"
-              {...a11yProps(1)}
-              sx={{ color: "var(--foreground)" }}
-            />
-          </Tabs>
-        </Box>
+            Upcoming Bills
+          </TabsTrigger>
+          <TabsTrigger
+            value="recurring"
+            className="data-[state=active]:bg-card data-[state=active]:text-foreground px-4 py-2"
+          >
+            Recurring Payments
+          </TabsTrigger>
+        </TabsList>
 
-       <CustomTabPanel value={value} index={0}>
-  <UpcomingBill />
-</CustomTabPanel>
+        <TabsContent value="upcoming" className="mt-4">
+          <UpcomingBill />
+        </TabsContent>
 
-        <CustomTabPanel value={value} index={1}>
+        <TabsContent value="recurring" className="mt-4">
           <RecurringPayment />
-        </CustomTabPanel>
-      </Box>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

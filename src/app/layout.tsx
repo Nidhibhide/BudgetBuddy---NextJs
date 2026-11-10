@@ -19,16 +19,14 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="text-black">
+      <body className="bg-background text-foreground antialiased">
         <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-        <ClientLayout>
-          {children}
-        </ClientLayout>
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <ClientLayout>{children}</ClientLayout>
         </ThemeProvider>
       </body>
     </html>

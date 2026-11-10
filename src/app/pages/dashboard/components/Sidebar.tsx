@@ -17,9 +17,11 @@ import { usePathname } from "next/navigation";
 const Sidebar = ({
   onClose,
   onLogout,
+  showThemeToggle = true,
 }: {
   onClose?: () => void;
   onLogout?: () => void;
+  showThemeToggle?: boolean;
 }) => {
   const pathname = usePathname();
 
@@ -61,65 +63,60 @@ const Sidebar = ({
   ];
 
   return (
-    <div className="w-full max-w-96 h-full flex flex-col bg-background text-foreground overflow-x-hidden">
-      {/* App Header */}
-      <div className="flex items-center py-6 px-4 mb-4 border-b border-foreground">
-        <div className="flex-1 flex items-center justify-center gap-1">
-          <MdAccountBalance size={32} style={{ fill: "var(--foreground)" }} />
-          <h2 className="text-2xl font-bold">BudgetBuddy</h2>
+    <div className="w-full h-full flex flex-col bg-shell text-shell-foreground border-r border-white/10 overflow-x-hidden">
+      <div className="flex items-center py-5 px-4 mb-2 border-b border-white/10">
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          <MdAccountBalance
+            size={28}
+            className="text-shell-foreground shrink-0"
+          />
+          <h2 className="text-xl font-bold truncate text-shell-foreground">
+            BudgetBuddy
+          </h2>
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle size="icon-lg" />
+        <div className="flex items-center gap-1 shrink-0">
+          {showThemeToggle && <ThemeToggle size="icon" />}
           {onClose && (
             <Button
               size="icon"
               variant="ghost"
-              className="cursor-pointer"
+              className="cursor-pointer text-shell-foreground hover:bg-shell-hover hover:text-shell-foreground"
               onClick={onClose}
             >
-              <X className="size-6" />
+              <X className="size-5" />
               <span className="sr-only">Close sidebar</span>
             </Button>
           )}
         </div>
       </div>
-      {/* Sidebar Navigation */}
-      <div className="flex-1">
-        <ul className="flex flex-col text-xl font-medium">
+      <div className="flex-1 px-2">
+        <ul className="flex flex-col gap-1 font-medium">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
-              <li
-                key={link.href}
-                className={`group flex items-center gap-2 cursor-pointer md:py-3 py-2 justify-center ${
-                  isActive
-                    ? "bg-foreground text-background"
-                    : "hover:bg-sidebar-hover text-foreground"
-                }`}
-                onClick={handleLinkClick}
-              >
+              <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="flex items-center gap-2 text-base md:text-lg"
+                  onClick={handleLinkClick}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-base transition-colors ${
+                    isActive
+                      ? "bg-shell-selected text-shell-foreground border-l-4 border-white"
+                      : "text-shell-foreground/90 hover:bg-shell-hover border-l-4 border-transparent"
+                  }`}
                 >
-                  <link.icon
-                    size={28}
-                    className={isActive ? "text-background" : "text-foreground"}
-                  />
+                  <link.icon size={22} className="text-shell-foreground" />
                   {link.label}
                 </Link>
               </li>
             );
           })}
-          <li
-            className="group flex items-center gap-2 cursor-pointer md:py-3 py-2 justify-center hover:bg-sidebar-hover text-foreground"
-            onClick={handleLogoutClick}
-          >
+          <li>
             <button
               type="button"
-              className="flex items-center gap-2 text-base md:text-lg"
+              onClick={handleLogoutClick}
+              className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-base text-shell-foreground/90 hover:bg-shell-hover border-l-4 border-transparent transition-colors cursor-pointer"
             >
-              <MdLogout size={28} className="text-foreground" />
+              <MdLogout size={22} className="text-shell-foreground" />
               Logout
             </button>
           </li>

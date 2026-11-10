@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
-import { SelectBox } from "@/app/features/common/index";
+import { SelectBox, useToast } from "@/app/features/common/index";
 import { deleteCategory } from "@/app/lib/category";
 import { Confirmation } from "../dialogs";
 import { DeleteCategoryProps } from "@/app/types/appTypes";
@@ -15,6 +15,7 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
   categories,
   transactionCount,
 }) => {
+  const { showSuccess, showError } = useToast();
   const [reassignCategoryId, setReassignCategoryId] = useState<string>("");
   const [deleteAction, setDeleteAction] = useState<"delete" | "reassign">(
     "delete"
@@ -42,10 +43,11 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
           deleteAction === "reassign" ? reassignCategoryId : undefined
         );
         if (result.success) {
+          showSuccess(result.message || "Category deleted");
           onCategoryDeleted();
           onOpenChange(false);
         } else {
-          console.error("Error Occurred", result.message);
+          showError(result.message || "Failed to delete category");
         }
       } finally {
         setLoading(false);

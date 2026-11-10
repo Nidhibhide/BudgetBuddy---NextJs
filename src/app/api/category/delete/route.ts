@@ -92,6 +92,6 @@ export async function DELETE(request: Request) {
     // Soft delete the category by archiving it
     await Category.updateOne({ _id: categoryId }, { isArchived: true });
 
-    return JsonOne(200, "Success", true);
+    return JsonOne(200, "Category deleted", true);
   });
 }

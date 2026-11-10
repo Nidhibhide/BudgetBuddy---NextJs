@@ -13,18 +13,17 @@ import {
   Trash2,
   Loader2,
   Download,
-  Eye,
   Search,
   ChevronDown,
   ChevronUp,
+  Receipt,
 } from "lucide-react";
 import {
   Table,
   CustomPagination,
-  NotFound,
   useToast,
 } from "@/app/features/common";
-import { Confirmation, ViewTransaction } from "@/app/features/dialogs";
+import { Confirmation } from "@/app/features/dialogs";
 import { Transaction as TransactionForm } from "@/app/features/forms";
 import { TransactionPDF } from "@/app/features/common";
 import { deleteTransaction } from "@/app/lib/transaction";
@@ -74,9 +73,6 @@ const Transaction: React.FC = React.memo(() => {
     null
   );
   const [deleting, setDeleting] = useState(false);
-  const [isViewTransactionOpen, setIsViewTransactionOpen] = useState(false);
-  const [viewTransactionData, setViewTransactionData] =
-    useState<TransactionType | null>(null);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -161,11 +157,6 @@ const Transaction: React.FC = React.memo(() => {
     setIsAddTransactionOpen(true);
   };
 
-  const handleViewClick = (transaction: TransactionType) => {
-    setViewTransactionData(transaction);
-    setIsViewTransactionOpen(true);
-  };
-
   const handleDeleteClick = (id: string) => {
     setDeleteTransactionId(id);
   };
@@ -215,62 +206,82 @@ const Transaction: React.FC = React.memo(() => {
     errors,
   ]);
 
+  const currency = session?.user?.currency || "INR";
+
   return (
-    <div className="w-full p-4 space-y-3">
-      {/* Header with Switch */}
+    <div className="w-full p-4 sm:p-6 space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-bold text-foreground">
-           Transactions
-          </h2>
-        <div className="flex items-center space-x-3">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Transactions</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Track income and expenses in one place.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {isExpense ? "Expense" : "Income"}
+            {currentType}
           </Label>
           <Switch
             id="expense-income-switch"
             checked={isExpense}
             onCheckedChange={setIsExpense}
-            className="bg-foreground"
+            className="bg-btn-background"
           />
+          {!loading && transactions.length > 0 && (
+            <Button
+              width="w-auto"
+              className="shrink-0"
+              onClick={() => setIsAddTransactionOpen(true)}
+            >
+              <Plus className="w-4 h-4" />
+              Add
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:justify-end">
-           <div className="w-full sm:w-[180px]">
-             <Formik
-               initialValues={{ category: selectedCategory }}
-               onSubmit={() => {}}
-             >
-               {() => (
-                 <SelectBox
-                   name="category"
-                   options={["All", ...categories.map((cat) => cat.name)]}
-                   value={selectedCategory}
-                   onChange={handleCategoryChange}
-                 />
-               )}
-             </Formik>
-           </div>
-           <Button
-             width="w-full sm:w-[180px]"
-             className="flex items-center justify-center gap-2"
-             onClick={() => setIsAddTransactionOpen(true)}
-           >
-             <Plus className="w-4 h-4" />
-             Add Transaction
-           </Button>
-         </div>
-        <div className="flex justify-end">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
+            <InputBox
+              name="search"
+              type="text"
+              label=""
+              placeholder="Search transactions..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              inputClassName="pl-9"
+            />
+          </div>
+          <div className="w-full sm:w-[180px]">
+            <Formik
+              initialValues={{ category: selectedCategory }}
+              enableReinitialize
+              onSubmit={() => {}}
+            >
+              {() => (
+                <SelectBox
+                  name="category"
+                  options={["All", ...categories.map((cat) => cat.name)]}
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                />
+              )}
+            </Formik>
+          </div>
+        </div>
+
+        <div className="flex justify-start">
           <button
+            type="button"
             onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-            className="text-foreground underline font-bold text-base cursor-pointer flex items-center gap-2"
+            className="text-sm font-medium text-btn-background hover:text-btn-hover cursor-pointer inline-flex items-center gap-1.5"
           >
-            Advanced Search
+            Advanced filters
             {isAdvancedOpen ? (
               <ChevronUp className="w-4 h-4" />
             ) : (
@@ -278,107 +289,114 @@ const Transaction: React.FC = React.memo(() => {
             )}
           </button>
         </div>
+
         <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
           <CollapsibleContent>
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4 items-center">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground w-4 h-4 z-10" />
-                  <InputBox
-                    name="search"
-                    type="text"
-                    label=""
-                    placeholder="Search transactions..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    inputClassName="pl-8 rounded-full"
-                  />
-                </div>
+            <div className="rounded-xl border border-border bg-muted p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="flex flex-col w-full">
+                <InputBox
+                  name="from"
+                  type="date"
+                  label="From"
+                  value={filters.dateFrom}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateFrom: e.target.value,
+                    }))
+                  }
+                  inputClassName="bg-background border-border dark:bg-background"
+                />
+                {errors.dateFrom && (
+                  <p className="text-destructive text-sm">{errors.dateFrom}</p>
+                )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                 <div className="flex flex-col w-full">
-                   <InputBox
-                     name="from"
-                     type="date"
-                     label="From"
-                     value={filters.dateFrom}
-                     onChange={(e) =>
-                       setFilters((prev) => ({
-                         ...prev,
-                         dateFrom: e.target.value,
-                       }))
-                     }
-                   />
-                   {errors.dateFrom && (
-                     <p className="text-red-500 text-sm">{errors.dateFrom}</p>
-                   )}
-                 </div>
-                 <div className="flex flex-col w-full">
-                   <InputBox
-                     name="to"
-                     type="date"
-                     label="To"
-                     value={filters.dateTo}
-                     onChange={(e) =>
-                       setFilters((prev) => ({
-                         ...prev,
-                         dateTo: e.target.value,
-                       }))
-                     }
-                   />
-                   {errors.dateTo && (
-                     <p className="text-red-500 text-sm">{errors.dateTo}</p>
-                   )}
-                 </div>
-                 <div className="flex flex-col w-full">
-                   <InputBox
-                     name="min"
-                     type="number"
-                     label="Min Amount"
-                     placeholder="Enter min amount"
-                     value={filters.minAmount}
-                     onChange={(e) =>
-                       setFilters((prev) => ({
-                         ...prev,
-                         minAmount: e.target.value,
-                       }))
-                     }
-                   />
-                   {errors.minAmount && (
-                     <p className="text-red-500 text-sm">{errors.minAmount}</p>
-                   )}
-                 </div>
-                 <div className="flex flex-col w-full">
-                   <InputBox
-                     name="max"
-                     type="number"
-                     label="Max Amount"
-                     placeholder="Enter max amount"
-                     value={filters.maxAmount}
-                     onChange={(e) =>
-                       setFilters((prev) => ({
-                         ...prev,
-                         maxAmount: e.target.value,
-                       }))
-                     }
-                   />
-                   {errors.maxAmount && (
-                     <p className="text-red-500 text-sm">{errors.maxAmount}</p>
-                   )}
-                 </div>
-               </div>
+              <div className="flex flex-col w-full">
+                <InputBox
+                  name="to"
+                  type="date"
+                  label="To"
+                  value={filters.dateTo}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      dateTo: e.target.value,
+                    }))
+                  }
+                  inputClassName="bg-background border-border dark:bg-background"
+                />
+                {errors.dateTo && (
+                  <p className="text-destructive text-sm">{errors.dateTo}</p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <InputBox
+                  name="min"
+                  type="number"
+                  label="Min Amount"
+                  placeholder="Enter min amount"
+                  value={filters.minAmount}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      minAmount: e.target.value,
+                    }))
+                  }
+                  inputClassName="bg-background border-border dark:bg-background"
+                />
+                {errors.minAmount && (
+                  <p className="text-destructive text-sm">{errors.minAmount}</p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <InputBox
+                  name="max"
+                  type="number"
+                  label="Max Amount"
+                  placeholder="Enter max amount"
+                  value={filters.maxAmount}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      maxAmount: e.target.value,
+                    }))
+                  }
+                  inputClassName="bg-background border-border dark:bg-background"
+                />
+                {errors.maxAmount && (
+                  <p className="text-destructive text-sm">{errors.maxAmount}</p>
+                )}
+              </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
 
-      {/* Table Section */}
       {loading ? (
-        <div className="flex justify-center items-center py-10">
-          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+        <div className="flex justify-center items-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
         </div>
       ) : transactions.length > 0 ? (
         <>
+          <div className="flex justify-end">
+            <Button
+              width="w-auto"
+              className="shrink-0"
+              onClick={() =>
+                handlePDFDownload(
+                  transactions,
+                  selectedCategory,
+                  currentType,
+                  currency,
+                  categories.map((cat) => cat.name)
+                )
+              }
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
+          </div>
+
           <Table
             data={transactions as TransactionType[]}
             columns={[
@@ -399,48 +417,42 @@ const Transaction: React.FC = React.memo(() => {
                 key: "amount",
                 label: "Amount",
                 sortable: true,
-                render: (value) => {
-                  const currency = session?.user?.currency || "INR";
-                  return `${value} ${currency}`;
-                },
+                render: (value) => `${value} ${currency}`,
               },
               {
                 key: "actions",
                 label: "Actions",
-                render: (value, row) => (
-                  <div className="flex gap-2">
+                render: (_value, row) => (
+                  <div className="flex gap-1 justify-end md:justify-start">
                     <button
-                      onClick={() => handleViewClick(row as TransactionType)}
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title="View"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
+                      type="button"
                       onClick={() => handleEditClick(row as TransactionType)}
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
+                      className="p-2 rounded-lg hover:bg-btn-background/10 text-foreground transition-colors cursor-pointer"
                       title="Edit"
+                      aria-label="Edit transaction"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDeleteClick(row._id as string)}
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                      className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors cursor-pointer"
                       title="Delete"
+                      aria-label="Delete transaction"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ),
               },
             ]}
-            title="Transactions"
+            title={`${currentType} list`}
+            keyField="_id"
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
           />
 
-          {/* Pagination */}
           <div className="flex justify-end mt-4">
             <CustomPagination
               currentPage={pagination.currentPage}
@@ -449,32 +461,29 @@ const Transaction: React.FC = React.memo(() => {
               className="justify-end"
             />
           </div>
-
-          {/* Download PDF Button */}
-          <div className="flex justify-center mt-4">
-            <Button
-              width="w-full sm:w-[180px]"
-              className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white"
-              onClick={() =>
-                handlePDFDownload(
-                  transactions,
-                  selectedCategory,
-                  currentType,
-                  session?.user?.currency || "INR",
-                  categories.map((cat) => cat.name)
-                )
-              }
-            >
-              <Download className="w-4 h-4" />
-              Download PDF
-            </Button>
-          </div>
         </>
       ) : (
-        <NotFound
-          title="No Transactions Found"
-          message="You haven't added any transactions yet."
-        />
+        <div className="rounded-2xl bg-muted/80 px-6 py-12 flex flex-col items-center text-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-btn-background/15 text-btn-background">
+            <Receipt className="w-7 h-7" />
+          </div>
+          <div className="space-y-1 max-w-sm">
+            <p className="text-lg font-semibold text-foreground">
+              No {currentType.toLowerCase()} transactions yet
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Add your first transaction to start tracking your money.
+            </p>
+          </div>
+          <Button
+            width="w-auto"
+            className="shrink-0"
+            onClick={() => setIsAddTransactionOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Add Transaction
+          </Button>
+        </div>
       )}
 
       <TransactionForm
@@ -488,12 +497,6 @@ const Transaction: React.FC = React.memo(() => {
           setCurrentPage(1);
           refetchTransactions();
         }}
-      />
-
-      <ViewTransaction
-        open={isViewTransactionOpen}
-        onOpenChange={setIsViewTransactionOpen}
-        transaction={viewTransactionData}
       />
 
       <Confirmation

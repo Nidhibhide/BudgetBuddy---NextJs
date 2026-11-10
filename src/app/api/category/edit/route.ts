@@ -54,7 +54,7 @@ export async function PUT(request: Request) {
     }
     await existingCategory.save();
 
-    return JsonOne(200, "Success", true, {
+    return JsonOne(200, "Category updated", true, {
       category: existingCategory
     });
   });

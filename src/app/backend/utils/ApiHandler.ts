@@ -7,6 +7,7 @@ import Joi from "joi";
 
 const apiMessages: Record<string, string> = {
   "backend.api.success": "Success",
+  "backend.api.transactionDeleted": "Transaction deleted",
   "backend.api.userNotFound": "User not found",
   "backend.api.transactionNotFound": "Transaction not found",
   "backend.api.balanceUpdateFailed": "Failed to update balance",

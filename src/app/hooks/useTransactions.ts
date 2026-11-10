@@ -68,8 +68,8 @@ export const useTransactions = ({
       if (totalsResult.success && totalsResult.data) {
         setTotals(totalsResult.data);
       }
-    } catch (err) {
-      console.error("An error occurred", err);
+    } catch {
+      // totals are optional; keep silent on failure
     }
   }, [type]);
 

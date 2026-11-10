@@ -22,15 +22,47 @@ export const Table: React.FC<GenericTableProps> = ({
 }) => {
 
   return (
-    <div className="w-full mt-10 text-foreground overflow-x-auto">
+    <div className="w-full mt-2 text-foreground">
       {title && (
-        <h3 className="text-xl font-semibold  mb-3">{title}</h3>
+        <h3 className="text-lg font-semibold mb-3 text-foreground">{title}</h3>
       )}
-      <ShadcnTable className="bg-background border border-foreground min-w-full">
-        <TableHeader>
-          <TableRow>
+
+      {/* Mobile-friendly stacked cards */}
+      <div className="md:hidden space-y-3">
+        {data.map((row, index) => (
+          <div
+            key={`mobile-${String(row[keyField] || index)}`}
+            className="rounded-xl border border-border bg-card p-3.5 space-y-2.5 shadow-sm"
+          >
             {columns.map((column) => (
-              <TableHead key={column.key} className="text-lg font-bold">
+              <div
+                key={column.key}
+                className="flex items-start justify-between gap-3 text-sm"
+              >
+                <span className="text-muted-foreground shrink-0 font-medium">
+                  {column.label}
+                </span>
+                <div className="text-right min-w-0 break-words">
+                  {column.render
+                    ? column.render(row[column.key], row)
+                    : column.key === "amount"
+                      ? row[column.key]?.toLocaleString()
+                      : row[column.key]
+                        ? String(row[column.key])
+                        : ""}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-x-auto">
+      <ShadcnTable className="bg-card border border-border min-w-full">
+        <TableHeader>
+          <TableRow className="hover:bg-transparent">
+            {columns.map((column) => (
+              <TableHead key={column.key} className="text-lg font-bold text-foreground">
                 <div className="flex items-center gap-2">
                   {column.label}
                   {column.sortable && (
@@ -49,7 +81,7 @@ export const Table: React.FC<GenericTableProps> = ({
         </TableHeader>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow key={String(row[keyField] || index)} className="hover:bg-foreground hover:text-background cursor-pointer transition-colors">
+            <TableRow key={String(row[keyField] || index)} className="hover:bg-muted/50 transition-colors">
               {columns.map((column) => (
                 <TableCell key={column.key}>
                   {column.render
@@ -63,6 +95,7 @@ export const Table: React.FC<GenericTableProps> = ({
           ))}
         </TableBody>
       </ShadcnTable>
+      </div>
     </div>
   );
 };

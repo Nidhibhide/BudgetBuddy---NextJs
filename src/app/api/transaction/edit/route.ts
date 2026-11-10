@@ -98,7 +98,7 @@ export async function PUT(request: Request) {
       amount !== undefined ? convertFromINR(updateData.amount!, user.currency) : convertFromINR(existingTransaction.amount, user.currency),
     ]);
 
-    return JsonOne(200, "Success", true, {
+    return JsonOne(200, "Transaction updated", true, {
       transaction: {
         ...updatedTransaction.toObject(),
         amount: responseAmount,

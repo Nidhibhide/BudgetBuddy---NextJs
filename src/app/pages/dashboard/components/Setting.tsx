@@ -1,81 +1,35 @@
 "use client";
 import React from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserSetting, ChangePassword } from "@/app/features/forms";
 
-import { CustomTabPanelProps } from "@/app/types/appTypes";
-
 const Setting: React.FC = () => {
-
-  const CustomTabPanel: React.FC<CustomTabPanelProps> = ({
-    children,
-    value,
-    index,
-    ...other
-  }) => {
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-      </div>
-    );
-  };
-
-  const a11yProps = (index: number) => {
-    return {
-      id: `simple-tab-${index}`,
-      "aria-controls": `simple-tabpanel-${index}`,
-    };
-  };
-
-  const [value, setValue] = React.useState<number>(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
   return (
-    <div className="px-4 pt-4 md:pt-16 text-foreground">
-      <Box sx={{ width: "100%" }}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-          }}
-        >
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            variant="scrollable"
-            scrollButtons="auto"
-            aria-label="settings tabs"
-            className="bg-background"
+    <div className="px-4 pt-4 md:pt-8 text-foreground">
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="w-full sm:w-auto h-auto flex flex-wrap justify-start bg-muted border border-border p-1 gap-1">
+          <TabsTrigger
+            value="profile"
+            className="data-[state=active]:bg-card data-[state=active]:text-foreground px-4 py-2"
           >
-            <Tab
-              label="Edit Profile"
-              {...a11yProps(0)}
-              sx={{ color: "var(--foreground)" }}
-            />
-            <Tab
-              label="Change Password"
-              {...a11yProps(1)}
-              sx={{ color: "var(--foreground)" }}
-            />
-          </Tabs>
-        </Box>
+            Edit Profile
+          </TabsTrigger>
+          <TabsTrigger
+            value="password"
+            className="data-[state=active]:bg-card data-[state=active]:text-foreground px-4 py-2"
+          >
+            Change Password
+          </TabsTrigger>
+        </TabsList>
 
-        <CustomTabPanel value={value} index={0}>
+        <TabsContent value="profile" className="mt-4 p-2 sm:p-4">
           <UserSetting />
-        </CustomTabPanel>
+        </TabsContent>
 
-        <CustomTabPanel value={value} index={1}>
+        <TabsContent value="password" className="mt-4 p-2 sm:p-4">
           <ChangePassword />
-        </CustomTabPanel>
-      </Box>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

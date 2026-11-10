@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     await newCategory.save();
 
-    return JsonOne(201, "Success", true, {
+    return JsonOne(201, "Category added", true, {
       category: newCategory
     });
   });

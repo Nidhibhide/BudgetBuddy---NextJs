@@ -11,7 +11,6 @@ export async function registerUser(data: User) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -32,7 +31,6 @@ export async function changePassword(data: {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -50,7 +48,6 @@ export async function updateProfile(data: User) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -68,7 +65,6 @@ export async function forgotPassword(data: { email: string }) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -88,7 +84,6 @@ export async function verifyResetToken(token: string) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -109,7 +104,6 @@ export async function resetPassword(data: {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:

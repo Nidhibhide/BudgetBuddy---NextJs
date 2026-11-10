@@ -7,7 +7,6 @@ export async function addUpcomingBill(data: UpcomingBill) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -26,7 +25,6 @@ export async function getUpcomingBills(status?: string, page?: number, limit?: n
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -43,7 +41,6 @@ export async function deleteUpcomingBill(id: string) {
     const response = await axios.delete(`/api/upcomingBill/delete?id=${id}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -60,7 +57,6 @@ export async function editUpcomingBill(id: string, data: Partial<UpcomingBill>) 
     const response = await axios.put(`/api/upcomingBill/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:

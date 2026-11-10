@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,12 +11,53 @@ import {
   Pen,
   Trash2,
   AlertTriangle,
+  Tags,
+  Receipt,
 } from "lucide-react";
-import { CustomPagination, NotFound, Table } from "@/app/features/common";
+import { CustomPagination, Table } from "@/app/features/common";
 import { DeleteCategory, Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
 import { useCategories, useTransactions } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
+
+const CATEGORY_COLORS = [
+  {
+    stripe: "bg-emerald-500",
+    badge: "bg-emerald-500 text-white",
+    amount: "text-emerald-700 dark:text-emerald-400",
+    track: "bg-emerald-500/20 dark:bg-white/15",
+    fill: "bg-emerald-500",
+    hover: "hover:border-emerald-700 hover:shadow-md hover:shadow-emerald-500/15 dark:hover:border-emerald-400",
+    selected: "border-emerald-700 ring-2 ring-emerald-500/40 shadow-md shadow-emerald-500/10 dark:border-emerald-400",
+  },
+  {
+    stripe: "bg-amber-500",
+    badge: "bg-amber-500 text-white",
+    amount: "text-amber-700 dark:text-amber-400",
+    track: "bg-amber-500/20 dark:bg-white/15",
+    fill: "bg-amber-500",
+    hover: "hover:border-amber-700 hover:shadow-md hover:shadow-amber-500/15 dark:hover:border-amber-400",
+    selected: "border-amber-700 ring-2 ring-amber-500/40 shadow-md shadow-amber-500/10 dark:border-amber-400",
+  },
+  {
+    stripe: "bg-rose-500",
+    badge: "bg-rose-500 text-white",
+    amount: "text-rose-700 dark:text-rose-400",
+    track: "bg-rose-500/20 dark:bg-white/15",
+    fill: "bg-rose-500",
+    hover: "hover:border-rose-700 hover:shadow-md hover:shadow-rose-500/15 dark:hover:border-rose-400",
+    selected: "border-rose-700 ring-2 ring-rose-500/40 shadow-md shadow-rose-500/10 dark:border-rose-400",
+  },
+  {
+    stripe: "bg-teal-500",
+    badge: "bg-teal-500 text-white",
+    amount: "text-teal-700 dark:text-teal-400",
+    track: "bg-teal-500/20 dark:bg-white/15",
+    fill: "bg-teal-500",
+    hover: "hover:border-teal-700 hover:shadow-md hover:shadow-teal-500/15 dark:hover:border-teal-400",
+    selected: "border-teal-700 ring-2 ring-teal-500/40 shadow-md shadow-teal-500/10 dark:border-teal-400",
+  },
+] as const;
 
 const Category: React.FC = React.memo(() => {
   const { data: session } = useSession();
@@ -59,7 +99,6 @@ const Category: React.FC = React.memo(() => {
     sortOrder,
   });
 
-  // Helper function to get category totals
   const getCategoryTotal = useCallback(
     (categoryName: string) => {
       const typeTotals = totals.find((t) => t.type === currentType);
@@ -113,234 +152,302 @@ const Category: React.FC = React.memo(() => {
     }
   }, [selectedCategory, currentPage, sortBy, sortOrder, refetchTransactions]);
 
+  const handleDeleteClick = async (
+    e: React.MouseEvent,
+    category: Category
+  ) => {
+    e.stopPropagation();
+    setDeleteLoading(true);
+    try {
+      let count = 0;
+      if (selectedCategory === category.name) {
+        count = pagination.totalTransactions;
+      } else {
+        const result = await getTransactions(currentType, category.name, 1, 1);
+        count = result.pagination?.totalTransactions || 0;
+      }
+      setCategoryTransactionCount(count);
+      setDeletingCategory(category);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
-    <div className="w-full p-4 space-y-3">
-      {/* Header with Switch */}
+    <div className="w-full p-4 sm:p-6 space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-bold text-foreground">
-           Categories
-         </h2>
-        <div className="flex items-center space-x-3">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Categories</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Group spending and income so budgets stay clear.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
           <Label
             htmlFor="expense-income-switch"
             className="text-base font-medium text-foreground"
           >
-            {currentType === "Expense" ? "Expense" : "Income"}
+            {currentType}
           </Label>
           <Switch
             id="expense-income-switch"
             checked={isExpense}
             onCheckedChange={setIsExpense}
-            className="bg-foreground"
+            className="bg-btn-background"
           />
+          {data.length < 4 && data.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingCategory(null);
+                setIsAddCategoryOpen(true);
+              }}
+              className="ml-auto sm:ml-2 inline-flex items-center gap-2 rounded-xl bg-btn-background px-3.5 py-2 text-sm font-medium text-white hover:bg-btn-hover transition-colors cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              Add
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {loading ? (
-          <div className="col-span-full flex justify-center items-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+      {loading ? (
+        <div className="flex justify-center items-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
+        </div>
+      ) : data.length === 0 ? (
+        <div className="rounded-2xl bg-selected-background/80 px-6 py-12 sm:py-14 flex flex-col items-center text-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-btn-background/15 text-btn-background">
+            <Tags className="w-7 h-7" />
           </div>
-        ) : (
-          <>
-            {data?.map((category: Category, index: number) => {
+          <div className="space-y-1.5 max-w-sm">
+            <p className="text-lg font-semibold text-foreground">
+              No {currentType.toLowerCase()} categories yet
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Create your first category to organize money and track progress
+              toward a budget or goal.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingCategory(null);
+              setIsAddCategoryOpen(true);
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-btn-background px-5 py-2.5 text-sm font-medium text-white hover:bg-btn-hover cursor-pointer shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Category
+          </button>
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <MousePointer className="w-3.5 h-3.5 text-btn-background" />
+            After you add one, tap it to see transactions.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl">
+            {data.map((category: Category, index: number) => {
               const { total, percentage, budgetLimit, goal } = getCategoryTotal(
                 category.name
               );
+              const isSelected = selectedCategory === category.name;
+              const hasLimit =
+                (currentType === "Expense" && budgetLimit > 0) ||
+                (currentType === "Income" && goal > 0);
+              const initial = category.name.charAt(0).toUpperCase();
+              const color =
+                CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+
               return (
-                <Card
-                  key={index}
-                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg sm:hover:scale-105 ${
-                    selectedCategory === category.name
-                      ? "bg-selected-background"
-                      : "bg-background"
-                  } cursor-pointer`}
-                  onClick={() => {
-                    setSelectedCategory(category.name);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center justify-center  space-x-2">
-                        <CardTitle className="text-xl font-semibold text-foreground">
-                          {category.name}
-                        </CardTitle>
+                <li key={category._id || category.name}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedCategory(category.name);
+                      setCurrentPage(1);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedCategory(category.name);
+                        setCurrentPage(1);
+                      }
+                    }}
+                    className={`relative h-full text-left rounded-xl border border-border bg-card overflow-hidden pl-3.5 pr-3 py-3.5 transition-all duration-200 cursor-pointer ${
+                      isSelected ? color.selected : color.hover
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-0 top-0 bottom-0 w-1.5 ${color.stripe}`}
+                      aria-hidden
+                    />
+
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${color.badge}`}
+                          aria-hidden
+                        >
+                          {initial}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-semibold text-foreground truncate">
+                            {category.name}
+                          </h3>
+                          <p
+                            className={`text-sm font-bold tabular-nums ${color.amount}`}
+                          >
+                            {total.toLocaleString()} {currency}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Pen
-                          className="w-4 h-4 text-foreground cursor-pointer hover:text-blue-500"
+                      <div className="flex items-center shrink-0 -mr-1">
+                        <button
+                          type="button"
+                          title="Edit"
+                          aria-label={`Edit ${category.name}`}
+                          className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-foreground cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingCategory(category);
                             setIsAddCategoryOpen(true);
                           }}
-                        />
-                        <Trash2
-                          className={`w-4 h-4 text-foreground cursor-pointer hover:text-red-500 ${
+                        >
+                          <Pen className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          title="Delete"
+                          aria-label={`Delete ${category.name}`}
+                          className={`p-1.5 rounded-md hover:bg-destructive/10 text-destructive cursor-pointer ${
                             deleteLoading ? "animate-spin" : ""
                           }`}
-                          onClick={async (e) => {
-                            e.stopPropagation();
-                            setDeleteLoading(true);
-                            try {
-                              // Get transaction count for this category
-                              let count = 0;
-                              if (selectedCategory === category.name) {
-                                count = pagination.totalTransactions;
-                              } else {
-                                const result = await getTransactions(
-                                  currentType,
-                                  category.name,
-                                  1,
-                                  1
-                                );
-                                count =
-                                  result.pagination?.totalTransactions || 0;
-                              }
-                              setCategoryTransactionCount(count);
-                              setDeletingCategory(category);
-                            } finally {
-                              setDeleteLoading(false);
-                            }
-                          }}
-                        />
+                          onClick={(e) => handleDeleteClick(e, category)}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="text-2xl font-bold text-foreground">
-                        {total.toLocaleString()} {currency}
-                      </div>
-                      {currentType === "Expense" && budgetLimit > 0 && (
-                        <div className="text-sm text-foreground/70">
-                          Budget:  {budgetLimit.toLocaleString()} {currency}
-                        </div>
-                      )}
-                      {currentType === "Income" && goal > 0 && (
-                        <div className="text-sm text-foreground/70">
-                          Goal:  {goal.toLocaleString()} {currency}
-                        </div>
-                      )}
-                      {(currentType === "Expense" && budgetLimit > 0) ||
-                      (currentType === "Income" && goal > 0) ? (
-                        <>
-                          <div className="text-sm text-foreground">
-                            {percentage.toFixed(1)}%
-                          </div>
-                          <div className="w-full bg-foreground rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${
-                                isExpense ? "bg-red-500" : "bg-green-500"
-                              } transition-all duration-500`}
-                              style={{ width: `${Math.min(percentage, 100)}%` }}
-                            ></div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex items-center space-x-1">
-                          <AlertTriangle
-                            className="w-6 h-6 text-yellow-600"
-                            strokeWidth={3}
-                          />
-                          <span className="text-base font-semibold text-foreground/60">
-                            {currentType === "Expense"
-                              ? "Set a budget to track expenses"
-                              : "Set a goal to track income"}
+
+                    {hasLimit ? (
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px] text-muted-foreground">
+                          <span>
+                            {currentType === "Expense" ? "Budget" : "Goal"}{" "}
+                            {(currentType === "Expense"
+                              ? budgetLimit
+                              : goal
+                            ).toLocaleString()}{" "}
+                            {currency}
+                          </span>
+                          <span className="tabular-nums font-medium text-foreground/80">
+                            {percentage.toFixed(0)}%
                           </span>
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                        <div
+                          className={`h-1.5 w-full rounded-full overflow-hidden ${color.track}`}
+                        >
+                          <div
+                            className={`h-full rounded-full ${color.fill} transition-all duration-500`}
+                            style={{
+                              width: `${Math.max(
+                                Math.min(percentage, 100),
+                                percentage > 0 ? 2 : 0
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                        <AlertTriangle className="w-3 h-3 text-yellow-600 shrink-0" />
+                        <span>
+                          {currentType === "Expense"
+                            ? "Set a budget"
+                            : "Set a goal"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </li>
               );
             })}
-            {data.length < 4 && (
-              <Card
-                className="relative overflow-hidden transition-all duration-300 hover:shadow-lg sm:hover:scale-105 bg-background border-dashed border-2 border-foreground/50 cursor-pointer"
-                onClick={() => setIsAddCategoryOpen(true)}
-              >
-                <CardContent className="flex flex-col items-center justify-center h-full py-8">
-                  <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center mb-4">
-                    <Plus className="w-6 h-6 text-foreground" />
-                  </div>
-                  <div className="text-lg font-semibold text-foreground">
-                    Add Category
-                  </div>
-                  <div className="text-sm text-foreground/70">
-                    Create a new category
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-      </div>
+          </ul>
 
-      {/* Table Section */}
-      {selectedCategory ? (
-        recordsLoading ? (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-foreground" />
-          </div>
-        ) : transactions.length > 0 ? (
-          <>
-            <Table
-              data={transactions}
-              columns={[
-                {
-                  key: "date",
-                  label: "Date",
-                  sortable: true,
-                  render: (value) =>
-                    value
-                      ? new Date(
-                          value as string | number | Date
-                        ).toLocaleDateString("en-GB")
-                      : "",
-                },
-                { key: "description", label: "Description" },
-                {
-                  key: "amount",
-                  label: "Amount",
-                  sortable: true,
-                  render: (value) => `${value} ${currency}`,
-                },
-                { key: "type", label: "Type" },
-              ]}
-              title={`Records for ${selectedCategory}`}
-              onSort={handleSort}
-              sortBy={sortBy}
-              sortOrder={sortOrder}
-            />
-            <div className="flex justify-end mt-4">
-              <CustomPagination
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={setCurrentPage}
-                className="justify-end"
-              />
-            </div>
-          </>
-        ) : (
-          <NotFound
-            title="No Records Found"
-            message={`No transactions found for ${selectedCategory}`}
-          />
-        )
-      ) : (
-        <NotFound
-          title="Select a Category"
-          message="Click on a category card to view its transactions"
-          icon={MousePointer}
-        />
+          {!selectedCategory && (
+            <p className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
+              <MousePointer className="w-4 h-4 text-btn-background shrink-0" />
+              Tap a category to view its transactions.
+            </p>
+          )}
+
+          {selectedCategory &&
+            (recordsLoading ? (
+              <div className="flex justify-center items-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
+              </div>
+            ) : transactions.length > 0 ? (
+              <>
+                <Table
+                  data={transactions}
+                  columns={[
+                    {
+                      key: "date",
+                      label: "Date",
+                      sortable: true,
+                      render: (value) =>
+                        value
+                          ? new Date(
+                              value as string | number | Date
+                            ).toLocaleDateString("en-GB")
+                          : "",
+                    },
+                    { key: "description", label: "Description" },
+                    {
+                      key: "amount",
+                      label: "Amount",
+                      sortable: true,
+                      render: (value) => `${value} ${currency}`,
+                    },
+                    { key: "type", label: "Type" },
+                  ]}
+                  title={`Records for ${selectedCategory}`}
+                  onSort={handleSort}
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                />
+                <div className="flex justify-end mt-4">
+                  <CustomPagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    onPageChange={setCurrentPage}
+                    className="justify-end"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="rounded-xl bg-muted/80 px-4 py-6 flex flex-col items-center text-center gap-2">
+                <Receipt className="w-6 h-6 text-btn-background" />
+                <p className="text-sm font-medium text-foreground">
+                  No transactions yet
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Nothing recorded under {selectedCategory} so far.
+                </p>
+              </div>
+            ))}
+        </div>
       )}
 
       <CategoryForm
         open={isAddCategoryOpen}
-        onOpenChange={setIsAddCategoryOpen}
+        onOpenChange={(open) => {
+          setIsAddCategoryOpen(open);
+          if (!open) setEditingCategory(null);
+        }}
         onCategoryAdded={() => refetchCategories()}
         category={editingCategory}
         onCategoryEdited={() => {
@@ -374,10 +481,3 @@ const Category: React.FC = React.memo(() => {
 Category.displayName = "Category";
 
 export default Category;
-
-//useCallback makes your React app faster by remembering functions, so they don’t get recreated on every render.
-// This stops child components from re-rendering again and again without need.
-
-//React.memo stops a component from re-rendering if its props haven’t changed, so it only updates when needed.
-
-//React.memo prevents a component from re-rendering if props don’t change, while useCallback keeps a function from being recreated on every render.

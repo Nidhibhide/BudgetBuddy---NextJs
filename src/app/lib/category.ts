@@ -7,7 +7,6 @@ export async function createCategory(data: Category) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -24,7 +23,6 @@ export async function getCategoryDetails(type: string) {
     const response = await axios.get(`/api/category/details?type=${type}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -41,7 +39,6 @@ export async function editCategory(id: string, data: Category) {
     const response = await axios.put(`/api/category/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -62,7 +59,6 @@ export async function deleteCategory(id: string, reassignCategoryId?: string) {
     const response = await axios.delete(url);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:

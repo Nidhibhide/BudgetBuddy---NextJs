@@ -7,7 +7,6 @@ export async function addRecurringPayment(data: RecurringPayment) {
 
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -26,7 +25,6 @@ export async function getRecurringPayments(status?: string, page?: number, limit
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -43,7 +41,6 @@ export async function deleteRecurringPayment(id: string) {
     const response = await axios.delete(`/api/recurringPayment/delete?id=${id}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -60,7 +57,6 @@ export async function editRecurringPayment(id: string, data: Partial<RecurringPa
     const response = await axios.put(`/api/recurringPayment/edit?id=${id}`, data);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:

@@ -92,7 +92,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputBox name="nextDueDate" label="Next Due Date" type="date" />
               <InputBox name="reminderDate" label="Reminder Date" type="date" />
-              <p className="text-sm text-gray-600 -mt-2">Notifications will start from this date</p>
+              <p className="text-sm text-muted-foreground -mt-2">Reminders are tracked from this date in your alerts list</p>
               <InputBox name="title" label="Title" />
               <TextareaBox name="description" label="Description" />
               <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
@@ -107,7 +107,9 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
                 <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  className="bg-gray-500 hover:bg-gray-600"
+                  bgColor="bg-transparent border border-border"
+                  hoverColor="hover:bg-sidebar-hover"
+                  className="text-foreground"
                 >
                   Cancel
                 </Button>

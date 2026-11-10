@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -13,18 +15,37 @@ export function ThemeProvider({
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ size = "icon" }) => {
-  const { setTheme, theme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <Button
+        size={size}
+        variant="ghost"
+        className="cursor-pointer text-inherit hover:bg-shell-hover hover:text-inherit"
+        aria-hidden
+      >
+        <Sun className="size-5" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
+
   return (
     <Button
       size={size}
-      className="cursor-pointer"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      variant="ghost"
+      className="cursor-pointer text-inherit hover:bg-shell-hover hover:text-inherit"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {theme === "dark" ? (
-        <Moon className="size-5" />
-      ) : (
-        <Sun className="size-5" />
-      )}
+      {isDark ? <Moon className="size-5" /> : <Sun className="size-5" />}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

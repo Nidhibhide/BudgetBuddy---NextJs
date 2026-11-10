@@ -75,7 +75,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-[calc(100vh-5rem)] w-full text-foreground flex justify-center items-center p-4">
-      <div className="w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md bg-card border-2 border-border rounded-2xl shadow-[0_12px_40px_rgba(99,102,241,0.18)] p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
         <Formik<SignUpFormValues>
           initialValues={{
@@ -129,9 +129,12 @@ const SignUp = () => {
               >
                 Sign Up
               </Button>
-              <p className="md:text-base text-sm mt-2 text-center">
+              <p className="md:text-base text-sm mt-2 text-center text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/signin" className="font-semibold  hover:underline">
+                <Link
+                  href="/signin"
+                  className="font-semibold text-btn-background hover:underline"
+                >
                   Sign In
                 </Link>
               </p>

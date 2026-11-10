@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 
     await newTransaction.save();
 
-    return JsonOne(201, "Success", true, {
+    return JsonOne(201, "Transaction added", true, {
       transaction: newTransaction,
     });
   });

@@ -8,12 +8,10 @@ export async function addTransaction(data: Transaction) {
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
-    const message =
-      (axiosError.response?.data as { message?: string })?.message ||
-      "Error Occurred";
-    console.error("Error Occurred:", message);
     return {
-      message,
+      message:
+        (axiosError.response?.data as { message?: string })?.message ||
+        "Error Occurred",
       success: false,
       statusCode: axiosError.response?.status || 500,
     };
@@ -34,12 +32,23 @@ export async function getTransactions(
   maxAmount?: string
 ) {
   try {
+    const params = new URLSearchParams({ type });
+    if (category) params.set("category", category);
+    if (page != null) params.set("page", String(page));
+    if (limit != null) params.set("limit", String(limit));
+    if (sortBy) params.set("sortBy", sortBy);
+    if (sortOrder) params.set("sortOrder", sortOrder);
+    if (search) params.set("search", search);
+    if (dateFrom) params.set("dateFrom", dateFrom);
+    if (dateTo) params.set("dateTo", dateTo);
+    if (minAmount) params.set("minAmount", minAmount);
+    if (maxAmount) params.set("maxAmount", maxAmount);
+
     const response = await axios.get(
-      `/api/transaction/details?type=${type}&category=${category}&page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&search=${search}&dateFrom=${dateFrom}&dateTo=${dateTo}&minAmount=${minAmount}&maxAmount=${maxAmount}`
+      `/api/transaction/details?${params.toString()}`
     );
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -56,7 +65,6 @@ export async function getTransactionTotals(type: string) {
     const response = await axios.get(`/api/transaction/total?type=${type}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:
@@ -91,7 +99,6 @@ export async function deleteTransaction(id: string) {
     const response = await axios.delete(`/api/transaction/delete?id=${id}`);
     return { ...response.data, statusCode: response.status };
   } catch (error: unknown) {
-    console.error("Error Occurred", error);
     const axiosError = error as AxiosError;
     return {
       message:

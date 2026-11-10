@@ -107,7 +107,9 @@ const Category: React.FC<AddCategoryProps> = ({
                 <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  className="bg-gray-500 hover:bg-gray-600"
+                  bgColor="bg-transparent border border-border"
+                  hoverColor="hover:bg-sidebar-hover"
+                  className="text-foreground"
                 >
                   Cancel
                 </Button>

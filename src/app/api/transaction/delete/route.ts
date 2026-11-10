@@ -43,6 +43,6 @@ export async function DELETE(request: Request) {
     transaction.isDeleted = true;
     await transaction.save();
 
-    return JsonOne(200, t("backend.api.success"), true);
+    return JsonOne(200, t("backend.api.transactionDeleted"), true);
   });
 }

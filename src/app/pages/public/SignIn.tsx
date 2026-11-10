@@ -69,7 +69,7 @@ const SignIn = () => {
   };
   return (
     <div className="min-h-[calc(100vh-5rem)] w-full flex justify-center items-center p-4 text-foreground">
-      <div className="w-full max-w-md bg-slate-200 dark:bg-slate-800 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] p-4 sm:p-8 flex flex-col items-center">
+      <div className="w-full max-w-md bg-card border-2 border-border rounded-2xl shadow-[0_12px_40px_rgba(99,102,241,0.18)] p-4 sm:p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6">Sign In</h1>
 
         <div className="mb-4 flex justify-center">
@@ -85,9 +85,9 @@ const SignIn = () => {
         </div>
 
         <div className="flex items-center w-full my-4">
-          <div className="flex-1 h-px bg-gray-300"></div>
-          <span className="mx-4 text-muted font-semibold">OR</span>
-          <div className="flex-1 h-px bg-gray-300"></div>
+          <div className="flex-1 h-px bg-foreground/25"></div>
+          <span className="mx-4 text-muted-foreground font-semibold">OR</span>
+          <div className="flex-1 h-px bg-foreground/25"></div>
         </div>
         <Formik<User>
           initialValues={{ name: "", email: "", currency: "", password: "" }}
@@ -112,7 +112,7 @@ const SignIn = () => {
                 <p className="text-sm text-right -mt-2">
                   <Link
                     href="/forgot-password"
-                    className="font-semibold text-primary hover:underline"
+                    className="font-semibold text-btn-background hover:underline"
                   >
                     Forgot Password?
                   </Link>
@@ -127,11 +127,11 @@ const SignIn = () => {
               >
                 Sign In
               </Button>
-              <p className="md:text-base text-sm mt-2 text-center">
+              <p className="md:text-base text-sm mt-2 text-center text-muted-foreground">
                 New User?{" "}
                 <Link
                   href="/signup"
-                  className="font-semibold text-primary hover:underline"
+                  className="font-semibold text-btn-background hover:underline"
                 >
                   Sign Up
                 </Link>
