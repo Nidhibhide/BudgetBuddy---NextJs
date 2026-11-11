@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { isDateNotPast } from "@/app/lib/dateUtils";
 
 const recurringPaymentSchema = new mongoose.Schema(
   {
@@ -12,9 +13,8 @@ const recurringPaymentSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      minlength: [2, "Description must be at least 2 characters"],
       maxlength: [200, "Description cannot exceed 200 characters"],
-      required: true,
+      default: "",
     },
     amount: {
       type: Number,
@@ -25,21 +25,21 @@ const recurringPaymentSchema = new mongoose.Schema(
       type: Date,
       required: true,
       validate: {
-        validator: function(value: Date) {
-          return value >= new Date();
+        validator: function (value: Date) {
+          return isDateNotPast(value);
         },
-        message: "Next due date cannot be in the past"
-      }
+        message: "Next due date cannot be in the past",
+      },
     },
     reminderDate: {
       type: Date,
       required: true,
       validate: {
-        validator: function(value: Date) {
-          return value >= new Date();
+        validator: function (value: Date) {
+          return isDateNotPast(value);
         },
-        message: "Reminder date cannot be in the past"
-      }
+        message: "Reminder date cannot be in the past",
+      },
     },
     frequency: {
       type: String,
@@ -61,8 +61,11 @@ const recurringPaymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add indexes for performance
 recurringPaymentSchema.index({ user: 1, isDeleted: 1, nextDueDate: 1 });
 recurringPaymentSchema.index({ user: 1, status: 1 });
 
-export default mongoose.models.RecurringPayment || mongoose.model("RecurringPayment", recurringPaymentSchema);
+if (mongoose.models.RecurringPayment) {
+  delete mongoose.models.RecurringPayment;
+}
+
+export default mongoose.model("RecurringPayment", recurringPaymentSchema);

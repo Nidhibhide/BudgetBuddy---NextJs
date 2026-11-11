@@ -323,6 +323,7 @@ export interface Session {
 
 export interface TotalBalanceProps {
   balance: number;
+  loading?: boolean;
 }
 
 export interface MonthlyExpenseData {
@@ -344,6 +345,7 @@ export type ExpenseData = {
 
 export interface MonthlyExpensePieChartProps {
   expenses: ExpenseData[];
+  loading?: boolean;
 }
 
 export interface TrendData {
@@ -354,6 +356,7 @@ export interface TrendData {
 
 export interface IncomeVsExpenseTrendProps {
   data: TrendData[];
+  loading?: boolean;
 }
 
 export type MonthlySummaryResponse = TrendData[];

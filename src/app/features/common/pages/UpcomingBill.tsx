@@ -2,15 +2,15 @@
 
 import React, { useState, useCallback } from "react";
 import { Formik } from "formik";
-import { Edit, Trash2, Plus, Eye, Loader2 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Edit, Trash2, Plus, Loader2, Receipt } from "lucide-react";
 import {
   Table,
   CustomPagination,
-  NotFound,
   Button,
   SelectBox,
 } from "@/app/features/common/index";
-import { ViewUpcomingBill,Confirmation } from "../../dialogs";
+import { Confirmation } from "../../dialogs";
 import { UpcomingBillForm } from "../../forms";
 import { useUpcomingBills } from "@/app/hooks";
 import { UpcomingBill as UpcomingBillType } from "@/app/types/appTypes";
@@ -18,6 +18,8 @@ import { deleteUpcomingBill } from "@/app/lib/upcomingBill";
 import { useToast } from "@/app/features/common";
 
 const UpcomingBill: React.FC = () => {
+  const { data: session } = useSession();
+  const currency = session?.user?.currency || "INR";
   const { showSuccess, showError } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("dueDate");
@@ -35,10 +37,9 @@ const UpcomingBill: React.FC = () => {
   const [selectedBill, setSelectedBill] = useState<UpcomingBillType | null>(
     null
   );
-  const [viewOpen, setViewOpen] = useState(false);
-  const [deleteUpcomingBillId, setDeleteUpcomingBillId] = useState<string | null>(
-    null
-  );
+  const [deleteUpcomingBillId, setDeleteUpcomingBillId] = useState<
+    string | null
+  >(null);
   const [deleting, setDeleting] = useState(false);
 
   const handleSort = useCallback(
@@ -59,9 +60,19 @@ const UpcomingBill: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const openAddForm = () => {
+    setSelectedBill(null);
+    setIsOpen(true);
+  };
+
+  const handleFormOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) setSelectedBill(null);
+  };
+
   const handleBillAdded = () => {
-    refetch(); // Refresh the list after adding or editing a bill
-    setSelectedBill(null); // Reset selected bill after operation
+    refetch();
+    setSelectedBill(null);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -76,62 +87,60 @@ const UpcomingBill: React.FC = () => {
       const response = await deleteUpcomingBill(deleteUpcomingBillId);
       if (response.success) {
         showSuccess(response.message);
-        // Refresh upcoming bills
         refetch();
         setDeleteUpcomingBillId(null);
       } else {
-        showError(response.message || "An error occurred. Please try again.");
+        showError(
+          response.message || "Couldn’t delete this bill. Please try again."
+        );
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-
-      showError("An error occurred. Please try again.");
+    } catch {
+      showError("Couldn’t delete this bill. Please try again.");
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <div className="w-full p-2 sm:p-4 space-y-3">
-      {/* Controls */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-end">
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Formik
-              initialValues={{ status: selectedStatus }}
-              onSubmit={() => {}}
-            >
-              {() => (
-                <div className="w-full sm:w-[180px]">
-                  <SelectBox
-                    name="status"
-                    options={["All", "Paid", "Unpaid"]}
-                    value={selectedStatus}
-                    onChange={handleStatusChange}
-                  />
-                </div>
-              )}
-            </Formik>
-            <Button
-              width="w-full sm:w-[180px]"
-              className="flex items-center justify-center gap-2"
-              onClick={() => setIsOpen(true)}
-            >
-              <Plus className="w-4 h-4" />
-              Add Upcoming Bill
-            </Button>
-          </div>
-        </div>
+    <div className="w-full space-y-3">
+      <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-end">
+        <Formik
+          initialValues={{ status: selectedStatus }}
+          enableReinitialize
+          onSubmit={() => {}}
+        >
+          {() => (
+            <div className="w-full sm:w-[180px]">
+              <SelectBox
+                name="status"
+                options={["All", "Paid", "Unpaid"]}
+                value={selectedStatus}
+                onChange={handleStatusChange}
+              />
+            </div>
+          )}
+        </Formik>
+        {!loading && upcomingBills.length > 0 && (
+          <Button
+            width="w-full sm:w-auto"
+            className="shrink-0"
+            onClick={openAddForm}
+          >
+            <Plus className="w-4 h-4" />
+            Add
+          </Button>
+        )}
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center py-10">
-          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+        <div className="flex justify-center items-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
         </div>
       ) : upcomingBills.length > 0 ? (
-        <>
+        <div className="flex flex-col gap-2">
           <Table
             data={upcomingBills as UpcomingBillType[]}
+            title="Upcoming bills"
             columns={[
               {
                 key: "dueDate",
@@ -157,14 +166,20 @@ const UpcomingBill: React.FC = () => {
               },
               { key: "title", label: "Title" },
               {
+                key: "amount",
+                label: "Amount",
+                sortable: true,
+                render: (value) => `${value} ${currency}`,
+              },
+              {
                 key: "status",
                 label: "Status",
                 render: (value) => (
                   <span
                     className={
                       (value as string) === "Paid"
-                        ? "text-green-500"
-                        : "text-red-500"
+                        ? "text-success"
+                        : "text-destructive"
                     }
                   >
                     {value as string}
@@ -174,21 +189,13 @@ const UpcomingBill: React.FC = () => {
               {
                 key: "actions",
                 label: "Actions",
-                render: (value, row) => (
-                  <div className="flex gap-2">
+                render: (_value, row) => (
+                  <div className="flex gap-1 justify-end md:justify-start">
                     <button
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
-                      title="View"
-                      onClick={() => {
-                        setSelectedBill(row as unknown as UpcomingBillType);
-                        setViewOpen(true);
-                      }}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-background/10 rounded transition-colors cursor-pointer"
+                      type="button"
+                      className="p-2 rounded-lg hover:bg-btn-background/10 text-foreground transition-colors cursor-pointer"
                       title="Edit"
+                      aria-label="Edit bill"
                       onClick={() => {
                         setSelectedBill(row as unknown as UpcomingBillType);
                         setIsOpen(true);
@@ -197,23 +204,25 @@ const UpcomingBill: React.FC = () => {
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDeleteClick(row._id as string)}
-                      className="p-2.5 min-h-10 min-w-10 inline-flex items-center justify-center hover:bg-red-500/10 rounded transition-colors cursor-pointer"
+                      className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors cursor-pointer"
                       title="Delete"
+                      aria-label="Delete bill"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ),
               },
             ]}
+            keyField="_id"
             onSort={handleSort}
             sortBy={sortBy}
             sortOrder={sortOrder}
           />
 
-          {/* Pagination */}
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end">
             <CustomPagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
@@ -221,25 +230,33 @@ const UpcomingBill: React.FC = () => {
               className="justify-end"
             />
           </div>
-        </>
+        </div>
       ) : (
-        <NotFound
-          title="No Upcoming Bills Found"
-          message="You haven't added any upcoming bills yet."
-        />
+        <div className="px-6 py-16 flex flex-col items-center text-center gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-btn-background/15 text-btn-background">
+            <Receipt className="w-7 h-7" />
+          </div>
+          <div className="space-y-1 max-w-sm">
+            <p className="text-lg font-semibold text-foreground">
+              No upcoming bills yet
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Add a bill reminder so you never miss a due date.
+            </p>
+          </div>
+          <Button width="w-auto" className="shrink-0" onClick={openAddForm}>
+            <Plus className="w-4 h-4" />
+            Upcoming Bill
+          </Button>
+        </div>
       )}
+
       <UpcomingBillForm
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={handleFormOpenChange}
         onBillAdded={handleBillAdded}
         bill={selectedBill}
       />
-      <ViewUpcomingBill
-        open={viewOpen}
-        onOpenChange={setViewOpen}
-        bill={selectedBill}
-      />
-
       <Confirmation
         open={!!deleteUpcomingBillId}
         onOpenChange={(open) => !open && setDeleteUpcomingBillId(null)}

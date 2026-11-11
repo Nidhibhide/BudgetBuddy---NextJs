@@ -13,47 +13,31 @@ import {
 import { useBalance, usePieChart, useBarGraph } from "@/app/hooks";
 
 const MainPage: React.FC = () => {
-
-  const {
-    balance,
-    // loading: balanceLoading,
-    // error: balanceError,
-  } = useBalance();
-  const {
-    expenses,
-    // loading: expensesLoading,
-    // error: expensesError,
-  } = usePieChart();
-  const {
-    summary,
-    // loading: summaryLoading,
-    // error: summaryError,
-  } = useBarGraph();
+  const { balance, loading: balanceLoading } = useBalance();
+  const { expenses, loading: expensesLoading } = usePieChart();
+  const { summary, loading: summaryLoading } = useBarGraph();
 
   return (
-    <div className="w-full px-4 sm:px-6 py-4 mx-auto space-y-6">
-      {/* Header */}
+    <div className="w-full px-4 sm:px-6 py-4 mx-auto space-y-6 bg-background">
       <div className="relative">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-foreground">
-            Overview
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">Overview</h1>
         </div>
       </div>
 
-      {/* Total Balance */}
-      <TotalBalance balance={balance} />
+      <TotalBalance balance={balance} loading={balanceLoading} />
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MonthlyExpensePieChart expenses={expenses} />
-        <IncomeVsExpenseTrend data={summary} />
+        <MonthlyExpensePieChart
+          expenses={expenses}
+          loading={expensesLoading}
+        />
+        <IncomeVsExpenseTrend data={summary} loading={summaryLoading} />
       </div>
 
-      {/* Bottom Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
         <RecentTransactions />
-        <BudgetCalendar/>
+        <BudgetCalendar />
         <Insights />
       </div>
     </div>

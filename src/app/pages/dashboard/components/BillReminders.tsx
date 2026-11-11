@@ -5,7 +5,14 @@ import { UpcomingBill, RecurringPayment } from "@/app/features/common";
 
 const BillReminders: React.FC = () => {
   return (
-    <div className="px-4 pt-4 md:pt-8 text-foreground">
+    <div className="w-full px-4 sm:px-6 py-4 text-foreground space-y-4">
+      <div>
+        <h2 className="text-2xl font-bold text-foreground">Set Alerts</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Track upcoming bills and recurring payments in one place.
+        </p>
+      </div>
+
       <Tabs defaultValue="upcoming" className="w-full">
         <TabsList className="w-full sm:w-auto h-auto flex flex-wrap justify-start bg-muted border border-border p-1 gap-1">
           <TabsTrigger

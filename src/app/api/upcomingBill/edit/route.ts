@@ -2,9 +2,10 @@ import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import UpcomingBill from "@/app/backend/models/upcomingBill";
 import { UpdateUpcomingBill } from "@/app/backend/validations/upcomingBill";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import { parseLocalDate } from "@/app/lib/dateUtils";
 
 export async function PUT(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (_session, userId) => {
     const url = new URL(request.url);
     const upcomingBillId = url.searchParams.get("id");
 
@@ -15,10 +16,15 @@ export async function PUT(request: Request) {
     }
 
     const { dueDate, reminderDate, title, description, amount, status } = body;
+    const parsedDueDate = parseLocalDate(dueDate);
+    const parsedReminderDate = parseLocalDate(reminderDate);
 
-    // Validate that reminderDate is before dueDate
-    if (new Date(reminderDate) >= new Date(dueDate)) {
-      return JsonOne(400, "Reminder date must be before due date", false);
+    if (parsedReminderDate.getTime() > parsedDueDate.getTime()) {
+      return JsonOne(
+        400,
+        "Reminder date must be on or before due date",
+        false
+      );
     }
 
     const existingUpcomingBill = await UpcomingBill.findOne({
@@ -31,22 +37,20 @@ export async function PUT(request: Request) {
       return JsonOne(404, "Upcoming bill not found", false);
     }
 
-    const updateData = {
-      title,
-      description,
-      amount,
-      dueDate: new Date(dueDate),
-      reminderDate: new Date(reminderDate),
-      status,
-    };
-
     const updatedUpcomingBill = await UpcomingBill.findByIdAndUpdate(
       upcomingBillId,
-      updateData,
-      { new: true }
+      {
+        title,
+        description: description || "",
+        amount,
+        dueDate: parsedDueDate,
+        reminderDate: parsedReminderDate,
+        status,
+      },
+      { new: true, runValidators: true }
     );
 
-    return JsonOne(200, "Success", true, {
+    return JsonOne(200, "Upcoming bill updated", true, {
       upcomingBill: updatedUpcomingBill,
     });
   });

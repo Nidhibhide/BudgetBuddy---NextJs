@@ -34,7 +34,7 @@ const Confirmation: React.FC<ConfirmationProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-sidebar-hover cursor-pointer">
+          <AlertDialogCancel className="bg-muted border border-border dark:border-white/20 text-foreground hover:bg-muted/80 cursor-pointer">
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction

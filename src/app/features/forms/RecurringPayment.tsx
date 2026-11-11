@@ -15,24 +15,45 @@ import { addRecurringPayment, editRecurringPayment } from "@/app/lib/recurringPa
 import { AddRecurringPaymentProps } from "@/app/types/appTypes";
 import type { RecurringPayment } from "@/app/types/appTypes";
 
-const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpenChange, onPaymentAdded, payment }) => {
+const startOfToday = () => {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
+const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({
+  open,
+  onOpenChange,
+  onPaymentAdded,
+  payment,
+}) => {
   const { data: session } = useSession();
   const { showSuccess, showError } = useToast();
   const [loading, setLoading] = useState(false);
+  const isEdit = !!payment?._id;
+  const currency = session?.user?.currency || "INR";
 
   const validationSchema = Yup.object().shape({
     nextDueDate: Yup.date()
-      .required("Date is required")
-      .min(new Date(), "Date cannot be in the past"),
+      .required("Next due date is required")
+      .min(startOfToday(), "Next due date cannot be in the past"),
     reminderDate: Yup.date()
-      .required("Date is required")
-      .min(new Date(), "Date cannot be in the past")
-      .when('nextDueDate', (nextDueDate, schema) => nextDueDate ? schema.max(Yup.ref('nextDueDate'), "Reminder date must be before next due date") : schema),
+      .required("Reminder date is required")
+      .min(startOfToday(), "Reminder date cannot be in the past")
+      .when("nextDueDate", (nextDueDate, schema) =>
+        nextDueDate
+          ? schema.max(
+              Yup.ref("nextDueDate"),
+              "Reminder date must be on or before next due date"
+            )
+          : schema
+      ),
     title: Yup.string()
       .min(1, "Title must be at least 1 character")
       .max(100, "Title must be at most 100 characters")
       .required("Title is required"),
     description: Yup.string()
+      .transform((value) => (value === "" ? undefined : value))
       .min(2, "Description must be at least 2 characters")
       .max(200, "Description must be at most 200 characters")
       .optional(),
@@ -50,18 +71,20 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
   const handleSubmit = async (values: RecurringPayment) => {
     setLoading(true);
     try {
-      const response = payment?._id
-        ? await editRecurringPayment(payment._id, values)
+      const response = isEdit
+        ? await editRecurringPayment(payment!._id!, values)
         : await addRecurringPayment(values);
       if (response.success) {
         showSuccess(response.message);
         onPaymentAdded(values);
         onOpenChange(false);
       } else {
-        showError(response.message || "Error Occurred");
+        showError(
+          response.message || "Couldn’t save this payment. Please try again."
+        );
       }
     } catch {
-      showError("Error Occurred");
+      showError("Couldn’t save this payment. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -69,16 +92,21 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="bg-card text-foreground border-border">
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {payment?._id ? "Edit Form" : "Add Form"}
+            {isEdit ? "Edit Recurring Payment" : "Add Recurring Payment"}
           </DialogTitle>
         </DialogHeader>
         <Formik
+          enableReinitialize
           initialValues={{
-            nextDueDate: payment?.nextDueDate ? new Date(payment.nextDueDate).toISOString().split("T")[0] : "",
-            reminderDate: payment?.reminderDate ? new Date(payment.reminderDate).toISOString().split("T")[0] : "",
+            nextDueDate: payment?.nextDueDate
+              ? new Date(payment.nextDueDate).toISOString().split("T")[0]
+              : "",
+            reminderDate: payment?.reminderDate
+              ? new Date(payment.reminderDate).toISOString().split("T")[0]
+              : "",
             title: payment?.title || "",
             description: payment?.description || "",
             amount: payment?.amount || 1,
@@ -92,11 +120,21 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputBox name="nextDueDate" label="Next Due Date" type="date" />
               <InputBox name="reminderDate" label="Reminder Date" type="date" />
-              <p className="text-sm text-muted-foreground -mt-2">Reminders are tracked from this date in your alerts list</p>
+              <p className="text-sm text-muted-foreground -mt-2">
+                We’ll remind you starting on this date.
+              </p>
               <InputBox name="title" label="Title" />
               <TextareaBox name="description" label="Description" />
-              <InputBox name="amount" label={`Amount (${session?.user?.currency || 'INR'})`} type="number" />
-              <SelectBox name="frequency" label="Frequency" options={["Weekly", "Monthly", "Yearly"]} />
+              <InputBox
+                name="amount"
+                label={`Amount (${currency})`}
+                type="number"
+              />
+              <SelectBox
+                name="frequency"
+                label="Frequency"
+                options={["Weekly", "Monthly", "Yearly"]}
+              />
               <SelectBox
                 name="status"
                 label="Status"
@@ -107,14 +145,14 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({ open, onOpen
                 <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  bgColor="bg-transparent border border-border"
-                  hoverColor="hover:bg-sidebar-hover"
+                  bgColor="bg-muted border border-border dark:border-white/20"
+                  hoverColor="hover:bg-muted/80"
                   className="text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button type="submit" loading={loading}>
-                  {payment?._id ? "Update" : "Add"}
+                  {isEdit ? "Update" : "Add"}
                 </Button>
               </div>
             </form>

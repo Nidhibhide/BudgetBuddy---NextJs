@@ -209,7 +209,7 @@ const Transaction: React.FC = React.memo(() => {
   const currency = session?.user?.currency || "INR";
 
   return (
-    <div className="w-full p-4 sm:p-6 space-y-5">
+    <div className="w-full p-4 sm:p-6 space-y-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Transactions</h2>
@@ -244,18 +244,34 @@ const Transaction: React.FC = React.memo(() => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-            <InputBox
-              name="search"
-              type="text"
-              label=""
-              placeholder="Search transactions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              inputClassName="pl-9"
-            />
+        <div className="flex flex-col sm:flex-row gap-2 sm:items-start sm:justify-center">
+          <div className="w-full sm:max-w-2xl flex flex-col gap-1.5">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
+              <InputBox
+                name="search"
+                type="text"
+                label=""
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                inputClassName="pl-9"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                className="text-sm font-medium text-btn-background hover:text-btn-hover cursor-pointer inline-flex items-center gap-1.5"
+              >
+                Advanced filters
+                {isAdvancedOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="w-full sm:w-[180px]">
             <Formik
@@ -273,26 +289,29 @@ const Transaction: React.FC = React.memo(() => {
               )}
             </Formik>
           </div>
-        </div>
-
-        <div className="flex justify-start">
-          <button
-            type="button"
-            onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
-            className="text-sm font-medium text-btn-background hover:text-btn-hover cursor-pointer inline-flex items-center gap-1.5"
-          >
-            Advanced filters
-            {isAdvancedOpen ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </button>
+          {!loading && transactions.length > 0 && (
+            <Button
+              width="w-auto"
+              className="shrink-0 w-full sm:w-auto"
+              onClick={() =>
+                handlePDFDownload(
+                  transactions,
+                  selectedCategory,
+                  currentType,
+                  currency,
+                  categories.map((cat) => cat.name)
+                )
+              }
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
+          )}
         </div>
 
         <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
           <CollapsibleContent>
-            <div className="rounded-xl border border-border bg-muted p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="rounded-xl border border-border dark:border-white/20 bg-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="flex flex-col w-full">
                 <InputBox
                   name="from"
@@ -305,7 +324,7 @@ const Transaction: React.FC = React.memo(() => {
                       dateFrom: e.target.value,
                     }))
                   }
-                  inputClassName="bg-background border-border dark:bg-background"
+                  inputClassName="bg-card border-border dark:border-white/20"
                 />
                 {errors.dateFrom && (
                   <p className="text-destructive text-sm">{errors.dateFrom}</p>
@@ -323,7 +342,7 @@ const Transaction: React.FC = React.memo(() => {
                       dateTo: e.target.value,
                     }))
                   }
-                  inputClassName="bg-background border-border dark:bg-background"
+                  inputClassName="bg-card border-border dark:border-white/20"
                 />
                 {errors.dateTo && (
                   <p className="text-destructive text-sm">{errors.dateTo}</p>
@@ -342,7 +361,7 @@ const Transaction: React.FC = React.memo(() => {
                       minAmount: e.target.value,
                     }))
                   }
-                  inputClassName="bg-background border-border dark:bg-background"
+                  inputClassName="bg-card border-border dark:border-white/20"
                 />
                 {errors.minAmount && (
                   <p className="text-destructive text-sm">{errors.minAmount}</p>
@@ -361,7 +380,7 @@ const Transaction: React.FC = React.memo(() => {
                       maxAmount: e.target.value,
                     }))
                   }
-                  inputClassName="bg-background border-border dark:bg-background"
+                  inputClassName="bg-card border-border dark:border-white/20"
                 />
                 {errors.maxAmount && (
                   <p className="text-destructive text-sm">{errors.maxAmount}</p>
@@ -377,26 +396,7 @@ const Transaction: React.FC = React.memo(() => {
           <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
         </div>
       ) : transactions.length > 0 ? (
-        <>
-          <div className="flex justify-end">
-            <Button
-              width="w-auto"
-              className="shrink-0"
-              onClick={() =>
-                handlePDFDownload(
-                  transactions,
-                  selectedCategory,
-                  currentType,
-                  currency,
-                  categories.map((cat) => cat.name)
-                )
-              }
-            >
-              <Download className="w-4 h-4" />
-              Download PDF
-            </Button>
-          </div>
-
+        <div className="flex flex-col gap-2">
           <Table
             data={transactions as TransactionType[]}
             columns={[
@@ -453,7 +453,7 @@ const Transaction: React.FC = React.memo(() => {
             sortOrder={sortOrder}
           />
 
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end">
             <CustomPagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
@@ -461,9 +461,9 @@ const Transaction: React.FC = React.memo(() => {
               className="justify-end"
             />
           </div>
-        </>
+        </div>
       ) : (
-        <div className="rounded-2xl bg-muted/80 px-6 py-12 flex flex-col items-center text-center gap-3">
+        <div className="px-6 py-16 flex flex-col items-center text-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-btn-background/15 text-btn-background">
             <Receipt className="w-7 h-7" />
           </div>
@@ -481,7 +481,7 @@ const Transaction: React.FC = React.memo(() => {
             onClick={() => setIsAddTransactionOpen(true)}
           >
             <Plus className="w-4 h-4" />
-            Add Transaction
+            Transaction
           </Button>
         </div>
       )}

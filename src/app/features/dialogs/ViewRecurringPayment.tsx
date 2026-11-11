@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useSession } from "next-auth/react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { formatDate } from "@/app/lib/dateUtils";
 import { FieldDisplay } from "@/app/features/common";
-
 import { ViewRecurringPaymentProps } from "@/app/types/appTypes";
 
 const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
@@ -17,11 +17,14 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
   onOpenChange,
   payment,
 }) => {
+  const { data: session } = useSession();
+  const currency = session?.user?.currency || "INR";
+
   if (!payment) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="text-foreground">
+      <DialogContent className="bg-card text-foreground border-border">
         <DialogHeader>
           <DialogTitle>{payment.title}</DialogTitle>
         </DialogHeader>
@@ -38,12 +41,12 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
           />
           <FieldDisplay
             label="Description"
-            value={payment.description}
+            value={payment.description || "—"}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
             label="Amount"
-            value={`${payment.amount} INR`}
+            value={`${payment.amount} ${currency}`}
             labelWidth="w-[130px]"
           />
           <FieldDisplay
@@ -55,7 +58,7 @@ const ViewRecurringPayment: React.FC<ViewRecurringPaymentProps> = ({
             label="Status"
             value={payment.status}
             valueClassName={
-              payment.status === "Active" ? "text-green-500" : "text-red-500"
+              payment.status === "Active" ? "text-success" : "text-destructive"
             }
             labelWidth="w-[130px]"
           />

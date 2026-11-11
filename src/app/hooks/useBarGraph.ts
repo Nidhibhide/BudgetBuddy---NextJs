@@ -4,7 +4,7 @@ import { MonthlySummaryResponse, TrendData } from '@/app/types/appTypes';
 
 export const useBarGraph = () => {
   const [summary, setSummary] = useState<TrendData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchMonthlySummary = useCallback(async () => {

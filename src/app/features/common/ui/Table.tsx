@@ -24,7 +24,7 @@ export const Table: React.FC<GenericTableProps> = ({
   return (
     <div className="w-full mt-2 text-foreground">
       {title && (
-        <h3 className="text-lg font-semibold mb-3 text-foreground">{title}</h3>
+        <h3 className="text-base font-semibold mb-3 text-foreground">{title}</h3>
       )}
 
       {/* Mobile-friendly stacked cards */}
@@ -62,7 +62,7 @@ export const Table: React.FC<GenericTableProps> = ({
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             {columns.map((column) => (
-              <TableHead key={column.key} className="text-lg font-bold text-foreground">
+              <TableHead key={column.key} className="text-sm font-semibold text-muted-foreground">
                 <div className="flex items-center gap-2">
                   {column.label}
                   {column.sortable && (
@@ -81,7 +81,7 @@ export const Table: React.FC<GenericTableProps> = ({
         </TableHeader>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow key={String(row[keyField] || index)} className="hover:bg-muted/50 transition-colors">
+            <TableRow key={String(row[keyField] || index)} className="hover:bg-btn-background/10 transition-colors">
               {columns.map((column) => (
                 <TableCell key={column.key}>
                   {column.render

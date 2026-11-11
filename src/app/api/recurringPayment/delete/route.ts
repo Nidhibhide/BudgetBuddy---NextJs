@@ -24,6 +24,6 @@ export async function DELETE(request: Request) {
     recurringPayment.isDeleted = true;
     await recurringPayment.save();
 
-    return JsonOne(200, "Success", true);
+    return JsonOne(200, "Recurring payment deleted", true);
   });
 }

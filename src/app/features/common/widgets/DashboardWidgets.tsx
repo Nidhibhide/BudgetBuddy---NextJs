@@ -7,29 +7,42 @@ import { TotalBalanceProps } from "@/app/types/appTypes";
 import { useTransactions } from "@/app/hooks/useTransactions";
 import { useInsights } from "@/app/hooks/useInsights";
 
+const ListPlaceholder = () => (
+  <div className="space-y-2.5">
+    {[0, 1, 2].map((item) => (
+      <div
+        key={item}
+        className="h-12 rounded-lg border border-border dark:border-white/20 bg-card"
+      />
+    ))}
+  </div>
+);
+
 export const Insights: React.FC = () => {
-  const { insights } = useInsights();
+  const { insights, loading } = useInsights();
 
   return (
-    <Card className="p-6 text-foreground bg-card border-border shadow-md flex flex-col h-full min-h-96">
-      <div className="flex items-center mb-4">
+    <Card className="p-4 text-foreground bg-card border-border shadow-sm flex flex-col h-full">
+      <div className="flex items-center mb-3">
         <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
-        <h3 className="text-lg font-semibold">
-          Insights
-        </h3>
+        <h3 className="text-lg font-semibold">Insights</h3>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <div className="space-y-3">
-          {insights.map((insight, index) => (
-            <div
-              key={index}
-              className="flex items-start p-3 bg-muted rounded-lg"
-            >
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 shrink-0"></div>
-              <p className="text-lg font-medium text-foreground">{insight}</p>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <ListPlaceholder />
+        ) : (
+          <div className="space-y-2.5">
+            {insights.map((insight, index) => (
+              <div
+                key={index}
+                className="flex items-start px-3 py-2.5 border border-border dark:border-white/20 rounded-lg bg-card"
+              >
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 shrink-0"></div>
+                <p className="text-base font-medium text-foreground">{insight}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Card>
   );
@@ -38,7 +51,7 @@ export const Insights: React.FC = () => {
 export const RecentTransactions: React.FC = () => {
   const { data: session } = useSession();
   const currency = session?.user?.currency || "INR";
-  const { transactions } = useTransactions({
+  const { transactions, loading } = useTransactions({
     type: "",
     limit: 10,
     sortBy: "date",
@@ -46,22 +59,22 @@ export const RecentTransactions: React.FC = () => {
   });
 
   return (
-    <Card className="p-6 text-foreground bg-card border-border shadow-md flex flex-col h-full min-h-96">
-      <h3 className="text-lg font-semibold mb-4">
-        Recent Transactions
-      </h3>
+    <Card className="p-4 text-foreground bg-card border-border shadow-sm flex flex-col h-full">
+      <h3 className="text-lg font-semibold mb-3">Recent Transactions</h3>
       <div className="flex-1 overflow-y-auto">
-        <div className="space-y-3">
-          {transactions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-2">
-              <X className="w-12 h-12 text-foreground/60" />
-              <p>No Data Found</p>
-            </div>
-          ) : (
-            transactions.map((transaction) => (
+        {loading ? (
+          <ListPlaceholder />
+        ) : transactions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-2">
+            <X className="w-12 h-12 text-foreground/60" />
+            <p>No Data Found</p>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {transactions.map((transaction) => (
               <div
                 key={transaction._id}
-                className="flex items-center justify-between gap-2 p-3 bg-muted rounded-lg"
+                className="flex items-center justify-between gap-2 p-2.5 border border-border dark:border-white/20 rounded-lg bg-card"
               >
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-base truncate">
@@ -83,27 +96,30 @@ export const RecentTransactions: React.FC = () => {
                   {Math.abs(transaction.amount || 0).toLocaleString()} {currency}
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </Card>
   );
 };
 
-export const TotalBalance: React.FC<TotalBalanceProps> = ({ balance }) => {
+export const TotalBalance: React.FC<TotalBalanceProps> = ({
+  balance,
+  loading = false,
+}) => {
   const { data: session } = useSession();
   const currency = session?.user?.currency || "INR";
 
   return (
-    <Card className="p-6 bg-card text-foreground border border-border border-l-4 border-l-btn-background shadow-md">
-      <div className="flex items-center justify-between">
+    <Card className="p-6 bg-card text-foreground border border-border border-l-4 border-l-btn-background shadow-sm">
+      <div className="flex justify-between items-center">
         <div>
           <h3 className="text-lg font-semibold mb-2 text-muted-foreground">
             Total Balance
           </h3>
           <p className="text-3xl font-bold text-foreground">
-            {balance.toLocaleString()} {currency}
+            {loading ? "—" : `${balance.toLocaleString()} ${currency}`}
           </p>
         </div>
         <div className="text-4xl opacity-80">💰</div>

@@ -21,7 +21,7 @@ export const useTransactions = ({
 }: UseTransactionsProps) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [totals, setTotals] = useState<TypeTotal[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,

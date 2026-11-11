@@ -3,7 +3,7 @@ import { getInsights } from "@/app/lib/dashboard";
 
 export const useInsights = () => {
   const [insights, setInsights] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchInsights = useCallback(async () => {

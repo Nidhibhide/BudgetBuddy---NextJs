@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { isDateNotPast } from "@/app/lib/dateUtils";
 
 const upcomingBillSchema = new mongoose.Schema(
   {
@@ -12,9 +13,8 @@ const upcomingBillSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      minlength: [2, "Description must be at least 2 characters"],
       maxlength: [200, "Description cannot exceed 200 characters"],
-      required: true,
+      default: "",
     },
     amount: {
       type: Number,
@@ -25,21 +25,21 @@ const upcomingBillSchema = new mongoose.Schema(
       type: Date,
       required: true,
       validate: {
-        validator: function(value: Date) {
-          return value >= new Date();
+        validator: function (value: Date) {
+          return isDateNotPast(value);
         },
-        message: "Due date cannot be in the past"
-      }
+        message: "Due date cannot be in the past",
+      },
     },
     reminderDate: {
       type: Date,
       required: true,
       validate: {
-        validator: function(value: Date) {
-          return value >= new Date();
+        validator: function (value: Date) {
+          return isDateNotPast(value);
         },
-        message: "Reminder date cannot be in the past"
-      }
+        message: "Reminder date cannot be in the past",
+      },
     },
     status: {
       type: String,
@@ -56,8 +56,11 @@ const upcomingBillSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add indexes for performance
 upcomingBillSchema.index({ user: 1, isDeleted: 1, dueDate: 1 });
 upcomingBillSchema.index({ user: 1, status: 1 });
 
-export default mongoose.models.UpcomingBill || mongoose.model("UpcomingBill", upcomingBillSchema);
+if (mongoose.models.UpcomingBill) {
+  delete mongoose.models.UpcomingBill;
+}
+
+export default mongoose.model("UpcomingBill", upcomingBillSchema);

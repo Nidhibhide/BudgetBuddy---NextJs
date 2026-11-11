@@ -4,7 +4,7 @@ import { DayData, BudgetCalendarResponse} from '@/app/types/appTypes';
 
 export const useBudgetCalendar = (month: number, year: number) => {
   const [daysData, setDaysData] = useState<DayData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBudgetCalendar = useCallback(async () => {

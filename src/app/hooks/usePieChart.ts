@@ -5,7 +5,7 @@ import { MonthlyExpensesResponse, ExpenseData } from '@/app/types/appTypes';
 
 export const usePieChart = () => {
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchMonthlyExpenses = useCallback(async () => {

@@ -216,7 +216,7 @@ const Category: React.FC = React.memo(() => {
           <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
         </div>
       ) : data.length === 0 ? (
-        <div className="rounded-2xl bg-selected-background/80 px-6 py-12 sm:py-14 flex flex-col items-center text-center gap-4">
+        <div className="px-6 py-14 sm:py-16 flex flex-col items-center text-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-btn-background/15 text-btn-background">
             <Tags className="w-7 h-7" />
           </div>
@@ -247,7 +247,7 @@ const Category: React.FC = React.memo(() => {
         </div>
       ) : (
         <div className="space-y-3">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl">
             {data.map((category: Category, index: number) => {
               const { total, percentage, budgetLimit, goal } = getCategoryTotal(
                 category.name
@@ -276,7 +276,7 @@ const Category: React.FC = React.memo(() => {
                         setCurrentPage(1);
                       }
                     }}
-                    className={`relative h-full text-left rounded-xl border border-border bg-card overflow-hidden pl-3.5 pr-3 py-3.5 transition-all duration-200 cursor-pointer ${
+                    className={`relative h-full text-left rounded-xl border border-border bg-card overflow-hidden pl-4 pr-3.5 py-4 transition-all duration-200 cursor-pointer ${
                       isSelected ? color.selected : color.hover
                     }`}
                   >
@@ -285,20 +285,20 @@ const Category: React.FC = React.memo(() => {
                       aria-hidden
                     />
 
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${color.badge}`}
+                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-base font-semibold ${color.badge}`}
                           aria-hidden
                         >
                           {initial}
                         </div>
                         <div className="min-w-0">
-                          <h3 className="text-sm font-semibold text-foreground truncate">
+                          <h3 className="text-lg font-semibold text-foreground truncate">
                             {category.name}
                           </h3>
                           <p
-                            className={`text-sm font-bold tabular-nums ${color.amount}`}
+                            className={`text-base font-bold tabular-nums ${color.amount}`}
                           >
                             {total.toLocaleString()} {currency}
                           </p>
@@ -309,32 +309,32 @@ const Category: React.FC = React.memo(() => {
                           type="button"
                           title="Edit"
                           aria-label={`Edit ${category.name}`}
-                          className="p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-foreground cursor-pointer"
+                          className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/10 text-foreground cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingCategory(category);
                             setIsAddCategoryOpen(true);
                           }}
                         >
-                          <Pen className="w-3.5 h-3.5" />
+                          <Pen className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
                           title="Delete"
                           aria-label={`Delete ${category.name}`}
-                          className={`p-1.5 rounded-md hover:bg-destructive/10 text-destructive cursor-pointer ${
+                          className={`p-2 rounded-md hover:bg-destructive/10 text-destructive cursor-pointer ${
                             deleteLoading ? "animate-spin" : ""
                           }`}
                           onClick={(e) => handleDeleteClick(e, category)}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
 
                     {hasLimit ? (
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-[11px] text-muted-foreground">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm text-muted-foreground">
                           <span>
                             {currentType === "Expense" ? "Budget" : "Goal"}{" "}
                             {(currentType === "Expense"
@@ -348,7 +348,7 @@ const Category: React.FC = React.memo(() => {
                           </span>
                         </div>
                         <div
-                          className={`h-1.5 w-full rounded-full overflow-hidden ${color.track}`}
+                          className={`h-2 w-full rounded-full overflow-hidden ${color.track}`}
                         >
                           <div
                             className={`h-full rounded-full ${color.fill} transition-all duration-500`}
@@ -362,8 +362,8 @@ const Category: React.FC = React.memo(() => {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                        <AlertTriangle className="w-3 h-3 text-yellow-600 shrink-0" />
+                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600 shrink-0" />
                         <span>
                           {currentType === "Expense"
                             ? "Set a budget"
@@ -429,12 +429,12 @@ const Category: React.FC = React.memo(() => {
                 </div>
               </>
             ) : (
-              <div className="rounded-xl bg-muted/80 px-4 py-6 flex flex-col items-center text-center gap-2">
-                <Receipt className="w-6 h-6 text-btn-background" />
-                <p className="text-sm font-medium text-foreground">
+              <div className="px-4 py-10 flex flex-col items-center text-center gap-2">
+                <Receipt className="w-8 h-8 text-btn-background" />
+                <p className="text-lg font-semibold text-foreground">
                   No transactions yet
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Nothing recorded under {selectedCategory} so far.
                 </p>
               </div>

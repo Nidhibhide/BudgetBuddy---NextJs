@@ -12,6 +12,7 @@ import {
 import { InputBox, SelectBox, Button, useToast} from "@/app/features/common/index";
 import { Category as CategoryType, AddCategoryProps} from "@/app/types/appTypes";
 import { createCategory, editCategory } from "@/app/lib/category";
+import { useSession } from "next-auth/react";
 
 const Category: React.FC<AddCategoryProps> = ({
   open,
@@ -20,6 +21,8 @@ const Category: React.FC<AddCategoryProps> = ({
   category,
   onCategoryEdited,
 }) => {
+  const { data: session } = useSession();
+  const currency = session?.user?.currency || "INR";
   const { showSuccess, showError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const isEdit = !!category;
@@ -98,17 +101,25 @@ const Category: React.FC<AddCategoryProps> = ({
                 </>
               )}
               {(isEdit ? category.type === "Expense" : values.type === "Expense") && (
-                <InputBox name="budgetLimit" label="Budget Limit" type="number" />
+                <InputBox
+                  name="budgetLimit"
+                  label={`Budget Limit (${currency})`}
+                  type="number"
+                />
               )}
               {(isEdit ? category.type === "Income" : values.type === "Income") && (
-                <InputBox name="goal" label="Goal" type="number" />
+                <InputBox
+                  name="goal"
+                  label={`Goal (${currency})`}
+                  type="number"
+                />
               )}
               <div className="flex justify-end space-x-2">
                 <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  bgColor="bg-transparent border border-border"
-                  hoverColor="hover:bg-sidebar-hover"
+                  bgColor="bg-muted border border-border dark:border-white/20"
+                  hoverColor="hover:bg-muted/80"
                   className="text-foreground"
                 >
                   Cancel

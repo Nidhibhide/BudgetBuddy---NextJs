@@ -124,9 +124,11 @@ export const InputBox: React.FC<InputBoxProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-1 relative">
-      <Label htmlFor={name} className="text-base text-foreground">
-        {label}
-      </Label>
+      {label ? (
+        <Label htmlFor={name} className="text-base text-foreground">
+          {label}
+        </Label>
+      ) : null}
       <div className="relative">
         <Input
           value={inputValue}
@@ -135,7 +137,7 @@ export const InputBox: React.FC<InputBoxProps> = ({
           placeholder={placeholder || label}
           onChange={handleChange}
           className={cn(
-            "h-11 bg-card border-border placeholder:text-base text-base text-foreground dark:bg-card",
+            "h-11 bg-card border-border placeholder:text-base text-base text-foreground",
             type === "password" && "pr-10",
             inputClassName
           )}

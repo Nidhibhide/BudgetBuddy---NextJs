@@ -81,7 +81,7 @@ const ChangePassword: React.FC = () => {
       onSubmit={handlePasswordSubmit}
     >
       {({ handleSubmit }) => (
-        <div className="w-full max-w-[600px] mx-auto bg-background p-6 rounded-lg shadow-sm border">
+        <div className="w-full max-w-[600px] mx-auto bg-card p-6 rounded-lg shadow-sm border border-border">
           <h2 className="text-2xl font-bold mb-6 text-foreground flex items-center gap-2">
             <Lock className="w-6 h-6 text-foreground" />
             Change Password

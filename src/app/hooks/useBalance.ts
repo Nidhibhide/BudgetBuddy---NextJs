@@ -3,7 +3,7 @@ import { getBalance } from "@/app/lib/dashboard";
 
 export const useBalance = () => {
   const [balance, setBalance] = useState<number>(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBalance = useCallback(async () => {

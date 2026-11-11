@@ -23,6 +23,6 @@ export async function DELETE(request: Request) {
     upcomingBill.isDeleted = true;
     await upcomingBill.save();
 
-    return JsonOne(200, "Success", true);
+    return JsonOne(200, "Upcoming bill deleted", true);
   });
 }

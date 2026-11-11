@@ -207,8 +207,8 @@ const Transaction: React.FC<AddTransactionProps> = ({
                 <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  bgColor="bg-transparent border border-border"
-                  hoverColor="hover:bg-sidebar-hover"
+                  bgColor="bg-muted border border-border dark:border-white/20"
+                  hoverColor="hover:bg-muted/80"
                   className="text-foreground"
                 >
                   Cancel
