@@ -64,13 +64,13 @@ const Sidebar = ({
 
   return (
     <div className="w-full h-full flex flex-col bg-shell text-shell-foreground border-r border-white/10 overflow-x-hidden">
-      <div className="flex items-center py-5 px-4 mb-2 border-b border-white/10">
+      <div className="flex items-center py-5 px-4 mb-2 border-b border-white/10 gap-2">
         <div className="flex-1 flex items-center gap-2 min-w-0">
           <MdAccountBalance
             size={28}
             className="text-shell-foreground shrink-0"
           />
-          <h2 className="text-xl font-bold truncate text-shell-foreground">
+          <h2 className="text-xl font-bold text-shell-foreground whitespace-nowrap">
             BudgetBuddy
           </h2>
         </div>

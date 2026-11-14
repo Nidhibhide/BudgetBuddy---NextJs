@@ -29,6 +29,7 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   options,
   onChange,
   value,
+  placeholder,
   className,
   icon,
 }) => {
@@ -46,7 +47,11 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
   }, []);
 
   const selectValue = value !== undefined ? value : field?.value || "";
-  const triggerClassName = `h-11 bg-card text-foreground border-border cursor-pointer flex items-center gap-2 ${className || ""}`;
+  const triggerClassName = cn(
+    "h-11 bg-card text-base text-foreground border-border cursor-pointer flex items-center gap-2",
+    className
+  );
+  const placeholderText = placeholder || label || "";
 
   const handleValueChange = (selectedValue: string) => {
     if (field) {
@@ -57,24 +62,29 @@ export const SelectBox: React.FC<SelectBoxProps> = ({
 
   return (
     <div className="w-full flex flex-col gap-1 relative">
-      {label && (
+      {label ? (
         <Label htmlFor={name} className="text-base text-foreground">
           {label}
         </Label>
-      )}
+      ) : null}
       {!mounted ? (
         <div
-          className={`rounded-md border px-3 py-2 text-sm shadow-sm ${triggerClassName}`}
+          className={cn(
+            "rounded-md border px-3 py-2 text-base shadow-sm",
+            triggerClassName
+          )}
           aria-hidden="true"
         >
           {icon}
-          <span className="text-muted-foreground">{selectValue || label || ""}</span>
+          <span className="text-muted-foreground">
+            {selectValue || placeholderText}
+          </span>
         </div>
       ) : (
         <Select value={selectValue} onValueChange={handleValueChange}>
           <SelectTrigger className={triggerClassName}>
             {icon}
-            <SelectValue placeholder={label} />
+            <SelectValue placeholder={placeholderText} />
           </SelectTrigger>
           <SelectContent className="bg-card text-foreground border-border">
             {options.map((option: string) => (
@@ -221,11 +231,28 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-export const Tooltip: React.FC<TooltipProps> = ({ label, children }) => {
+export const Tooltip: React.FC<TooltipProps> = ({
+  label,
+  children,
+  variant = "default",
+  side = "bottom",
+}) => {
+  const isWarning = variant === "warning";
+  const positionClass =
+    side === "top"
+      ? "bottom-full mb-2"
+      : "top-full mt-2";
   return (
-    <div className="relative group inline-block cursor-pointer">
+    <div className="relative group inline-flex max-w-full">
       {children}
-      <span className="absolute hidden group-hover:block top-full mt-3 left-1/2 -translate-x-1/2 bg-foreground text-background text-sm rounded px-2 py-1 whitespace-nowrap z-50 pointer-events-none">
+      <span
+        role="tooltip"
+        className={`absolute hidden group-hover:block ${positionClass} left-1/2 -translate-x-1/2 text-xs sm:text-sm font-medium rounded-md px-2.5 py-1.5 whitespace-nowrap z-50 pointer-events-none shadow-sm ${
+          isWarning
+            ? "bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950 dark:text-amber-100 dark:border-amber-700"
+            : "bg-foreground text-background"
+        }`}
+      >
         {label}
       </span>
     </div>

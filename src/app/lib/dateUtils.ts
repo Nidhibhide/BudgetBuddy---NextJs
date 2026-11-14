@@ -12,6 +12,32 @@ export const parseLocalDate = (value: string | Date): Date => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
+/** Format a Date as YYYY-MM-DD for date inputs. */
+export const toDateInputValue = (value: string | Date): string => {
+  const date = parseLocalDate(value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+/** Subtract whole days from a calendar date. */
+export const subtractDays = (value: string | Date, days: number): Date => {
+  const date = parseLocalDate(value);
+  date.setDate(date.getDate() - days);
+  return date;
+};
+
+/** Whole calendar days from start to end (end - start). */
+export const daysBetween = (
+  start: string | Date,
+  end: string | Date
+): number => {
+  const startMs = parseLocalDate(start).getTime();
+  const endMs = parseLocalDate(end).getTime();
+  return Math.round((endMs - startMs) / (1000 * 60 * 60 * 24));
+};
+
 /** True when the calendar day is today or in the future. */
 export const isDateNotPast = (value: Date): boolean => {
   const day = parseLocalDate(value);

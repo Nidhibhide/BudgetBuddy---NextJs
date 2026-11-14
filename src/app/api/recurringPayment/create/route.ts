@@ -1,8 +1,13 @@
 import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import RecurringPayment from "@/app/backend/models/recurringPayment";
+import User from "@/app/backend/models/user";
 import { CreateRecurringPayment } from "@/app/backend/validations/recurringPayment";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { parseLocalDate } from "@/app/lib/dateUtils";
+import {
+  convertToINR,
+  convertFromINR,
+} from "@/app/backend/utils/currencyConverter";
 
 export async function POST(request: Request) {
   return await withAuthAndDB(async (_session, userId) => {
@@ -32,10 +37,17 @@ export async function POST(request: Request) {
       );
     }
 
+    const user = await User.findById(userId);
+    if (!user) {
+      return JsonOne(404, "User not found", false);
+    }
+
+    const amountInINR = await convertToINR(amount, user.currency || "INR");
+
     const newRecurringPayment = new RecurringPayment({
       title,
       description: description || "",
-      amount,
+      amount: amountInINR,
       nextDueDate: parsedNextDueDate,
       reminderDate: parsedReminderDate,
       frequency,
@@ -46,7 +58,13 @@ export async function POST(request: Request) {
     await newRecurringPayment.save();
 
     return JsonOne(201, "Recurring payment added", true, {
-      recurringPayment: newRecurringPayment,
+      recurringPayment: {
+        ...newRecurringPayment.toObject(),
+        amount: await convertFromINR(
+          newRecurringPayment.amount,
+          user.currency || "INR"
+        ),
+      },
     });
   });
 }

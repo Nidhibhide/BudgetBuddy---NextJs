@@ -8,6 +8,11 @@ export const useUpcomingBills = ({
   limit = 10,
   sortBy = "dueDate",
   sortOrder = "asc",
+  search,
+  dateFrom,
+  dateTo,
+  minAmount,
+  maxAmount,
 }: UseUpcomingBillsProps) => {
   const [upcomingBills, setUpcomingBills] = useState<UpcomingBill[]>([]);
   const [loading, setLoading] = useState(false);
@@ -16,6 +21,7 @@ export const useUpcomingBills = ({
     currentPage: 1,
     totalPages: 1,
     totalUpcomingBills: 0,
+    totalUnpaidAmount: 0,
     limit: 10,
   });
 
@@ -28,7 +34,12 @@ export const useUpcomingBills = ({
         page,
         limit,
         sortBy,
-        sortOrder
+        sortOrder,
+        search,
+        dateFrom,
+        dateTo,
+        minAmount,
+        maxAmount
       );
       if (response.success) {
         setUpcomingBills(response.data || []);
@@ -38,12 +49,25 @@ export const useUpcomingBills = ({
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An error occurred. Please try again."
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [status, page, limit, sortBy, sortOrder]);
+  }, [
+    status,
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    search,
+    dateFrom,
+    dateTo,
+    minAmount,
+    maxAmount,
+  ]);
 
   useEffect(() => {
     fetchUpcomingBills();

@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { getRecurringPayments } from "@/app/lib/recurringPayment";
-import type { RecurringPayment, UseUpcomingBillsProps } from "@/app/types/appTypes";
+import type {
+  RecurringPayment,
+  UseUpcomingBillsProps,
+} from "@/app/types/appTypes";
 
 export const useRecurringPayments = ({
   status = "All",
@@ -8,8 +11,15 @@ export const useRecurringPayments = ({
   limit = 10,
   sortBy = "nextDueDate",
   sortOrder = "asc",
+  search,
+  dateFrom,
+  dateTo,
+  minAmount,
+  maxAmount,
 }: UseUpcomingBillsProps) => {
-  const [recurringPayments, setRecurringPayments] = useState<RecurringPayment[]>([]);
+  const [recurringPayments, setRecurringPayments] = useState<
+    RecurringPayment[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
@@ -28,7 +38,12 @@ export const useRecurringPayments = ({
         page,
         limit,
         sortBy,
-        sortOrder
+        sortOrder,
+        search,
+        dateFrom,
+        dateTo,
+        minAmount,
+        maxAmount
       );
       if (response.success) {
         setRecurringPayments(response.data || []);
@@ -38,12 +53,25 @@ export const useRecurringPayments = ({
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An error occurred. Please try again."
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again."
       );
     } finally {
       setLoading(false);
     }
-  }, [status, page, limit, sortBy, sortOrder]);
+  }, [
+    status,
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    search,
+    dateFrom,
+    dateTo,
+    minAmount,
+    maxAmount,
+  ]);
 
   useEffect(() => {
     fetchRecurringPayments();

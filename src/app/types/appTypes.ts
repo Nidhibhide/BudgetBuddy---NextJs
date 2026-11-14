@@ -88,6 +88,8 @@ export interface ButtonProps {
 export interface TooltipProps {
   label: string;
   children: React.ReactNode;
+  variant?: "default" | "warning";
+  side?: "top" | "bottom";
 }
 
 export interface GetStartedLinkProps {
@@ -261,6 +263,10 @@ export interface UpcomingBill {
   dueDate: string;
   reminderDate: string;
   status: string;
+  razorpayOrderId?: string | null;
+  razorpayPaymentId?: string | null;
+  paymentStatus?: "none" | "pending" | "paid" | "failed";
+  expenseTransactionId?: string | null;
   _id?: string;
   user?: string;
   isDeleted?: boolean;
@@ -283,6 +289,11 @@ export interface UseUpcomingBillsProps {
   limit?: number;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  minAmount?: string;
+  maxAmount?: string;
 }
 
 export interface RecurringPayment {

@@ -46,6 +46,28 @@ const upcomingBillSchema = new mongoose.Schema(
       enum: ["Paid", "Unpaid"],
       default: "Unpaid",
     },
+    reminderEmailSent: {
+      type: Boolean,
+      default: false,
+    },
+    razorpayOrderId: {
+      type: String,
+      default: null,
+    },
+    razorpayPaymentId: {
+      type: String,
+      default: null,
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["none", "pending", "paid", "failed"],
+      default: "none",
+    },
+    expenseTransactionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Transaction",
+      default: null,
+    },
     isDeleted: { type: Boolean, default: false },
     user: {
       type: mongoose.Schema.Types.ObjectId,

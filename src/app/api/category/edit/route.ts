@@ -1,14 +1,17 @@
 import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import Category from "@/app/backend/models/category";
+import User from "@/app/backend/models/user";
 import { EditCategory } from "@/app/backend/validations/category";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
+import {
+  convertToINR,
+  convertFromINR,
+} from "@/app/backend/utils/currencyConverter";
 
 export async function PUT(request: Request) {
-  return await withAuthAndDB(async (session, userId) => {
+  return await withAuthAndDB(async (_session, userId) => {
     const url = new URL(request.url);
     const categoryId = url.searchParams.get("id");
-
-
 
     const body = await request.json();
     const { error } = EditCategory().validate(body);
@@ -18,7 +21,11 @@ export async function PUT(request: Request) {
 
     const { name, budgetLimit, goal, type } = body;
 
-    // Check if category exists and belongs to user
+    const user = await User.findById(userId);
+    if (!user) {
+      return JsonOne(404, "User not found", false);
+    }
+
     const existingCategory = await Category.findOne({
       _id: categoryId,
       user: userId,
@@ -29,7 +36,6 @@ export async function PUT(request: Request) {
       return JsonOne(404, "Category not found", false);
     }
 
-    // Check if new name already exists for this user and type
     const duplicateCategory = await Category.findOne({
       name,
       type: type || existingCategory.type,
@@ -42,20 +48,48 @@ export async function PUT(request: Request) {
       return JsonOne(400, "Category name already exists", false);
     }
 
+    const categoryType = type || existingCategory.type;
     existingCategory.name = name;
     if (type) {
       existingCategory.type = type;
     }
+
     if (budgetLimit !== undefined) {
-      existingCategory.budgetLimit = type === 'Expense' || (!type && existingCategory.type === 'Expense') ? budgetLimit : 0;
+      if (categoryType === "Expense") {
+        existingCategory.budgetLimit = await convertToINR(
+          budgetLimit,
+          user.currency || "INR"
+        );
+      } else {
+        existingCategory.budgetLimit = 0;
+      }
     }
+
     if (goal !== undefined) {
-      existingCategory.goal = type === 'Income' || (!type && existingCategory.type === 'Income') ? goal : 0;
+      if (categoryType === "Income") {
+        existingCategory.goal = await convertToINR(
+          goal,
+          user.currency || "INR"
+        );
+      } else {
+        existingCategory.goal = 0;
+      }
     }
+
     await existingCategory.save();
 
     return JsonOne(200, "Category updated", true, {
-      category: existingCategory
+      category: {
+        ...existingCategory.toObject(),
+        budgetLimit: await convertFromINR(
+          existingCategory.budgetLimit || 0,
+          user.currency || "INR"
+        ),
+        goal: await convertFromINR(
+          existingCategory.goal || 0,
+          user.currency || "INR"
+        ),
+      },
     });
   });
 }

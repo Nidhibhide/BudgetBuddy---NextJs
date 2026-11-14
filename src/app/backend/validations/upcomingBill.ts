@@ -12,7 +12,7 @@ export const CreateUpcomingBill = () =>
     title: stringValidator("Title", 1, 100, true),
     description: stringValidator("Description", 0, 200, false).allow(""),
     amount: numberValidator("Amount", 1, 1000000, true),
-    status: selectValidator("Status", ["Paid", "Unpaid"], true),
+    status: selectValidator("Status", ["Paid", "Unpaid"], false),
   });
 
 export const UpdateUpcomingBill = () =>

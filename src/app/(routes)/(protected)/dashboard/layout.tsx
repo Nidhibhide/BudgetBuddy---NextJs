@@ -6,7 +6,7 @@ import Sidebar from "@/app/pages/dashboard/components/Sidebar";
 import { IoMenu } from "react-icons/io5";
 import { signOut } from "next-auth/react";
 import { Confirmation } from "@/app/features/dialogs";
-import { ThemeToggle } from "@/app/features/common";
+import { ThemeToggle, ReminderBell } from "@/app/features/common";
 
 const pageTitles: Record<string, string> = {
   "/dashboard/home": "Dashboard",
@@ -54,7 +54,10 @@ export default function DashboardLayout({
             {pageTitle}
           </span>
         </div>
-        <ThemeToggle size="icon" />
+        <div className="flex items-center gap-1">
+          <ReminderBell light />
+          <ThemeToggle size="icon" />
+        </div>
       </div>
 
       <div className="hidden lg:block fixed top-0 left-0 z-10 h-screen w-64">
@@ -77,8 +80,11 @@ export default function DashboardLayout({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto overflow-x-hidden lg:ml-64">
-        {children}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden lg:ml-64 flex flex-col min-w-0">
+        <div className="hidden lg:flex items-center justify-end gap-1 px-4 sm:px-6 py-3 sticky top-0 z-10 bg-background/90 backdrop-blur border-b border-border">
+          <ReminderBell />
+        </div>
+        <div className="flex-1 min-w-0">{children}</div>
       </div>
 
       <Confirmation

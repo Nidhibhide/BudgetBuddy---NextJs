@@ -1,8 +1,13 @@
 import { withAuthAndDB } from "@/app/backend/utils/ApiHandler";
 import RecurringPayment from "@/app/backend/models/recurringPayment";
+import User from "@/app/backend/models/user";
 import { UpdateRecurringPayment } from "@/app/backend/validations/recurringPayment";
 import { JsonOne } from "@/app/backend/utils/ApiResponse";
 import { parseLocalDate } from "@/app/lib/dateUtils";
+import {
+  convertToINR,
+  convertFromINR,
+} from "@/app/backend/utils/currencyConverter";
 
 export async function PUT(request: Request) {
   return await withAuthAndDB(async (_session, userId) => {
@@ -35,6 +40,11 @@ export async function PUT(request: Request) {
       );
     }
 
+    const user = await User.findById(userId);
+    if (!user) {
+      return JsonOne(404, "User not found", false);
+    }
+
     const existingRecurringPayment = await RecurringPayment.findOne({
       _id: recurringPaymentId,
       user: userId,
@@ -45,22 +55,35 @@ export async function PUT(request: Request) {
       return JsonOne(404, "Recurring payment not found", false);
     }
 
+    const reminderChanged =
+      existingRecurringPayment.reminderDate.getTime() !==
+      parsedReminderDate.getTime();
+
+    const amountInINR = await convertToINR(amount, user.currency || "INR");
+
     const updatedRecurringPayment = await RecurringPayment.findByIdAndUpdate(
       recurringPaymentId,
       {
         title,
         description: description || "",
-        amount,
+        amount: amountInINR,
         nextDueDate: parsedNextDueDate,
         reminderDate: parsedReminderDate,
         frequency,
         status,
+        ...(reminderChanged ? { reminderEmailSent: false } : {}),
       },
       { new: true, runValidators: true }
     );
 
     return JsonOne(200, "Recurring payment updated", true, {
-      recurringPayment: updatedRecurringPayment,
+      recurringPayment: {
+        ...updatedRecurringPayment!.toObject(),
+        amount: await convertFromINR(
+          updatedRecurringPayment!.amount,
+          user.currency || "INR"
+        ),
+      },
     });
   });
 }

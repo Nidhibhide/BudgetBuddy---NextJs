@@ -37,4 +37,50 @@ This link will expire in 5 minutes. If you didn't request this, you can ignore i
   };
 };
 
-export { transporterFun, mailOptionsForResetPass };
+type ReminderEmailPayload = {
+  email: string;
+  name?: string;
+  title: string;
+  amount: number;
+  dueDate: string;
+  type: "bill" | "payment";
+};
+
+const mailOptionsForReminder = ({
+  email,
+  name,
+  title,
+  amount,
+  dueDate,
+  type,
+}: ReminderEmailPayload) => {
+  const label = type === "bill" ? "upcoming bill" : "recurring payment";
+
+  return {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: `Reminder: ${title} is due soon - BudgetBuddy`,
+    text: `Hi ${name || "there"},
+
+This is a reminder for your ${label}: ${title}.
+Amount: ${amount}
+Due date: ${dueDate}
+
+Open BudgetBuddy to review your alerts.`,
+    html: `
+    <div style="font-family: Arial, sans-serif;">
+      <p><strong>BudgetBuddy Payment Reminder</strong></p>
+      <p>Hi ${name || "there"},</p>
+      <p>This is a reminder for your <strong>${label}</strong>:</p>
+      <ul>
+        <li><strong>Title:</strong> ${title}</li>
+        <li><strong>Amount:</strong> ${amount}</li>
+        <li><strong>Due date:</strong> ${dueDate}</li>
+      </ul>
+      <p>Please pay on time to avoid late fees.</p>
+    </div>
+  `,
+  };
+};
+
+export { transporterFun, mailOptionsForResetPass, mailOptionsForReminder };

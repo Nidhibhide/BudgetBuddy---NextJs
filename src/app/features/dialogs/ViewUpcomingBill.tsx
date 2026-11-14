@@ -39,13 +39,6 @@ const ViewUpcomingBill: React.FC<ViewUpcomingBillProps> = ({
             label="Amount"
             value={`${bill.amount} ${currency}`}
           />
-          <FieldDisplay
-            label="Status"
-            value={bill.status}
-            valueClassName={
-              bill.status === "Paid" ? "text-success" : "text-destructive"
-            }
-          />
         </div>
       </DialogContent>
     </Dialog>

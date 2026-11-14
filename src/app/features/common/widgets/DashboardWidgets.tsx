@@ -2,19 +2,14 @@
 import React from "react";
 import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
-import { Lightbulb, X } from "lucide-react";
+import { Lightbulb, X, Loader2 } from "lucide-react";
 import { TotalBalanceProps } from "@/app/types/appTypes";
 import { useTransactions } from "@/app/hooks/useTransactions";
 import { useInsights } from "@/app/hooks/useInsights";
 
-const ListPlaceholder = () => (
-  <div className="space-y-2.5">
-    {[0, 1, 2].map((item) => (
-      <div
-        key={item}
-        className="h-12 rounded-lg border border-border dark:border-white/20 bg-card"
-      />
-    ))}
+const ListLoader = () => (
+  <div className="flex items-center justify-center py-10">
+    <Loader2 className="w-7 h-7 animate-spin text-btn-background" />
   </div>
 );
 
@@ -29,7 +24,7 @@ export const Insights: React.FC = () => {
       </div>
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <ListPlaceholder />
+          <ListLoader />
         ) : (
           <div className="space-y-2.5">
             {insights.map((insight, index) => (
@@ -63,7 +58,7 @@ export const RecentTransactions: React.FC = () => {
       <h3 className="text-lg font-semibold mb-3">Recent Transactions</h3>
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <ListPlaceholder />
+          <ListLoader />
         ) : transactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-2">
             <X className="w-12 h-12 text-foreground/60" />
@@ -118,9 +113,13 @@ export const TotalBalance: React.FC<TotalBalanceProps> = ({
           <h3 className="text-lg font-semibold mb-2 text-muted-foreground">
             Total Balance
           </h3>
-          <p className="text-3xl font-bold text-foreground">
-            {loading ? "—" : `${balance.toLocaleString()} ${currency}`}
-          </p>
+          {loading ? (
+            <Loader2 className="w-7 h-7 animate-spin text-btn-background" />
+          ) : (
+            <p className="text-3xl font-bold text-foreground">
+              {balance.toLocaleString()} {currency}
+            </p>
+          )}
         </div>
         <div className="text-4xl opacity-80">💰</div>
       </div>

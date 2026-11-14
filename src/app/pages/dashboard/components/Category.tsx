@@ -13,11 +13,20 @@ import {
   AlertTriangle,
   Tags,
   Receipt,
+  Search,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
-import { CustomPagination, Table } from "@/app/features/common";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import {
+  CustomPagination,
+  Table,
+  Tooltip,
+  InputBox,
+} from "@/app/features/common";
 import { DeleteCategory, Category as CategoryForm } from "@/app/features/forms";
 import { getTransactions } from "@/app/lib/transaction";
-import { useCategories, useTransactions } from "@/app/hooks/index";
+import { useCategories, useTransactions, useDebounce } from "@/app/hooks/index";
 import type { Category } from "@/app/types/appTypes";
 
 const CATEGORY_COLORS = [
@@ -75,6 +84,92 @@ const Category: React.FC = React.memo(() => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [sortBy, setSortBy] = useState<string>("date");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [filters, setFilters] = useState({
+    dateFrom: "",
+    dateTo: "",
+    minAmount: "",
+    maxAmount: "",
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
+  const [datePreset, setDatePreset] = useState<
+    "today" | "week" | "month" | "custom" | null
+  >(null);
+
+  const toInputDate = useCallback((d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }, []);
+
+  const applyDatePreset = useCallback(
+    (preset: "today" | "week" | "month" | "custom") => {
+      if (preset === "custom") {
+        if (datePreset === "custom") {
+          setDatePreset(null);
+          setFilters((prev) => ({ ...prev, dateFrom: "", dateTo: "" }));
+        } else {
+          setDatePreset("custom");
+        }
+        return;
+      }
+
+      if (datePreset === preset) {
+        setDatePreset(null);
+        setFilters((prev) => ({ ...prev, dateFrom: "", dateTo: "" }));
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let from = new Date(today);
+
+      if (preset === "week") {
+        const day = today.getDay();
+        const diff = day === 0 ? 6 : day - 1;
+        from.setDate(today.getDate() - diff);
+      } else if (preset === "month") {
+        from = new Date(today.getFullYear(), today.getMonth(), 1);
+      }
+
+      setDatePreset(preset);
+      setFilters((prev) => ({
+        ...prev,
+        dateFrom: toInputDate(from),
+        dateTo: toInputDate(today),
+      }));
+    },
+    [datePreset, toInputDate]
+  );
+
+  const validateFilters = useCallback((newFilters: typeof filters) => {
+    const newErrors: { [key: string]: string } = {};
+    if (
+      newFilters.dateFrom &&
+      newFilters.dateTo &&
+      new Date(newFilters.dateFrom) > new Date(newFilters.dateTo)
+    ) {
+      newErrors.dateTo = "To date must be after from date";
+    }
+    if (
+      newFilters.minAmount &&
+      newFilters.maxAmount &&
+      parseFloat(newFilters.minAmount) > parseFloat(newFilters.maxAmount)
+    ) {
+      newErrors.maxAmount = "Max amount must be greater than min amount";
+    }
+    if (newFilters.minAmount && parseFloat(newFilters.minAmount) < 0) {
+      newErrors.minAmount = "Min amount must be positive";
+    }
+    if (newFilters.maxAmount && parseFloat(newFilters.maxAmount) < 0) {
+      newErrors.maxAmount = "Max amount must be positive";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, []);
 
   const currentType = isExpense ? "Expense" : "Income";
   const currency = session?.user?.currency || "INR";
@@ -97,7 +192,19 @@ const Category: React.FC = React.memo(() => {
     page: currentPage,
     sortBy,
     sortOrder,
+    search: debouncedSearch,
+    dateFrom: filters.dateFrom,
+    dateTo: filters.dateTo,
+    minAmount: filters.minAmount,
+    maxAmount: filters.maxAmount,
   });
+
+  const hasActiveFilters =
+    !!debouncedSearch ||
+    !!filters.dateFrom ||
+    !!filters.dateTo ||
+    !!filters.minAmount ||
+    !!filters.maxAmount;
 
   const getCategoryTotal = useCallback(
     (categoryName: string) => {
@@ -117,11 +224,13 @@ const Category: React.FC = React.memo(() => {
         percentage = Math.min((total / goal) * 100, 100);
       }
 
+      const limit = currentType === "Expense" ? budgetLimit : goal;
       return {
         total,
         percentage,
         budgetLimit,
         goal,
+        remaining: limit - total,
       };
     },
     [totals, currentType, data]
@@ -132,7 +241,19 @@ const Category: React.FC = React.memo(() => {
     setEditingCategory(null);
     setDeletingCategory(null);
     setCurrentPage(1);
+    setSearchQuery("");
+    setFilters({ dateFrom: "", dateTo: "", minAmount: "", maxAmount: "" });
+    setDatePreset(null);
+    setIsAdvancedOpen(false);
   }, [currentType]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSearchQuery("");
+    setFilters({ dateFrom: "", dateTo: "", minAmount: "", maxAmount: "" });
+    setDatePreset(null);
+    setIsAdvancedOpen(false);
+  }, [selectedCategory]);
 
   const handleSort = useCallback(
     (column: string) => {
@@ -144,6 +265,23 @@ const Category: React.FC = React.memo(() => {
     },
     [sortBy, sortOrder]
   );
+
+  useEffect(() => {
+    validateFilters(filters);
+  }, [filters, validateFilters]);
+
+  useEffect(() => {
+    if (Object.keys(errors).length === 0) {
+      setCurrentPage(1);
+    }
+  }, [
+    debouncedSearch,
+    filters.dateFrom,
+    filters.dateTo,
+    filters.minAmount,
+    filters.maxAmount,
+    errors,
+  ]);
 
   useEffect(() => {
     if (selectedCategory) {
@@ -238,7 +376,7 @@ const Category: React.FC = React.memo(() => {
             className="inline-flex items-center gap-2 rounded-xl bg-btn-background px-5 py-2.5 text-sm font-medium text-white hover:bg-btn-hover cursor-pointer shadow-sm"
           >
             <Plus className="w-4 h-4" />
-            Add Category
+            Category
           </button>
           <p className="text-xs text-muted-foreground flex items-center gap-1.5">
             <MousePointer className="w-3.5 h-3.5 text-btn-background" />
@@ -247,15 +385,65 @@ const Category: React.FC = React.memo(() => {
         </div>
       ) : (
         <div className="space-y-3">
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl">
-            {data.map((category: Category, index: number) => {
-              const { total, percentage, budgetLimit, goal } = getCategoryTotal(
-                category.name
+          {selectedCategory ? (
+            (() => {
+              const selectedIndex = data.findIndex(
+                (c) => c.name === selectedCategory
               );
-              const isSelected = selectedCategory === category.name;
+              const color =
+                CATEGORY_COLORS[
+                  (selectedIndex >= 0 ? selectedIndex : 0) %
+                    CATEGORY_COLORS.length
+                ];
+              const { total, budgetLimit, goal } =
+                getCategoryTotal(selectedCategory);
+              const limit =
+                currentType === "Expense" ? budgetLimit : goal;
+              const initial = selectedCategory.charAt(0).toUpperCase();
+
+              return (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${color.badge}`}
+                      aria-hidden
+                    >
+                      {initial}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-foreground truncate">
+                        {selectedCategory}
+                      </p>
+                      <p className="text-sm text-muted-foreground tabular-nums">
+                        {total.toLocaleString()} {currency}
+                        {limit > 0
+                          ? ` / ${limit.toLocaleString()} ${currency}`
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory(null)}
+                    className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-btn-background hover:bg-btn-background/10 cursor-pointer transition-colors"
+                  >
+                    Change
+                  </button>
+                </div>
+              );
+            })()
+          ) : (
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {data.map((category: Category, index: number) => {
+              const { total, percentage, budgetLimit, goal, remaining } =
+                getCategoryTotal(category.name);
               const hasLimit =
                 (currentType === "Expense" && budgetLimit > 0) ||
                 (currentType === "Income" && goal > 0);
+              const usedPct =
+                currentType === "Expense" && budgetLimit > 0
+                  ? (total / budgetLimit) * 100
+                  : 0;
               const initial = category.name.charAt(0).toUpperCase();
               const color =
                 CATEGORY_COLORS[index % CATEGORY_COLORS.length];
@@ -276,9 +464,7 @@ const Category: React.FC = React.memo(() => {
                         setCurrentPage(1);
                       }
                     }}
-                    className={`relative h-full text-left rounded-xl border border-border bg-card overflow-hidden pl-4 pr-3.5 py-4 transition-all duration-200 cursor-pointer ${
-                      isSelected ? color.selected : color.hover
-                    }`}
+                    className={`relative h-full text-left rounded-xl border border-border bg-card overflow-hidden pl-4 pr-3.5 py-4 transition-all duration-200 cursor-pointer ${color.hover}`}
                   >
                     <span
                       className={`absolute left-0 top-0 bottom-0 w-1.5 ${color.stripe}`}
@@ -305,6 +491,32 @@ const Category: React.FC = React.memo(() => {
                         </div>
                       </div>
                       <div className="flex items-center shrink-0 -mr-1">
+                        {currentType === "Expense" && usedPct >= 80 && (
+                          <Tooltip
+                            label={
+                              usedPct >= 100
+                                ? "Budget used up"
+                                : "Almost at budget"
+                            }
+                          >
+                            <span
+                              role="img"
+                              aria-label={
+                                usedPct >= 100
+                                  ? "Budget used up"
+                                  : "Almost at budget"
+                              }
+                              className={`p-1.5 inline-flex items-center justify-center ${
+                                usedPct >= 100
+                                  ? "text-destructive"
+                                  : "text-amber-600 dark:text-amber-400"
+                              }`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <AlertTriangle className="w-5 h-5" strokeWidth={2.5} />
+                            </span>
+                          </Tooltip>
+                        )}
                         <button
                           type="button"
                           title="Edit"
@@ -360,6 +572,17 @@ const Category: React.FC = React.memo(() => {
                             }}
                           />
                         </div>
+                        <p
+                          className={`text-sm tabular-nums ${
+                            remaining >= 0
+                              ? "text-muted-foreground"
+                              : "text-destructive font-medium"
+                          }`}
+                        >
+                          {remaining >= 0
+                            ? `Remaining ${remaining.toLocaleString()} ${currency}`
+                            : `Over by ${Math.abs(remaining).toLocaleString()} ${currency}`}
+                        </p>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -376,6 +599,7 @@ const Category: React.FC = React.memo(() => {
               );
             })}
           </ul>
+          )}
 
           {!selectedCategory && (
             <p className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
@@ -384,61 +608,219 @@ const Category: React.FC = React.memo(() => {
             </p>
           )}
 
-          {selectedCategory &&
-            (recordsLoading ? (
-              <div className="flex justify-center items-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
-              </div>
-            ) : transactions.length > 0 ? (
-              <>
-                <Table
-                  data={transactions}
-                  columns={[
-                    {
-                      key: "date",
-                      label: "Date",
-                      sortable: true,
-                      render: (value) =>
-                        value
-                          ? new Date(
-                              value as string | number | Date
-                            ).toLocaleDateString("en-GB")
-                          : "",
-                    },
-                    { key: "description", label: "Description" },
-                    {
-                      key: "amount",
-                      label: "Amount",
-                      sortable: true,
-                      render: (value) => `${value} ${currency}`,
-                    },
-                    { key: "type", label: "Type" },
-                  ]}
-                  title={`Records for ${selectedCategory}`}
-                  onSort={handleSort}
-                  sortBy={sortBy}
-                  sortOrder={sortOrder}
-                />
-                <div className="flex justify-end mt-4">
-                  <CustomPagination
-                    currentPage={pagination.currentPage}
-                    totalPages={pagination.totalPages}
-                    onPageChange={setCurrentPage}
-                    className="justify-end"
-                  />
+          {selectedCategory && (
+            <div className="space-y-3">
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="w-full sm:max-w-2xl flex flex-col gap-1.5">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 z-10 pointer-events-none" />
+                    <InputBox
+                      name="category-search"
+                      type="text"
+                      label=""
+                      placeholder="Search transactions..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      inputClassName="pl-9"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+                      className="text-sm font-medium text-btn-background hover:text-btn-hover cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      Advanced filters
+                      {isAdvancedOpen ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </>
-            ) : (
-              <div className="px-4 py-10 flex flex-col items-center text-center gap-2">
-                <Receipt className="w-8 h-8 text-btn-background" />
-                <p className="text-lg font-semibold text-foreground">
-                  No transactions yet
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Nothing recorded under {selectedCategory} so far.
-                </p>
               </div>
-            ))}
+
+              <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
+                <CollapsibleContent>
+                  <div className="rounded-xl border border-border dark:border-white/20 bg-card p-4 space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(
+                        [
+                          { key: "today", label: "Today" },
+                          { key: "week", label: "This Week" },
+                          { key: "month", label: "This Month" },
+                          { key: "custom", label: "Custom Date" },
+                        ] as const
+                      ).map(({ key, label }) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => applyDatePreset(key)}
+                          className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer border ${
+                            datePreset === key
+                              ? "bg-btn-background text-white border-btn-background"
+                              : "bg-background text-foreground border-border dark:border-white/20 hover:border-btn-background/50"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {datePreset === "custom" && (
+                        <>
+                          <div className="min-w-0 w-full">
+                            <InputBox
+                              name="category-from"
+                              type="date"
+                              label="From"
+                              value={filters.dateFrom}
+                              onChange={(e) => {
+                                setDatePreset("custom");
+                                setFilters((prev) => ({
+                                  ...prev,
+                                  dateFrom: e.target.value,
+                                }));
+                              }}
+                              inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                            />
+                            {errors.dateFrom && (
+                              <p className="text-destructive text-sm">
+                                {errors.dateFrom}
+                              </p>
+                            )}
+                          </div>
+                          <div className="min-w-0 w-full">
+                            <InputBox
+                              name="category-to"
+                              type="date"
+                              label="To"
+                              value={filters.dateTo}
+                              onChange={(e) => {
+                                setDatePreset("custom");
+                                setFilters((prev) => ({
+                                  ...prev,
+                                  dateTo: e.target.value,
+                                }));
+                              }}
+                              inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                            />
+                            {errors.dateTo && (
+                              <p className="text-destructive text-sm">
+                                {errors.dateTo}
+                              </p>
+                            )}
+                          </div>
+                        </>
+                      )}
+                      <div className="min-w-0 w-full">
+                        <InputBox
+                          name="category-min"
+                          type="number"
+                          label="Min Amount"
+                          placeholder="Enter min amount"
+                          value={filters.minAmount}
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              minAmount: e.target.value,
+                            }))
+                          }
+                          inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                        />
+                        {errors.minAmount && (
+                          <p className="text-destructive text-sm">
+                            {errors.minAmount}
+                          </p>
+                        )}
+                      </div>
+                      <div className="min-w-0 w-full">
+                        <InputBox
+                          name="category-max"
+                          type="number"
+                          label="Max Amount"
+                          placeholder="Enter max amount"
+                          value={filters.maxAmount}
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              maxAmount: e.target.value,
+                            }))
+                          }
+                          inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                        />
+                        {errors.maxAmount && (
+                          <p className="text-destructive text-sm">
+                            {errors.maxAmount}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {recordsLoading ? (
+                <div className="flex justify-center items-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
+                </div>
+              ) : transactions.length > 0 ? (
+                <>
+                  <Table
+                    data={transactions}
+                    columns={[
+                      {
+                        key: "date",
+                        label: "Date",
+                        sortable: true,
+                        render: (value) =>
+                          value
+                            ? new Date(
+                                value as string | number | Date
+                              ).toLocaleDateString("en-GB")
+                            : "",
+                      },
+                      { key: "description", label: "Description" },
+                      {
+                        key: "amount",
+                        label: "Amount",
+                        sortable: true,
+                        render: (value) => `${value} ${currency}`,
+                      },
+                      { key: "type", label: "Type" },
+                    ]}
+                    title={`Records for ${selectedCategory}`}
+                    onSort={handleSort}
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                  />
+                  <div className="flex justify-end mt-4">
+                    <CustomPagination
+                      currentPage={pagination.currentPage}
+                      totalPages={pagination.totalPages}
+                      onPageChange={setCurrentPage}
+                      className="justify-end"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="px-4 py-10 flex flex-col items-center text-center gap-2">
+                  <Receipt className="w-8 h-8 text-btn-background" />
+                  <p className="text-lg font-semibold text-foreground">
+                    {hasActiveFilters
+                      ? "No matching transactions"
+                      : "No transactions yet"}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {hasActiveFilters
+                      ? "Try changing search or filters."
+                      : `Nothing recorded under ${selectedCategory} so far.`}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 

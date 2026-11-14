@@ -1,15 +1,13 @@
 import Category from "@/app/backend/models/category";
 import Transaction from "@/app/backend/models/transaction";
-import { convertToINR } from "@/app/backend/utils/currencyConverter";
 import { LimitCheckResult } from "@/app/types/appTypes";
-
 
 export async function checkLimitForCreate(
   categoryId: string,
   userId: string,
   type: "Expense" | "Income",
   amountInINR: number,
-  userCurrency: string
+  _userCurrency: string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
@@ -17,11 +15,8 @@ export async function checkLimitForCreate(
       return { success: false, message: "Category not found" };
     }
 
+    // budgetLimit / goal are stored in INR (same as transactions)
     if (type === "Expense" && category.budgetLimit > 0) {
-      const budgetLimitInINR = await convertToINR(
-        category.budgetLimit,
-        userCurrency
-      );
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -34,14 +29,13 @@ export async function checkLimitForCreate(
           totalSpent += transaction.amount;
         }
       }
-      if (totalSpent + amountInINR > budgetLimitInINR) {
+      if (totalSpent + amountInINR > category.budgetLimit) {
         return {
           success: false,
           message: "Adding this expense would exceed the budget limit",
         };
       }
     } else if (type === "Income" && category.goal > 0) {
-      const goalInINR = await convertToINR(category.goal, userCurrency);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -54,7 +48,7 @@ export async function checkLimitForCreate(
           totalIncome += transaction.amount;
         }
       }
-      if (totalIncome + amountInINR > goalInINR) {
+      if (totalIncome + amountInINR > category.goal) {
         return {
           success: false,
           message: "Adding this income would exceed the goal",
@@ -80,7 +74,7 @@ export async function checkLimitForEdit(
   userId: string,
   type: "Expense" | "Income",
   balanceAdjustment: number,
-  userCurrency: string
+  _userCurrency: string
 ): Promise<LimitCheckResult> {
   try {
     const category = await Category.findById(categoryId);
@@ -88,15 +82,12 @@ export async function checkLimitForEdit(
       return { success: false, message: "Category not found" };
     }
 
+    // budgetLimit / goal are stored in INR (same as transactions)
     if (
       type === "Expense" &&
       category.budgetLimit > 0 &&
       balanceAdjustment > 0
     ) {
-      const budgetLimitInINR = await convertToINR(
-        category.budgetLimit,
-        userCurrency
-      );
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -109,7 +100,7 @@ export async function checkLimitForEdit(
           totalSpent += transaction.amount;
         }
       }
-      if (totalSpent + balanceAdjustment > budgetLimitInINR) {
+      if (totalSpent + balanceAdjustment > category.budgetLimit) {
         return {
           success: false,
           message: "Editing this expense would exceed the budget limit",
@@ -120,7 +111,6 @@ export async function checkLimitForEdit(
       category.goal > 0 &&
       balanceAdjustment > 0
     ) {
-      const goalInINR = await convertToINR(category.goal, userCurrency);
       const allTransactions = await Transaction.find({
         category: categoryId,
         user: userId,
@@ -133,7 +123,7 @@ export async function checkLimitForEdit(
           totalIncome += transaction.amount;
         }
       }
-      if (totalIncome + balanceAdjustment > goalInINR) {
+      if (totalIncome + balanceAdjustment > category.goal) {
         return {
           success: false,
           message: "Editing this income would exceed the goal",

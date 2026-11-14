@@ -24,29 +24,43 @@ const Confirmation: React.FC<ConfirmationProps> = ({
   confirmLabel = "Delete",
 }) => {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (loading && !nextOpen) return;
+        onOpenChange(nextOpen);
+      }}
+    >
       <AlertDialogContent className="bg-card text-foreground border-border">
         <AlertDialogHeader>
           <AlertDialogTitle>{title || "Confirm Action"}</AlertDialogTitle>
-          <AlertDialogDescription className="text-base font-medium text-muted-foreground">
-            {description ||
-              "Are you sure you want to proceed with this action?"}
+          <AlertDialogDescription asChild>
+            <div className="text-base font-medium text-muted-foreground">
+              {description ||
+                "Are you sure you want to proceed with this action?"}
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="bg-muted border border-border dark:border-white/20 text-foreground hover:bg-muted/80 cursor-pointer">
+          <AlertDialogCancel
+            disabled={loading}
+            className="bg-muted border border-border dark:border-white/20 text-foreground hover:bg-muted/80 cursor-pointer"
+          >
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={(e) => {
+              e.preventDefault();
+              if (!loading) onConfirm();
+            }}
             className="bg-btn-background text-white hover:bg-btn-hover cursor-pointer"
             disabled={loading}
           >
-            {loading ? (
+            {loading && (
               <Loader2 className="h-4 w-4 animate-spin text-white" />
-            ) : (
-              confirmLabel
             )}
+            {confirmLabel}
+
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

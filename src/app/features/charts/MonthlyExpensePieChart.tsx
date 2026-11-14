@@ -6,10 +6,12 @@ import { Card } from '@/components/ui/card';
 import { useSession } from 'next-auth/react';
 import { useTheme } from 'next-themes';
 import { MonthlyExpensePieChartProps } from '@/app/types/appTypes';
-import { X } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
 
 const ChartPlaceholder = () => (
-  <div className="h-full rounded-md border border-border bg-card" />
+  <div className="h-full flex items-center justify-center">
+    <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
+  </div>
 );
 
 const MonthlyExpensePieChart: React.FC<MonthlyExpensePieChartProps> = ({

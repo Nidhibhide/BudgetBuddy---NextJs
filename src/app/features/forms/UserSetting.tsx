@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { InputBox, Button, useToast, useHandleResponse, SelectBox } from "@/app/features/common/index";
+import { InputBox, Button, useToast, SelectBox } from "@/app/features/common/index";
 import { updateProfile } from "@/app/lib/auth";
 import { User as UserIcon } from "lucide-react";
 import { User } from "@/app/types/appTypes";
@@ -11,8 +11,7 @@ import { CURRENCIES } from "@/constants";
 
 const UserSetting: React.FC = () => {
   const [profileLoading, setProfileLoading] = useState<boolean>(false);
-  const { showError } = useToast();
-  const Response = useHandleResponse();
+  const { showSuccess, showError } = useToast();
   const { data: session, update } = useSession();
 
   const profileValidationSchema = Yup.object().shape({
@@ -52,8 +51,16 @@ const UserSetting: React.FC = () => {
         email: values.email,
         currency: values.currency!,
       });
-      Response({ response, successMessage: "Success" });
-      await update({ name: values.name, email: values.email, currency: values.currency });
+      if (response.success) {
+        showSuccess(response.message || "Profile updated successfully");
+        await update({
+          name: values.name,
+          email: values.email,
+          currency: values.currency,
+        });
+      } else {
+        showError(response.message || "Could not update profile");
+      }
     } catch (error: unknown) {
       const err = error as Error;
       showError(err.message || "An unexpected error occurred");

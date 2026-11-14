@@ -52,6 +52,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const isEdit = !!transaction?._id;
+  const isDuplicate = !!transaction && !transaction._id;
 
   const validationSchema = Yup.object().shape({
     date: Yup.date()
@@ -157,7 +158,11 @@ const Transaction: React.FC<AddTransactionProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-foreground">
-            {isEdit ? "Edit Form" : "Add Form"}
+            {isEdit
+              ? "Edit Form"
+              : isDuplicate
+                ? "Duplicate Form"
+                : "Add Form"}
           </DialogTitle>
         </DialogHeader>
         <Formik
@@ -217,6 +222,7 @@ const Transaction: React.FC<AddTransactionProps> = ({
                   type="submit"
                   loading={loading}
                   disabled={categories.length === 0 && !isEdit}
+                  text={isEdit ? "Updating..." : "Adding..."}
                 >
                   {isEdit ? "Update" : "Add"}
                 </Button>

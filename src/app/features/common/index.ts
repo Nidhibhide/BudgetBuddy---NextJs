@@ -16,4 +16,5 @@ export { Insights } from "./widgets/DashboardWidgets";
 export { default as UpcomingBill } from "./pages/UpcomingBill";
 export { default as RecurringPayment } from "./pages/RecurringPayment";
 export { ThemeProvider, default as ThemeToggle } from "./theme/Theme";
+export { default as ReminderBell } from "./widgets/ReminderBell";
 export { TransactionPDF } from "./helpers/PDFGenerator";

@@ -51,6 +51,18 @@ const recurringPaymentSchema = new mongoose.Schema(
       enum: ["Active", "Inactive"],
       default: "Active",
     },
+    reminderEmailSent: {
+      type: Boolean,
+      default: false,
+    },
+    razorpayOrderId: {
+      type: String,
+      default: null,
+    },
+    lastRazorpayPaymentId: {
+      type: String,
+      default: null,
+    },
     isDeleted: { type: Boolean, default: false },
     user: {
       type: mongoose.Schema.Types.ObjectId,

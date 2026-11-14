@@ -22,7 +22,7 @@ export const Table: React.FC<GenericTableProps> = ({
 }) => {
 
   return (
-    <div className="w-full mt-2 text-foreground">
+    <div className={`w-full text-foreground ${title ? "mt-2" : ""}`}>
       {title && (
         <h3 className="text-base font-semibold mb-3 text-foreground">{title}</h3>
       )}
@@ -81,7 +81,7 @@ export const Table: React.FC<GenericTableProps> = ({
         </TableHeader>
         <TableBody>
           {data.map((row, index) => (
-            <TableRow key={String(row[keyField] || index)} className="hover:bg-btn-background/10 transition-colors">
+            <TableRow key={String(row[keyField] || index)} className="hover:bg-sidebar-hover transition-colors">
               {columns.map((column) => (
                 <TableCell key={column.key}>
                   {column.render

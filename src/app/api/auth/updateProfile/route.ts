@@ -44,7 +44,7 @@ export async function PUT(request: Request) {
     // Update the session with new user data
     // Note: This is a server-side update, but the client will need to refresh the session
 
-    return JsonOne(200, "Success", true, {
+    return JsonOne(200, "Profile updated successfully", true, {
       name: updatedUser.name,
       email: updatedUser.email,
       currency: updatedUser.currency,

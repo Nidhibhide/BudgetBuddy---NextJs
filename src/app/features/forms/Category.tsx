@@ -124,7 +124,11 @@ const Category: React.FC<AddCategoryProps> = ({
                 >
                   Cancel
                 </Button>
-                <Button type="submit" loading={isLoading}>
+                <Button
+                  type="submit"
+                  loading={isLoading}
+                  text={isEdit ? "Updating..." : "Adding..."}
+                >
                   {isEdit ? "Update" : "Add"}
                 </Button>
               </div>

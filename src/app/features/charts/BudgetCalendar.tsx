@@ -2,15 +2,19 @@
 
 import * as React from "react";
 import { enGB } from "date-fns/locale";
+import { useSession } from "next-auth/react";
 import { Card } from "@/components/ui/card";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { useBudgetCalendar } from "@/app/hooks/useBudgetCalendar";
+import { Loader2 } from "lucide-react";
 
 const formatDayKey = (value: Date) => value.toLocaleDateString("en-CA");
 const formatDisplayDate = (value: string | Date) =>
   new Date(value).toLocaleDateString("en-GB");
 
 const BudgetCalendar: React.FC = () => {
+  const { data: session } = useSession();
+  const currency = session?.user?.currency || "INR";
   const [date, setDate] = React.useState<Date | undefined>(undefined);
   const [activeTip, setActiveTip] = React.useState<string | null>(null);
   const [mounted, setMounted] = React.useState(false);
@@ -53,7 +57,9 @@ const BudgetCalendar: React.FC = () => {
       <div className="flex-1">
         <div className="space-y-3">
           {!mounted || !date || calendarLoading ? (
-            <div className="h-56 rounded-md border border-border bg-card" />
+            <div className="h-56 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-btn-background" />
+            </div>
           ) : (
             <div className="[&_select]:bg-foreground [&_select]:text-background [&_select]:border-border">
               <Calendar
@@ -110,10 +116,12 @@ const BudgetCalendar: React.FC = () => {
             {detailData ? (
               <>
                 <p className="text-success">
-                  Income: {detailData.income.toLocaleString("en-GB")}
+                  Income: {detailData.income.toLocaleString("en-GB")}{" "}
+                  {currency}
                 </p>
                 <p className="text-destructive">
-                  Expense: {detailData.expense.toLocaleString("en-GB")}
+                  Expense: {detailData.expense.toLocaleString("en-GB")}{" "}
+                  {currency}
                 </p>
               </>
             ) : (

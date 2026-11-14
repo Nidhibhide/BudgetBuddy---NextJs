@@ -22,6 +22,10 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
   );
   const [loading, setLoading] = useState(false);
 
+  const otherCategories = categories.filter(
+    (cat) => cat._id !== category?._id && cat.name.trim() !== ""
+  );
+
   useEffect(() => {
     if (!open) {
       setReassignCategoryId("");
@@ -29,7 +33,8 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
     }
   }, [open]);
 
-  const selectedCategoryName = categories.find((cat) => cat._id === reassignCategoryId)?.name || "";
+  const selectedCategoryName =
+    categories.find((cat) => cat._id === reassignCategoryId)?.name || "";
 
   const handleConfirm = async () => {
     if (category && category._id) {
@@ -55,13 +60,15 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
     }
   };
 
+  const selectClassName = "h-9 text-sm";
+
   return (
     <Formik
       initialValues={{
         deleteAction:
           deleteAction === "delete"
             ? "Delete all transactions"
-            : "Reassign to category",
+            : "Move to another category",
         reassignCategoryId: selectedCategoryName,
       }}
       onSubmit={() => {}}
@@ -75,32 +82,31 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
         loading={loading}
         description={
           transactionCount > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p>
                 Are you sure you want to delete {category?.name}?
               </p>
               <p>
-                This category has {transactionCount} associated transaction(s).
+                This category has {transactionCount} linked transaction
+                {transactionCount === 1 ? "" : "s"}.
               </p>
-              <div>
-                <label className="text-sm font-medium">
-                  Choose an action
-                </label>
+              <div className="space-y-2.5">
                 <SelectBox
                   name="deleteAction"
-                  label=""
+                  label="Action"
+                  className={selectClassName}
                   options={
-                    categories.length > 1
+                    otherCategories.length > 0
                       ? [
                           "Delete all transactions",
-                          "Reassign to category",
+                          "Move to another category",
                         ]
                       : ["Delete all transactions"]
                   }
                   value={
                     deleteAction === "delete"
                       ? "Delete all transactions"
-                      : "Reassign to category"
+                      : "Move to another category"
                   }
                   onChange={(value) => {
                     const newAction =
@@ -110,19 +116,17 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
                     setDeleteAction(newAction);
                     if (newAction === "delete") {
                       setReassignCategoryId("");
+                    } else if (otherCategories[0]?._id) {
+                      setReassignCategoryId(otherCategories[0]._id);
                     }
                   }}
                 />
                 {deleteAction === "reassign" && (
                   <SelectBox
                     name="reassignCategoryId"
-                    label="Select category"
-                    options={categories
-                      .filter(
-                        (cat) =>
-                          cat._id !== category?._id && cat.name.trim() !== ""
-                      )
-                      .map((cat) => cat.name)}
+                    label="Move to"
+                    className={selectClassName}
+                    options={otherCategories.map((cat) => cat.name)}
                     value={selectedCategoryName}
                     onChange={(value) => {
                       const cat = categories.find((cat) => cat.name === value);
@@ -133,7 +137,7 @@ const DeleteCategory: React.FC<DeleteCategoryProps> = ({
               </div>
             </div>
           ) : (
-            `No associated transactions for "${category?.name}" (${category?.type}).`
+            `No linked transactions for "${category?.name}" (${category?.type}).`
           )
         }
       />

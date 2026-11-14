@@ -11,6 +11,7 @@ import {
   Plus,
   Edit,
   Trash2,
+  Copy,
   Loader2,
   Download,
   Search,
@@ -85,7 +86,56 @@ const Transaction: React.FC = React.memo(() => {
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isAdvancedOpen, setIsAdvancedOpen] = useState<boolean>(false);
+  const [datePreset, setDatePreset] = useState<
+    "today" | "week" | "month" | "custom" | null
+  >(null);
 
+  const toInputDate = useCallback((d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }, []);
+
+  const applyDatePreset = useCallback(
+    (preset: "today" | "week" | "month" | "custom") => {
+      if (preset === "custom") {
+        if (datePreset === "custom") {
+          setDatePreset(null);
+          setFilters((prev) => ({ ...prev, dateFrom: "", dateTo: "" }));
+        } else {
+          setDatePreset("custom");
+        }
+        return;
+      }
+
+      if (datePreset === preset) {
+        setDatePreset(null);
+        setFilters((prev) => ({ ...prev, dateFrom: "", dateTo: "" }));
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let from = new Date(today);
+
+      if (preset === "week") {
+        const day = today.getDay();
+        const diff = day === 0 ? 6 : day - 1;
+        from.setDate(today.getDate() - diff);
+      } else if (preset === "month") {
+        from = new Date(today.getFullYear(), today.getMonth(), 1);
+      }
+
+      setDatePreset(preset);
+      setFilters((prev) => ({
+        ...prev,
+        dateFrom: toInputDate(from),
+        dateTo: toInputDate(today),
+      }));
+    },
+    [datePreset, toInputDate]
+  );
 
   const currentType = isExpense ? "Expense" : "Income";
   const { categories } = useCategories(currentType);
@@ -154,6 +204,12 @@ const Transaction: React.FC = React.memo(() => {
 
   const handleEditClick = (transaction: TransactionType) => {
     setEditTransactionData(transaction);
+    setIsAddTransactionOpen(true);
+  };
+
+  const handleDuplicateClick = (transaction: TransactionType) => {
+    const { _id: _unused, ...rest } = transaction;
+    setEditTransactionData(rest as TransactionType);
     setIsAddTransactionOpen(true);
   };
 
@@ -311,80 +367,119 @@ const Transaction: React.FC = React.memo(() => {
 
         <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
           <CollapsibleContent>
-            <div className="rounded-xl border border-border dark:border-white/20 bg-card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="flex flex-col w-full">
-                <InputBox
-                  name="from"
-                  type="date"
-                  label="From"
-                  value={filters.dateFrom}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      dateFrom: e.target.value,
-                    }))
-                  }
-                  inputClassName="bg-card border-border dark:border-white/20"
-                />
-                {errors.dateFrom && (
-                  <p className="text-destructive text-sm">{errors.dateFrom}</p>
-                )}
+            <div className="rounded-xl border border-border dark:border-white/20 bg-card p-4 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                {(
+                  [
+                    { key: "today", label: "Today" },
+                    { key: "week", label: "This Week" },
+                    { key: "month", label: "This Month" },
+                    { key: "custom", label: "Custom Date" },
+                  ] as const
+                ).map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => applyDatePreset(key)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer border ${
+                      datePreset === key
+                        ? "bg-btn-background text-white border-btn-background"
+                        : "bg-background text-foreground border-border dark:border-white/20 hover:border-btn-background/50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
-              <div className="flex flex-col w-full">
-                <InputBox
-                  name="to"
-                  type="date"
-                  label="To"
-                  value={filters.dateTo}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      dateTo: e.target.value,
-                    }))
-                  }
-                  inputClassName="bg-card border-border dark:border-white/20"
-                />
-                {errors.dateTo && (
-                  <p className="text-destructive text-sm">{errors.dateTo}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {datePreset === "custom" && (
+                  <>
+                    <div className="min-w-0 w-full">
+                      <InputBox
+                        name="from"
+                        type="date"
+                        label="From"
+                        value={filters.dateFrom}
+                        onChange={(e) => {
+                          setDatePreset("custom");
+                          setFilters((prev) => ({
+                            ...prev,
+                            dateFrom: e.target.value,
+                          }));
+                        }}
+                        inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                      />
+                      {errors.dateFrom && (
+                        <p className="text-destructive text-sm">
+                          {errors.dateFrom}
+                        </p>
+                      )}
+                    </div>
+                    <div className="min-w-0 w-full">
+                      <InputBox
+                        name="to"
+                        type="date"
+                        label="To"
+                        value={filters.dateTo}
+                        onChange={(e) => {
+                          setDatePreset("custom");
+                          setFilters((prev) => ({
+                            ...prev,
+                            dateTo: e.target.value,
+                          }));
+                        }}
+                        inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                      />
+                      {errors.dateTo && (
+                        <p className="text-destructive text-sm">
+                          {errors.dateTo}
+                        </p>
+                      )}
+                    </div>
+                  </>
                 )}
-              </div>
-              <div className="flex flex-col w-full">
-                <InputBox
-                  name="min"
-                  type="number"
-                  label="Min Amount"
-                  placeholder="Enter min amount"
-                  value={filters.minAmount}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      minAmount: e.target.value,
-                    }))
-                  }
-                  inputClassName="bg-card border-border dark:border-white/20"
-                />
-                {errors.minAmount && (
-                  <p className="text-destructive text-sm">{errors.minAmount}</p>
-                )}
-              </div>
-              <div className="flex flex-col w-full">
-                <InputBox
-                  name="max"
-                  type="number"
-                  label="Max Amount"
-                  placeholder="Enter max amount"
-                  value={filters.maxAmount}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      maxAmount: e.target.value,
-                    }))
-                  }
-                  inputClassName="bg-card border-border dark:border-white/20"
-                />
-                {errors.maxAmount && (
-                  <p className="text-destructive text-sm">{errors.maxAmount}</p>
-                )}
+                <div className="min-w-0 w-full">
+                  <InputBox
+                    name="min"
+                    type="number"
+                    label="Min Amount"
+                    placeholder="Enter min amount"
+                    value={filters.minAmount}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        minAmount: e.target.value,
+                      }))
+                    }
+                    inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                  />
+                  {errors.minAmount && (
+                    <p className="text-destructive text-sm">
+                      {errors.minAmount}
+                    </p>
+                  )}
+                </div>
+                <div className="min-w-0 w-full">
+                  <InputBox
+                    name="max"
+                    type="number"
+                    label="Max Amount"
+                    placeholder="Enter max amount"
+                    value={filters.maxAmount}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        maxAmount: e.target.value,
+                      }))
+                    }
+                    inputClassName="w-full min-w-0 bg-card border-border dark:border-white/20"
+                  />
+                  {errors.maxAmount && (
+                    <p className="text-destructive text-sm">
+                      {errors.maxAmount}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </CollapsibleContent>
@@ -432,6 +527,17 @@ const Transaction: React.FC = React.memo(() => {
                       aria-label="Edit transaction"
                     >
                       <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDuplicateClick(row as TransactionType)
+                      }
+                      className="p-2 rounded-lg hover:bg-btn-background/10 text-foreground transition-colors cursor-pointer"
+                      title="Duplicate"
+                      aria-label="Duplicate transaction"
+                    >
+                      <Copy className="w-4 h-4" />
                     </button>
                     <button
                       type="button"
