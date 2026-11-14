@@ -68,7 +68,7 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({
         "Reminder would be in the past. Use fewer days.",
         function (days) {
           const { dueDate } = this.parent;
-          if (!dueDate || days === undefined || days === null || days === "") {
+          if (!dueDate || days === undefined || days === null) {
             return true;
           }
           const reminder = subtractDays(dueDate, Number(days));
@@ -128,7 +128,7 @@ const UpcomingBillForm: React.FC<AddUpcomingBillProps> = ({
             {isEdit ? "Edit Upcoming Bill" : "Add Upcoming Bill"}
           </DialogTitle>
         </DialogHeader>
-        <Formik
+        <Formik<UpcomingBillFormValues>
           enableReinitialize
           initialValues={{
             dueDate: bill?.dueDate

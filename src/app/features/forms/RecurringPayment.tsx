@@ -82,12 +82,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({
         "Reminder would be in the past. Use fewer days.",
         function (days) {
           const { nextDueDate } = this.parent;
-          if (
-            !nextDueDate ||
-            days === undefined ||
-            days === null ||
-            days === ""
-          ) {
+          if (!nextDueDate || days === undefined || days === null) {
             return true;
           }
           const reminder = subtractDays(nextDueDate, Number(days));
@@ -153,7 +148,7 @@ const RecurringPaymentForm: React.FC<AddRecurringPaymentProps> = ({
             {isEdit ? "Edit Recurring Payment" : "Add Recurring Payment"}
           </DialogTitle>
         </DialogHeader>
-        <Formik
+        <Formik<RecurringPaymentFormValues>
           enableReinitialize
           initialValues={{
             nextDueDate: payment?.nextDueDate
